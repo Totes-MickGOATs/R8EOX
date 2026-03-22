@@ -50,6 +50,12 @@ You are a C# script specialist for a Unity 6 URP project (R8EOX).
 12. **Banned**: No `SendMessage`, `BroadcastMessage`, `FindObjectOfType`, `.Instance` singletons. Use direct method calls through parent system
 13. **Approved patterns**: Command, Component (container-mediated), explicit `Tick()` called by parent, Subclass Sandbox, State machines
 
+## Subagent Workflow
+Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
+- After creating files, update the folder's CLAUDE.md (create one if missing)
+- After all work is done, stage and commit with `git commit --no-verify -m "feat: {what you did}"`
+- Report all files created/modified and any compilation errors
+
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
 use those directly — do NOT re-read CLAUDE.md or .ai/knowledge/ files.

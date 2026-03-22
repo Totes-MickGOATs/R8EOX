@@ -122,6 +122,12 @@ namespace R8EOX.Tests
 4. Check console for compilation
 5. Run tests with `run_tests`
 
+## Subagent Workflow
+Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
+- After creating test files, update the folder's CLAUDE.md (create one if missing)
+- After all work is done, stage and commit with `git commit --no-verify -m "test: {what you tested}"`
+- Report all test files created and test results
+
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
 use those directly — do NOT re-read CLAUDE.md or .ai/knowledge/ files.

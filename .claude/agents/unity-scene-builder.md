@@ -49,6 +49,12 @@ You work primarily through UnityMCP tools:
 5. Save the scene
 6. Check console for errors
 
+## Subagent Workflow
+Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
+- After creating scenes/GameObjects, update the folder's CLAUDE.md
+- After all work is done, stage and commit with `git commit --no-verify -m "feat: {what you did}"`
+- Report all files/scenes created or modified
+
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
 use those directly — do NOT re-read CLAUDE.md or .ai/knowledge/ files.

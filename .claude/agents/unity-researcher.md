@@ -48,6 +48,11 @@ When returning research results:
 Before making external API calls, check if the answer is already in `.ai/knowledge/`.
 Read `.ai/knowledge/README.md` for the index of available docs.
 
+## Subagent Workflow
+Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
+- Research agents are read-only — no commits needed
+- Report findings with verified sources
+
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
 use those directly — do NOT re-read CLAUDE.md or .ai/knowledge/ files.

@@ -15,6 +15,8 @@ Read this index first. Only load the specific document you need for your current
 | Using MCP tools | `tooling/agent-guide.md` |
 | Understanding lint rules | `tooling/linting-rules.md` |
 | Deciding where files go | `conventions/directory-conventions.md` |
+| Documenting folders | `conventions/folder-documentation.md` |
+| **Any subagent task** | **`tooling/subagent-workflow.md`** (always inject into agent prompts) |
 
 ## Document Freshness
 

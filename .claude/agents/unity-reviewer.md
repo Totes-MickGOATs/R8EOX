@@ -60,6 +60,12 @@ If the code looks clean, say so briefly.
 - **Banned patterns**: Singleton `.Instance`, `SendMessage`, `BroadcastMessage`, `FindObjectOfType`, peer-to-peer Observer events
 - **Approved alternatives**: Command pattern, container-mediated Component, explicit Tick(), Subclass Sandbox
 
+## Subagent Workflow
+Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
+- After reviewing, verify folder CLAUDE.md files are up to date
+- Flag missing or stale documentation in your review output
+- Report all files reviewed and issues found
+
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
 use those directly — do NOT re-read CLAUDE.md or .ai/knowledge/ files.
