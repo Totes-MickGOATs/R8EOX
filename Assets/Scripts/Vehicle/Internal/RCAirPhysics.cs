@@ -1,5 +1,4 @@
 using UnityEngine;
-using R8EOX.Vehicle.Config;
 
 namespace R8EOX.Vehicle.Internal
 {
