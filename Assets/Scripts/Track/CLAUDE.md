@@ -11,8 +11,10 @@ Track/circuit definition — path, checkpoints, boundaries, and surface types.
 - Configuration via `TrackConfig` ScriptableObject
 
 ## Contents
+- `SpawnPointData.cs` — Public struct (DTO) exposing spawn point data across system boundaries
 - `TrackManager.cs` — Top-level API: track queries, checkpoint tracking
 - `Internal/Centerline.cs` — Spline/path defining track center
 - `Internal/Checkpoint.cs` — Lap tracking, position detection triggers
+- `Internal/SpawnPoint.cs` — Vehicle spawn location markers with index and player flag
 - `Internal/TrackBoundary.cs` — Walls, barriers, out-of-bounds detection
 - `Internal/TrackSurface.cs` — Surface types (asphalt, dirt, grass) and grip modifiers

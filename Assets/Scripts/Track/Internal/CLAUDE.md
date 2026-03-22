@@ -12,4 +12,5 @@ Internal implementation classes for the Track system. Only `TrackManager` should
 - `Centerline.cs` — Spline-based track center path: point sampling, nearest point projection, total length
 - `Checkpoint.cs` — MonoBehaviour with trigger collider: detects vehicle passage, notifies TrackManager via Action
 - `TrackBoundary.cs` — MonoBehaviour with collision: applies bounce force when vehicles hit walls
+- `SpawnPoint.cs` — MonoBehaviour marking vehicle spawn locations: serializes index, isPlayerSpawn flag; provides SpawnPointData DTO via ToData(); draws Gizmo in editor
 - `TrackSurface.cs` — MonoBehaviour with SurfaceType enum (Asphalt/Dirt/Grass/Gravel): returns grip multiplier
