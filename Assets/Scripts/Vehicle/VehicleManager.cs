@@ -85,7 +85,7 @@ namespace R8EOX.Vehicle
         public float SmoothThrottle { get; private set; }     public float CurrentSteering   { get; private set; }
         public bool  IsAirborne     { get; private set; }     public float TumbleFactor       { get; private set; }
         public float TiltAngle      { get; private set; }     public bool  ReverseEngaged     { get; private set; }
-        public float ForwardSpeed   { get; private set; }     public MotorPreset ActiveMotorPreset => _motorPreset;
+        public float ForwardSpeed   { get; private set; }     internal MotorPreset ActiveMotorPreset => _motorPreset;
 
         // Tuning accessors
         public float EngineForceMax => _engineForceMax; public float MaxSpeed    => _maxSpeed;
@@ -99,7 +99,7 @@ namespace R8EOX.Vehicle
         public float GripCoeff => _gripCoeff; public float ComGroundY => _comGround.y;
         public float TumbleEngageDeg => _tumbleEngageDeg; public float TumbleFullDeg  => _tumbleFullDeg;
         public float TumbleBounce    => _tumbleBounce;    public float TumbleFriction => _tumbleFriction;
-        public RCAirPhysics AirPhysics => _airPhysics; public Drivetrain DrivetrainRef => _drivetrain;
+        internal RCAirPhysics AirPhysics => _airPhysics; internal Drivetrain DrivetrainRef => _drivetrain;
         public float Mass => _rb != null ? _rb.mass : k_DefaultMass;
 
         // Private fields
@@ -119,13 +119,13 @@ namespace R8EOX.Vehicle
         void Start()
         {
             ApplyMotorPreset();
-            _rb.mass = k_DefaultMass; _rb.centerOfMass = _comGround; _rb.drag = 0f;
-            _rb.angularDrag = k_DefaultAngularDrag; _rb.interpolation = RigidbodyInterpolation.Interpolate;
+            _rb.mass = k_DefaultMass; _rb.centerOfMass = _comGround; _rb.linearDamping = 0f;
+            _rb.angularDamping = k_DefaultAngularDrag; _rb.interpolation = RigidbodyInterpolation.Interpolate;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            var physMat = new PhysicMaterial("CarBody") {
+            var physMat = new PhysicsMaterial("CarBody") {
                 dynamicFriction = 0f, staticFriction = 0f, bounciness = k_DefaultBounciness,
-                frictionCombine = PhysicMaterialCombine.Minimum, bounceCombine = PhysicMaterialCombine.Maximum
+                frictionCombine = PhysicsMaterialCombine.Minimum, bounceCombine = PhysicsMaterialCombine.Maximum
             };
             foreach (var col in GetComponentsInChildren<Collider>()) col.material = physMat;
 
@@ -161,7 +161,7 @@ namespace R8EOX.Vehicle
             float steerIn     = _input != null ? _input.Steer    : 0f;
             float rampRate    = throttleRaw > SmoothThrottle ? _throttleRampUp : _throttleRampDown;
             SmoothThrottle = Mathf.MoveTowards(SmoothThrottle, throttleRaw, rampRate * dt);
-            ForwardSpeed   = Vector3.Dot(_rb.velocity, transform.forward);
+            ForwardSpeed   = Vector3.Dot(_rb.linearVelocity, transform.forward);
 
             if (IsAirborne)
             {
@@ -190,8 +190,8 @@ namespace R8EOX.Vehicle
         }
 
         // Public API
-        public float GetSpeedKmh()        => _rb.velocity.magnitude * k_MsToKmh;
-        public float GetForwardSpeedKmh() => Vector3.Dot(_rb.velocity, transform.forward) * k_MsToKmh;
+        public float GetSpeedKmh()        => _rb.linearVelocity.magnitude * k_MsToKmh;
+        public float GetForwardSpeedKmh() => Vector3.Dot(_rb.linearVelocity, transform.forward) * k_MsToKmh;
 
         public float GetSlip()
         {
@@ -200,7 +200,7 @@ namespace R8EOX.Vehicle
             return count > 0 ? slip / count : 0f;
         }
 
-        public RaycastWheel[] GetAllWheels()
+        internal RaycastWheel[] GetAllWheels()
         { if (_wheels.All.Length == 0) _wheels.Discover(transform); return _wheels.All; }
 
         public void ApplySuspensionSettings() =>
@@ -221,7 +221,7 @@ namespace R8EOX.Vehicle
         { _tumbleEngageDeg = engageDeg; _tumbleFullDeg = fullDeg; _tumbleBounce = bounce; _tumbleFriction = friction; }
         public void SetCentreOfMass(float groundY) => _comGround = new Vector3(0f, groundY, 0f);
         public void SetMass(float mass) { if (_rb != null) _rb.mass = mass; }
-        public void SelectMotorPreset(MotorPreset preset) { _motorPreset = preset; ApplyMotorPreset(); }
+        internal void SelectMotorPreset(MotorPreset preset) { _motorPreset = preset; ApplyMotorPreset(); }
 
         // Private
         void ApplyMotorPreset()
@@ -237,7 +237,7 @@ namespace R8EOX.Vehicle
             var r = ESCMath.ComputeGroundDrive(
                 throttleIn, brakeIn, fwdSpeed, ReverseEngaged,
                 _engineForceMax, _brakeForce, _reverseForce, _coastDrag, _maxSpeed,
-                _rb.velocity.magnitude, k_ReverseSpeedThreshold, k_ForwardSpeedClearThreshold, k_ReverseBrakeMinThreshold);
+                _rb.linearVelocity.magnitude, k_ReverseSpeedThreshold, k_ForwardSpeedClearThreshold, k_ReverseBrakeMinThreshold);
             CurrentEngineForce = r.EngineForce; CurrentBrakeForce = r.BrakeForce; ReverseEngaged = r.ReverseEngaged;
             if (r.CoastDragForce > 0f) _rb.AddForce(-transform.forward * r.CoastDragForce, ForceMode.Force);
         }
@@ -247,7 +247,7 @@ namespace R8EOX.Vehicle
             Vector3 euler = transform.eulerAngles;
             transform.rotation = Quaternion.Euler(0f, euler.y, 0f);
             transform.position += Vector3.up * k_FlipHeightOffset;
-            _rb.velocity = _rb.angularVelocity = Vector3.zero;
+            _rb.linearVelocity = _rb.angularVelocity = Vector3.zero;
         }
     }
 }
