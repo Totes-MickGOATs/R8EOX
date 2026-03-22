@@ -12,10 +12,29 @@ namespace R8EOX.Session.Internal
                 currentPhase = SessionPhase.Loading;
         }
 
-        internal void BeginSpawning()
+        internal void BeginVehicleSelect()
         {
             if (currentPhase == SessionPhase.Loading)
+                currentPhase = SessionPhase.VehicleSelect;
+        }
+
+        internal void EndVehicleSelect()
+        {
+            if (currentPhase == SessionPhase.VehicleSelect)
                 currentPhase = SessionPhase.Spawning;
+        }
+
+        internal void BeginSpawning()
+        {
+            if (currentPhase == SessionPhase.Loading
+                || currentPhase == SessionPhase.VehicleSelect)
+                currentPhase = SessionPhase.Spawning;
+        }
+
+        internal void ReturnToVehicleSelect()
+        {
+            if (currentPhase == SessionPhase.Ready)
+                currentPhase = SessionPhase.VehicleSelect;
         }
 
         internal void MarkReady()

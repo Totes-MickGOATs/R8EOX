@@ -29,6 +29,14 @@ namespace R8EOX
         public int AiDifficultyLevel => aiDifficultyLevel;
 
         /// <summary>
+        /// Update the vehicle prefab at runtime (used by vehicle selection overlay).
+        /// </summary>
+        public void SetVehiclePrefab(GameObject prefab)
+        {
+            vehiclePrefab = prefab;
+        }
+
+        /// <summary>
         /// Create a runtime SessionConfig for editor-play or programmatic sessions.
         /// </summary>
         public static SessionConfig CreateRuntime(

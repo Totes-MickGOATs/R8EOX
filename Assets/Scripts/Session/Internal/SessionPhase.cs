@@ -4,6 +4,7 @@ namespace R8EOX.Session.Internal
     {
         Idle,
         Loading,
+        VehicleSelect,
         Spawning,
         Ready,
         Teardown

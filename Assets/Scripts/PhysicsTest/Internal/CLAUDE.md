@@ -10,6 +10,7 @@ Internal implementation for the PhysicsTest system. Only PhysicsTestManager refe
 ## Contents
 - `WaypointPath.cs` — Closed-loop path with Catmull-Rom interpolation and editor gizmos
 - `IWritableInput.cs` — Local writable input abstraction; allows PathFollower to command throttle/brake/steer without a cross-system internal dependency
+- `InputAdapter.cs` — Bridges R8EOX.Input.Internal.ScriptedInput to IWritableInput using a fully-qualified name; avoids a cross-system using directive
 - `PathFollower.cs` — Drives a vehicle along a WaypointPath; computes steering and throttle each FixedUpdate and writes to an IWritableInput
 - `PlaybackController.cs` — Wraps Time.timeScale for play/pause/speed/step control
 - `DebugOverlay.cs` — IMGUI debug HUD: playback controls, vehicle telemetry, per-wheel diagnostics (3 panels)

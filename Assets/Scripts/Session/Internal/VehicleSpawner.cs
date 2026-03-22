@@ -74,6 +74,55 @@ namespace R8EOX.Session.Internal
             return aiVehicles.ToArray();
         }
 
+        internal void DestroyPlayerVehicle()
+        {
+            if (PlayerVehicle != null)
+            {
+                spawnedVehicles.Remove(PlayerVehicle);
+                Object.Destroy(PlayerVehicle);
+                Debug.Log(
+                    "[VehicleSpawner] Player vehicle destroyed.");
+            }
+
+            PlayerVehicle = null;
+        }
+
+        internal (Vector3 position, Quaternion rotation)
+            GetPlayerPositionAndRotation()
+        {
+            if (PlayerVehicle == null)
+                return (Vector3.zero, Quaternion.identity);
+
+            Transform t = PlayerVehicle.transform;
+            return (t.position, t.rotation);
+        }
+
+        internal GameObject SpawnPlayerVehicleAt(
+            GameObject prefab,
+            Vector3 position,
+            Quaternion rotation)
+        {
+            if (prefab == null)
+            {
+                Debug.LogError(
+                    "[VehicleSpawner] Cannot spawn player vehicle " +
+                    "— prefab is null.");
+                return null;
+            }
+
+            GameObject vehicle =
+                Object.Instantiate(prefab, position, rotation);
+            vehicle.name = "PlayerVehicle";
+
+            spawnedVehicles.Add(vehicle);
+            PlayerVehicle = vehicle;
+
+            Debug.Log(
+                $"[VehicleSpawner] Spawned player vehicle at " +
+                $"{position} (explicit position).");
+            return vehicle;
+        }
+
         internal void DestroyAllSpawned()
         {
             foreach (var vehicle in spawnedVehicles)
