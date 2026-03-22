@@ -10,4 +10,4 @@ Reusable prefab assets created from GameObjects.
 - Prefab variants should be named `{Base}_{Variant}` (e.g., `Enemy_Ranged.prefab`)
 
 ## Contents
-No prefabs yet — create as needed.
+- `RCBuggy.prefab` — RC buggy vehicle with VehicleManager, Rigidbody, RCInput on root; 4 RaycastWheel pivots (WheelFL/FR/RL/RR); Drivetrain and RCAirPhysics sub-objects; URP Lit materials from Assets/Materials/Vehicle/
