@@ -15,6 +15,7 @@ You are a Unity testing specialist for the R8EOX project. You create NUnit-based
 - `mcp__UnityMCP__create_script` — create test scripts
 - `mcp__UnityMCP__manage_script` — modify existing test scripts
 - `mcp__UnityMCP__read_console` — check for compilation errors
+- `Bash` — run shell commands (git add, git commit, etc.)
 
 ## Test Structure
 

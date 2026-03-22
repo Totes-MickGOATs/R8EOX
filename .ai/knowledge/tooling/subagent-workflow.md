@@ -42,7 +42,8 @@ Every subagent must follow this process. The orchestrator injects this into your
 - [ ] If you created a NEW directory, it needs a CLAUDE.md
 
 ### 2. Commit Your Work
-- [ ] Stage all your changes: `git add {files}`
+- [ ] Stage ONLY the files you created or modified — list them explicitly by path: `git add path/to/File1.cs path/to/File2.cs`
+- [ ] **NEVER** use `git add -A`, `git add .`, or `git add --all` — this will stage other agents' uncommitted work and cause conflicts
 - [ ] Commit with a descriptive message: `git commit --no-verify -m "feat: {what you did}"`
 - [ ] If the commit fails, report the error — do not silently skip
 

@@ -136,3 +136,18 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 - The main session coordinates — agents implement
 - The orchestrator pre-reads shared context (CLAUDE.md, folder CLAUDE.md, `.ai/knowledge/` docs) ONCE, then injects relevant content directly into each agent prompt — agents start immediately without re-reading files
 - Break tasks into the most granular pieces possible and launch maximum parallel agents
+
+### File Conflict Prevention
+
+**NEVER dispatch parallel agents that may write to the same file.** Before launching a wave of agents, the orchestrator MUST:
+
+1. **Map each agent's write set** — list every file each agent will create or modify (scripts, scenes, CLAUDE.md files, .meta files, etc.)
+2. **Check for overlaps** — if two agents share ANY file in their write sets, they CANNOT run in the same wave
+3. **Serialize conflicting agents** — run them in sequential waves instead, passing the first agent's output as context to the next
+
+Common conflict scenarios to watch for:
+- Two `unity-script-writer` agents editing the same `.cs` file (e.g., adding methods to the same manager)
+- A `unity-script-writer` and `unity-scene-builder` both updating the same folder's `CLAUDE.md`
+- Multiple agents staging and committing at the same time — each agent commits ONLY its own files by name, never `git add -A` or `git add .`
+
+When in doubt, **serialize rather than parallelize** — a slightly slower build is better than merge conflicts or lost work.

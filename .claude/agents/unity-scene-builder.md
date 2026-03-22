@@ -21,6 +21,7 @@ You work primarily through UnityMCP tools:
 - `mcp__UnityMCP__find_gameobjects` — query existing objects
 - `mcp__UnityMCP__manage_ui` — UI elements (Canvas, panels, text, buttons)
 - `mcp__UnityMCP__read_console` — check for errors after changes
+- `Bash` — run shell commands (git add, git commit, etc.)
 
 ## Project Context
 

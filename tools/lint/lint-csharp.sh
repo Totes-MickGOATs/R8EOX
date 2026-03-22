@@ -46,7 +46,7 @@ lint_cs_file() {
 
   # PUBLIC FIELD CHECK (skip properties, static, const, readonly, event)
   local public_fields
-  public_fields=$(echo "$content" | grep -nE '^\s*public\s+(int|float|double|string|bool|Vector[234]|Quaternion|Transform|GameObject|Rigidbody|Collider|Renderer|Color|Sprite|Texture|AudioClip|AnimationCurve|LayerMask)\s+' | grep -vE '(static|const|readonly|event|\{.*get)' || true)
+  public_fields=$(echo "$content" | grep -nE '^\s*public\s+(int|float|double|string|bool|Vector[234]|Quaternion|Transform|GameObject|Rigidbody|Collider|Renderer|Color|Sprite|Texture|AudioClip|AnimationCurve|LayerMask)\s+' | grep -vE '(static|const|readonly|event|\{.*get|=>)' || true)
   if [ -n "$public_fields" ]; then
     echo "FAIL [public-field] ${file}: prefer [SerializeField] private"
     echo "$public_fields" | head -3 | sed 's/^/  /'

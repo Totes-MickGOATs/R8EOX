@@ -17,6 +17,7 @@ You are a C# script specialist for a Unity 6 URP project (R8EOX).
 - `mcp__UnityMCP__unity_reflect` — verify Unity API types and members before using them
 - `mcp__UnityMCP__unity_docs` — look up Unity documentation
 - `mcp__context7__resolve-library-id` and `mcp__context7__query-docs` — look up library documentation
+- `Bash` — run shell commands (git add, git commit, etc.)
 
 ## Code Style (Mandatory)
 

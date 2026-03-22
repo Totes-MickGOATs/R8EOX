@@ -47,7 +47,7 @@ lint_ai_doc() {
         errors=$((errors + 1))
       fi
       local frontmatter
-      frontmatter=$(echo "$content" | sed -n '2,/^---$/p' | head -n -1)
+      frontmatter=$(echo "$content" | sed -n '2,/^---$/p' | sed '$d')
       if ! echo "$frontmatter" | grep -q '^name:'; then
         echo "FAIL [frontmatter-name] ${file}: frontmatter must include name:"
         errors=$((errors + 1))

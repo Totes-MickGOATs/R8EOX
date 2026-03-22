@@ -43,6 +43,41 @@ Each game system (Combat, Movement, UI, etc.) gets its own folder under `Assets/
 - Use `R8EOX.{System}` namespace for the top-level class
 - Use `R8EOX.{System}.Internal` namespace + `internal` access for sub-components
 
+## Convention-Over-Configuration
+
+Prefer folder structure as config. Builders and tools discover files by **naming convention** rather than requiring manual references in ScriptableObjects or code.
+
+- Builders scan folders and find files by known names (e.g., `diffuse.jpg`, `normal.png`, `arm.jpg`)
+- Folder names encode metadata (e.g., `0_DirtBase/` — numeric prefix = ordering)
+- Only settings that **cannot** be inferred from files use lightweight config SOs (tile size, fog density, dimensions)
+- Config SOs have sensible defaults — if the `.asset` file is missing, the builder uses defaults
+- Generated output goes in a `Generated/` subfolder to separate source from build artifacts
+- New content = duplicate a folder + replace files. No code changes needed.
+
+### Track Structure
+
+```
+Assets/Tracks/{TrackName}/
+├── Environment/                    # Background (skybox, atmosphere)
+│   ├── skybox.hdr                  # .hdr file = skybox HDRI
+│   └── EnvironmentSettings.asset   # Fog, ambient, sun tuning
+├── Terrain/                        # Ground geometry + textures
+│   ├── heightmap.raw               # Raw heightmap file
+│   ├── TerrainSettings.asset       # Dimensions, resolutions
+│   ├── Layers/
+│   │   ├── 0_{LayerName}/          # Prefix = layer index
+│   │   │   ├── diffuse.*           # PBR textures by convention
+│   │   │   ├── normal.*
+│   │   │   ├── arm.*
+│   │   │   └── LayerSettings.asset # Optional: tile size, metallic, smoothness
+│   │   └── 1_{LayerName}/
+│   ├── blend-mask.*                # Splatmap blend control
+│   └── Macro/
+│       ├── normal-map.*
+│       └── specular-map.*
+└── Generated/                      # Builder output (not hand-edited)
+```
+
 ## Path Conventions
 
 - All paths in code are relative to `Assets/` unless stated otherwise

@@ -273,66 +273,61 @@ RL_7D=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
 RL_5H_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 RL_7D_RESET=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
-LINE_RL=""
-if [ -n "$RL_5H" ] || [ -n "$RL_7D" ]; then
-  RL_PARTS=""
+LINE_RL_5H=""
+LINE_RL_7D=""
 
-  if [ -n "$RL_5H" ]; then
-    RL_5H_INT=$(printf '%.0f' "$RL_5H")
-    RL_5H_ICON=""
-    if [ "$RL_5H_INT" -ge 90 ]; then
-      RL_5H_COLOR="${BLINK}${RED}"
-      RL_5H_ICON=" ${BLINK}${RED}⚠${RST}"
-    elif [ "$RL_5H_INT" -ge 70 ]; then
-      RL_5H_COLOR="$RED"
-      RL_5H_ICON=" ${RED}⚠${RST}"
-    elif [ "$RL_5H_INT" -ge 50 ]; then
-      RL_5H_COLOR="$YELLOW"
-      RL_5H_ICON=" ${YELLOW}⚠${RST}"
-    else
-      RL_5H_COLOR="$GREEN"
-    fi
-    RESET_STR=""
-    if [ -n "$RL_5H_RESET" ]; then
-      RL_5H_LOCAL=$(date -r "$RL_5H_RESET" "+%b %d %I:%M %p" 2>/dev/null || echo "$RL_5H_RESET")
-      RESET_STR=$(printf " ${DIM}resets %s${RST}" "$RL_5H_LOCAL")
-    fi
-    RL_PARTS=$(printf "${RL_5H_COLOR}5h: %s%%${RST}%b%b" "$RL_5H_INT" "$RL_5H_ICON" "$RESET_STR")
+if [ -n "$RL_5H" ]; then
+  RL_5H_INT=$(printf '%.0f' "$RL_5H")
+  RL_5H_ICON=""
+  if [ "$RL_5H_INT" -ge 90 ]; then
+    RL_5H_COLOR="${BLINK}${RED}"
+    RL_5H_ICON=" ${BLINK}${RED}⚠${RST}"
+  elif [ "$RL_5H_INT" -ge 70 ]; then
+    RL_5H_COLOR="$RED"
+    RL_5H_ICON=" ${RED}⚠${RST}"
+  elif [ "$RL_5H_INT" -ge 50 ]; then
+    RL_5H_COLOR="$YELLOW"
+    RL_5H_ICON=" ${YELLOW}⚠${RST}"
+  else
+    RL_5H_COLOR="$GREEN"
   fi
-
-  if [ -n "$RL_7D" ]; then
-    RL_7D_INT=$(printf '%.0f' "$RL_7D")
-    RL_7D_ICON=""
-    if [ "$RL_7D_INT" -ge 90 ]; then
-      RL_7D_COLOR="${BLINK}${RED}"
-      RL_7D_ICON=" ${BLINK}${RED}⚠${RST}"
-    elif [ "$RL_7D_INT" -ge 70 ]; then
-      RL_7D_COLOR="$RED"
-      RL_7D_ICON=" ${RED}⚠${RST}"
-    elif [ "$RL_7D_INT" -ge 50 ]; then
-      RL_7D_COLOR="$YELLOW"
-      RL_7D_ICON=" ${YELLOW}⚠${RST}"
-    else
-      RL_7D_COLOR="$GREEN"
-    fi
-    RESET_7D_STR=""
-    if [ -n "$RL_7D_RESET" ]; then
-      RL_7D_LOCAL=$(date -r "$RL_7D_RESET" "+%b %d %I:%M %p" 2>/dev/null || echo "$RL_7D_RESET")
-      RESET_7D_STR=$(printf " ${DIM}resets %s${RST}" "$RL_7D_LOCAL")
-    fi
-    if [ -n "$RL_PARTS" ]; then
-      RL_PARTS=$(printf "%b ${DIM}·${RST} ${RL_7D_COLOR}7d: %s%%${RST}%b%b" "$RL_PARTS" "$RL_7D_INT" "$RL_7D_ICON" "$RESET_7D_STR")
-    else
-      RL_PARTS=$(printf "${RL_7D_COLOR}7d: %s%%${RST}%b%b" "$RL_7D_INT" "$RL_7D_ICON" "$RESET_7D_STR")
-    fi
+  RESET_STR=""
+  if [ -n "$RL_5H_RESET" ]; then
+    RL_5H_LOCAL=$(date -r "$RL_5H_RESET" "+%b %d %I:%M %p" 2>/dev/null || echo "$RL_5H_RESET")
+    RESET_STR=$(printf " ${DIM}resets %s${RST}" "$RL_5H_LOCAL")
   fi
+  LINE_RL_5H=$(printf "${DIM}rate limit 5h:${RST} ${RL_5H_COLOR}%s%%${RST}%b%b" "$RL_5H_INT" "$RL_5H_ICON" "$RESET_STR")
+fi
 
-  LINE_RL=$(printf "${DIM}rate limit:${RST} %b" "$RL_PARTS")
+if [ -n "$RL_7D" ]; then
+  RL_7D_INT=$(printf '%.0f' "$RL_7D")
+  RL_7D_ICON=""
+  if [ "$RL_7D_INT" -ge 90 ]; then
+    RL_7D_COLOR="${BLINK}${RED}"
+    RL_7D_ICON=" ${BLINK}${RED}⚠${RST}"
+  elif [ "$RL_7D_INT" -ge 70 ]; then
+    RL_7D_COLOR="$RED"
+    RL_7D_ICON=" ${RED}⚠${RST}"
+  elif [ "$RL_7D_INT" -ge 50 ]; then
+    RL_7D_COLOR="$YELLOW"
+    RL_7D_ICON=" ${YELLOW}⚠${RST}"
+  else
+    RL_7D_COLOR="$GREEN"
+  fi
+  RESET_7D_STR=""
+  if [ -n "$RL_7D_RESET" ]; then
+    RL_7D_LOCAL=$(date -r "$RL_7D_RESET" "+%b %d %I:%M %p" 2>/dev/null || echo "$RL_7D_RESET")
+    RESET_7D_STR=$(printf " ${DIM}resets %s${RST}" "$RL_7D_LOCAL")
+  fi
+  LINE_RL_7D=$(printf "${DIM}rate limit 7d:${RST} ${RL_7D_COLOR}%s%%${RST}%b%b" "$RL_7D_INT" "$RL_7D_ICON" "$RESET_7D_STR")
 fi
 
 # --- Output (multi-line) ---
 OUTPUT=$(printf "\n%b\n%b\n%b\n%b\n%b\n%b\n%b" "$LINE0" "$LINE1" "$LINE2" "$LINE3" "$LINE4" "$LINE5" "$LINE6")
-if [ -n "$LINE_RL" ]; then
-  OUTPUT=$(printf "%b\n%b" "$OUTPUT" "$LINE_RL")
+if [ -n "$LINE_RL_5H" ]; then
+  OUTPUT=$(printf "%b\n%b" "$OUTPUT" "$LINE_RL_5H")
+fi
+if [ -n "$LINE_RL_7D" ]; then
+  OUTPUT=$(printf "%b\n%b" "$OUTPUT" "$LINE_RL_7D")
 fi
 printf "%b" "$OUTPUT"
