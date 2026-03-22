@@ -1,37 +1,66 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace R8EOX.Input
 {
+    /// <summary>
+    /// Top-level coordinator for the Input system.
+    /// Manages enabling/disabling input and provides the active input provider.
+    /// VehicleManager resolves IVehicleInput via GetComponent on its own GameObject;
+    /// this manager handles system-level concerns like pausing input.
+    /// </summary>
     public class InputManager : MonoBehaviour
     {
-        [SerializeField] private PlayerInput playerInput;
+        [SerializeField]
+        [Tooltip("The input provider component (e.g., RCInput). Auto-resolved if null.")]
+        private MonoBehaviour inputProviderOverride;
 
-        private InputAction throttleAction;
-        private InputAction brakeAction;
-        private InputAction steeringAction;
+        /// <summary>Current active input provider.</summary>
+        public IVehicleInput ActiveInput { get; private set; }
+
+        /// <summary>Whether input is currently enabled.</summary>
+        public bool InputEnabled { get; private set; } = true;
 
         private void Awake()
         {
-            // TODO: Resolve input actions from PlayerInput
+            ResolveInputProvider();
         }
 
-        public float GetThrottle()
+        /// <summary>
+        /// Enable all input processing.
+        /// </summary>
+        public void EnableInput()
         {
-            // TODO: Read throttle input value
-            return 0f;
+            InputEnabled = true;
+            SetProviderEnabled(true);
         }
 
-        public float GetBrake()
+        /// <summary>
+        /// Disable all input processing (e.g., during pause or cutscene).
+        /// </summary>
+        public void DisableInput()
         {
-            // TODO: Read brake input value
-            return 0f;
+            InputEnabled = false;
+            SetProviderEnabled(false);
         }
 
-        public float GetSteering()
+        private void ResolveInputProvider()
         {
-            // TODO: Read steering input value
-            return 0f;
+            if (inputProviderOverride != null
+                && inputProviderOverride is IVehicleInput overrideInput)
+            {
+                ActiveInput = overrideInput;
+                return;
+            }
+
+            ActiveInput = GetComponentInChildren<IVehicleInput>();
+        }
+
+        private void SetProviderEnabled(bool enabled)
+        {
+            if (ActiveInput is MonoBehaviour mb)
+            {
+                mb.enabled = enabled;
+            }
         }
     }
 }
