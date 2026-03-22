@@ -18,8 +18,12 @@ ScriptableObject class definitions. Asset instances created from these go in app
 - `TrackType.cs` — Enum: Circuit, PointToPoint
 - `SessionMode.cs` — Enum: Practice, Race, TimeTrial
 - `SessionConfig.cs` — Session parameters (mode, track, vehicle, laps, AI, countdown, time limit)
-- `SessionChannel.cs` — Runtime data channel for sharing active SessionConfig between systems
+- `SessionChannel.cs` — Runtime data channel for sharing active SessionConfig and VehicleRegistry between systems
 - `RaceConfig.cs` — Race configuration
 - `EnvironmentSettings.cs` — Skybox, fog, ambient light, and sun settings
 - `TerrainSettings.cs` — Terrain dimensions and resolution settings
 - `LayerSettings.cs` — Terrain layer tile size and surface properties
+- `VehicleCategory.cs` — Enum: Buggy, Truck, Stadium, Custom
+- `VehicleStats.cs` — Serializable struct: normalized stats for UI display (speed, acceleration, handling, weight)
+- `VehicleDefinition.cs` — Vehicle metadata: name, description, thumbnail, prefab reference, category, stats
+- `VehicleRegistry.cs` — Collection of VehicleDefinition refs + overlay prefab reference for vehicle selection UI
