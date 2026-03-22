@@ -16,5 +16,10 @@ RC car vehicle physics — suspension, drivetrain, grip, and handling. This is t
 
 ## Contents
 - `VehicleManager.cs` — Top-level API: RC car controller, reads input, applies forces, exposes tuning
+- `WheelTelemetry.cs` — Public readonly struct: per-wheel data snapshot (contact, slip, grip, RPM, suspension)
+- `VehicleTelemetry.cs` — Public readonly struct: full vehicle state snapshot (speed, RPM, inputs, airborne, wheels)
 - `Internal/` — Internal MonoBehaviours and helper classes
 - `Internal/Physics/` — Pure static math classes (suspension, grip, drivetrain, tumble)
+
+## Telemetry Contracts
+`WheelTelemetry` and `VehicleTelemetry` are public DTOs in `R8EOX.Vehicle` — other systems (Audio, VFX, UI) read them without touching Vehicle internals. `VehicleTelemetry` is returned by `VehicleManager.GetTelemetry()`.
