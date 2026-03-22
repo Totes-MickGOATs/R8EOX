@@ -104,7 +104,7 @@ namespace R8EOX.Editor.Builders
 
             GameObject wing = AddBoxMesh(root, "RearWing",
                 new Vector3(0.48f, 0.008f, 0.16f), new Vector3(0f, 0.167f, -0.6f), blueSolid);
-            wing.transform.localRotation = Quaternion.Euler(-22.5f, 0f, 0f);
+            wing.transform.localRotation = Quaternion.Euler(22.5f, 0f, 0f);
         }
 
         static void AddControlArms(GameObject root, Material darkGrey)
