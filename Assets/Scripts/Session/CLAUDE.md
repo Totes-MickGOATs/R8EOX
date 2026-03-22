@@ -12,7 +12,7 @@ Session orchestration — manages the lifecycle of play sessions (practice, race
 
 ## Contents
 - `SessionManager.cs` — Top-level API: begin/end session, coordinate systems
-- `Internal/SessionBootstrapper.cs` — Scene-resident: detects editor-play vs session flow (TODO)
+- `Internal/SessionBootstrapper.cs` — Scene-resident: detects editor-play vs menu flow via SessionChannel; creates default Practice session in editor-play mode
 - `Internal/SessionPhase.cs` — Enum: Idle, Loading, Spawning, Ready, Teardown
 - `Internal/SessionState.cs` — FSM with validated phase transitions (TODO)
 - `Internal/VehicleSpawner.cs` — Instantiates vehicle prefabs at spawn points with terrain safety
