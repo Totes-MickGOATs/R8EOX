@@ -18,6 +18,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `TrackBuilder.cs` | Assembles complete track scenes from terrain, environment, and vehicle |
 | `TrackFolderData.cs` | Data struct for scanned track folder contents |
 | `TrackFolderScanner.cs` | Scans track asset folders by naming convention |
+| `PhysicsTestTrackBuilder.cs` | Builds the PhysicsTestTrack scene: ground, obstacles, waypoints, lighting, camera, PhysicsTestManager |
 
 ## Conventions
 
