@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC Buggy Scale Playground</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #e0e0e0; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+  #toolbar { display: flex; gap: 8px; padding: 10px 16px; background: #16213e; border-bottom: 1px solid #2a2a4a; align-items: center; flex-wrap: wrap; z-index: 10; }
+  #toolbar .group { display: flex; gap: 4px; align-items: center; }
+  #toolbar .sep { width: 1px; height: 24px; background: #2a2a4a; margin: 0 8px; }
+  #toolbar label { font-size: 12px; color: #8888aa; margin-right: 4px; }
+  button { background: #2a2a4a; color: #c0c0d0; border: 1px solid #3a3a5a; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  button:hover { background: #3a3a5a; color: #fff; }
+  button.active { background: #2E73E6; color: #fff; border-color: #4a8af0; }
+  #canvas-wrap { flex: 1; position: relative; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #info { position: absolute; bottom: 12px; left: 16px; font-size: 11px; color: #667; font-family: 'SF Mono', 'Consolas', monospace; line-height: 1.6; background: rgba(22,33,62,0.85); padding: 8px 12px; border-radius: 6px; border: 1px solid #2a2a4a; }
+  #info strong { color: #8888cc; }
+  #physics-panel { position: absolute; top: 12px; right: 16px; width: 340px; font-size: 11px; color: #c0c0d0; font-family: 'SF Mono', 'Consolas', monospace; line-height: 1.55; background: rgba(22,33,62,0.92); padding: 14px 16px; border-radius: 8px; border: 1px solid #2a2a4a; max-height: calc(100vh - 120px); overflow-y: auto; }
+  #physics-panel .panel-title { font-size: 12px; color: #fff; font-family: system-ui, sans-serif; font-weight: 700; margin: 0 0 8px 0; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; }
+  #physics-panel .section-head { color: #8888aa; font-weight: 700; font-size: 11px; margin: 10px 0 4px 0; }
+  #physics-panel .row { display: flex; justify-content: space-between; white-space: nowrap; }
+  #physics-panel .row .lbl { color: #8888aa; }
+  #physics-panel .row .val { color: #e0e0e0; }
+  #physics-panel .row .rule { color: #444466; margin-left: 8px; min-width: 50px; text-align: right; }
+  #physics-panel .section-sep { border: none; border-top: 1px solid #2a2a4a; margin: 8px 0; }
+  #physics-panel .ref-toggle { color: #6666aa; cursor: pointer; font-size: 10px; margin-top: 10px; user-select: none; }
+  #physics-panel .ref-body { font-size: 10px; color: #667; margin-top: 6px; line-height: 1.6; }
+  .toggle-wrap { display: flex; align-items: center; gap: 6px; }
+  .toggle { position: relative; width: 36px; height: 20px; background: #2a2a4a; border-radius: 10px; cursor: pointer; transition: background 0.2s; border: 1px solid #3a3a5a; }
+  .toggle.on { background: #2E73E6; border-color: #4a8af0; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #c0c0d0; border-radius: 50%; transition: transform 0.2s; }
+  .toggle.on::after { transform: translateX(16px); background: #fff; }
+  #scale-slider {
+    -webkit-appearance: none;
+    width: 180px;
+    height: 6px;
+    background: #2a2a4a;
+    border-radius: 3px;
+    outline: none;
+  }
+  #scale-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #2E73E6;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #4a8af0;
+  }
+  #scale-label { font-size: 11px; color: #c0c0d0; min-width: 140px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <div class="group">
+    <label>VIEW</label>
+    <button onclick="setView('quarter')" id="btn-quarter" class="active">3/4</button>
+    <button onclick="setView('front')" id="btn-front">Front</button>
+    <button onclick="setView('side')" id="btn-side">Side</button>
+    <button onclick="setView('top')" id="btn-top">Top</button>
+    <button onclick="setView('rear')" id="btn-rear">Rear</button>
+  </div>
+  <div class="sep"></div>
+  <div class="group">
+    <label>VEHICLE</label>
+    <button onclick="setVehicle('2wd')" id="btn-2wd" class="active">2WD</button>
+    <button onclick="setVehicle('4wd')" id="btn-4wd">4WD</button>
+  </div>
+  <div class="sep"></div>
+  <div class="group">
+    <label>SCALE</label>
+    <input type="range" id="scale-slider" min="0.25" max="4.0" step="0.01" value="1.0" oninput="onScaleSlider(this.value)">
+    <button onclick="setScale(1.0)">1/4</button>
+    <button onclick="setScale(2.0)">1/2</button>
+    <button onclick="setScale(3.0)">3/4</button>
+    <button onclick="setScale(4.0)">1/1</button>
+    <span id="scale-label">1/4 Scale (1.0x)</span>
+  </div>
+  <div class="sep"></div>
+  <div class="toggle-wrap">
+    <label>Dimensions</label>
+    <div class="toggle" id="dim-toggle" onclick="toggleDimensions()"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="group">
+    <label>DISPLAY</label>
+    <button onclick="setDisplay('visuals')" id="btn-visuals" class="active">Visuals</button>
+    <button onclick="setDisplay('colliders')" id="btn-colliders">Colliders</button>
+    <button onclick="setDisplay('both')" id="btn-both">Both</button>
+  </div>
+  <div class="sep"></div>
+  <div class="toggle-wrap">
+    <label>Wireframe</label>
+    <div class="toggle" id="wire-toggle" onclick="toggleWireframe()"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="toggle-wrap">
+    <label>Explode</label>
+    <div class="toggle" id="explode-toggle" onclick="toggleExplode()"></div>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+  <div id="info"></div>
+  <div id="physics-panel"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── Vehicle Specs ─────────────────────────────────────────────
+const SPEC_2WD = {
+  name: '2WD Buggy', layout: 'RWD', bodyColor: 0x2E73E6, bodyOpacity: 0.85,
+  bodyParts: [
+    { name: 'ChassisPlate', sx: 0.52, sy: 0.032, sz: 1.36, px: 0, py: -0.233, pz: 0 },
+    { name: 'FrontBumper',  sx: 0.48, sy: 0.12,  sz: 0.10, px: 0, py: -0.153, pz: 0.78 },
+    { name: 'RearBumper',   sx: 0.40, sy: 0.16,  sz: 0.16, px: 0, py: -0.153, pz: -0.72 },
+    { name: 'FrontShockTower', sx: 0.40, sy: 0.24, sz: 0.02, px: 0, py: -0.073, pz: 0.48 },
+    { name: 'RearShockTower',  sx: 0.32, sy: 0.24, sz: 0.02, px: 0, py: -0.073, pz: -0.48 },
+    { name: 'BodyShell', sx: 0.48, sy: 0.16, sz: 1.12, px: 0, py: -0.05, pz: 0.08 },
+  ],
+  rearWing: { sx: 0.48, sy: 0.008, sz: 0.16, px: 0, py: 0.167, pz: -0.60, rotX: 22.5 },
+  controlArms: [
+    { name: 'FrontArmL', sx: 0.26, sy: 0.02, sz: 0.08, px: -0.26, py: -0.213, pz: 0.68 },
+    { name: 'FrontArmR', sx: 0.26, sy: 0.02, sz: 0.08, px:  0.26, py: -0.213, pz: 0.68 },
+    { name: 'RearArmL',  sx: 0.26, sy: 0.02, sz: 0.08, px: -0.26, py: -0.213, pz: -0.68 },
+    { name: 'RearArmR',  sx: 0.26, sy: 0.02, sz: 0.08, px:  0.26, py: -0.213, pz: -0.68 },
+  ],
+  wheels: [
+    { name: 'WheelFL', px: -0.5, pz:  0.68, tireR: 0.166, tireH: 0.112, hubR: 0.11, hubH: 0.128 },
+    { name: 'WheelFR', px:  0.5, pz:  0.68, tireR: 0.166, tireH: 0.112, hubR: 0.11, hubH: 0.128 },
+    { name: 'WheelRL', px: -0.5, pz: -0.68, tireR: 0.166, tireH: 0.168, hubR: 0.11, hubH: 0.184 },
+    { name: 'WheelRR', px:  0.5, pz: -0.68, tireR: 0.166, tireH: 0.168, hubR: 0.11, hubH: 0.184 },
+  ],
+  colliders: [
+    { name: 'ChassisSlab',    sx: 0.56, sy: 0.12, sz: 1.56, cx: 0, cy: -0.17,  cz: 0 },
+    { name: 'BodyShellCol',   sx: 0.48, sy: 0.28, sz: 1.00, cx: 0, cy:  0.03,  cz: 0 },
+    { name: 'FrontBumperCol', sx: 0.44, sy: 0.14, sz: 0.16, cx: 0, cy: -0.10,  cz: 0.86 },
+    { name: 'RearBumperCol',  sx: 0.36, sy: 0.18, sz: 0.18, cx: 0, cy: -0.08,  cz: -0.86 },
+  ],
+  mass: 15.0,
+  engineForce: 260, maxSpeed: 27, brakeForce: 221, reverseForce: 143, coastDrag: 30,
+  frontSpringStrength: 700, frontSpringDamping: 41,
+  rearSpringStrength: 350, rearSpringDamping: 29,
+  gripCoeff: 0.7,
+  comY: -0.12,
+  wheelRadius: 0.166,
+  restDistance: 0.20, overExtend: 0.08, minSpringLen: 0.032, maxSpringForce: 50,
+  sphereCastRadius: 0.15,
+  wheelMoI: 0.120,
+  steeringMax: 0.50,
+  overallLength: 1.69, overallWidth: 1.18, overallHeight: 0.54,
+  wheelbase: 1.36, track: 1.00, groundClearance: 0.117,
+  groundY: -0.366,
+};
+
+const SPEC_4WD = {
+  name: '4WD Buggy', layout: 'AWD', bodyColor: 0x2EBF59, bodyOpacity: 0.85,
+  bodyParts: [
+    { name: 'ChassisPlate', sx: 0.52, sy: 0.032, sz: 1.36, px: 0, py: -0.233, pz: 0 },
+    { name: 'FrontBumper',  sx: 0.48, sy: 0.12,  sz: 0.10, px: 0, py: -0.153, pz: 0.78 },
+    { name: 'RearBumper',   sx: 0.40, sy: 0.16,  sz: 0.16, px: 0, py: -0.153, pz: -0.72 },
+    { name: 'FrontShockTower', sx: 0.40, sy: 0.24, sz: 0.02, px: 0, py: -0.073, pz: 0.48 },
+    { name: 'RearShockTower',  sx: 0.32, sy: 0.24, sz: 0.02, px: 0, py: -0.073, pz: -0.48 },
+    { name: 'BodyShell', sx: 0.48, sy: 0.16, sz: 1.12, px: 0, py: -0.05, pz: 0.08 },
+  ],
+  rearWing: { sx: 0.48, sy: 0.008, sz: 0.16, px: 0, py: 0.167, pz: -0.60, rotX: 22.5 },
+  controlArms: [
+    { name: 'FrontArmL', sx: 0.28, sy: 0.02, sz: 0.08, px: -0.28, py: -0.213, pz: 0.68 },
+    { name: 'FrontArmR', sx: 0.28, sy: 0.02, sz: 0.08, px:  0.28, py: -0.213, pz: 0.68 },
+    { name: 'RearArmL',  sx: 0.28, sy: 0.02, sz: 0.08, px: -0.28, py: -0.213, pz: -0.68 },
+    { name: 'RearArmR',  sx: 0.28, sy: 0.02, sz: 0.08, px:  0.28, py: -0.213, pz: -0.68 },
+  ],
+  wheels: [
+    { name: 'WheelFL', px: -0.52, pz:  0.68, tireR: 0.166, tireH: 0.140, hubR: 0.11, hubH: 0.156 },
+    { name: 'WheelFR', px:  0.52, pz:  0.68, tireR: 0.166, tireH: 0.140, hubR: 0.11, hubH: 0.156 },
+    { name: 'WheelRL', px: -0.52, pz: -0.68, tireR: 0.166, tireH: 0.168, hubR: 0.11, hubH: 0.184 },
+    { name: 'WheelRR', px:  0.52, pz: -0.68, tireR: 0.166, tireH: 0.168, hubR: 0.11, hubH: 0.184 },
+  ],
+  colliders: [
+    { name: 'ChassisSlab',    sx: 0.60, sy: 0.12, sz: 1.56, cx: 0, cy: -0.17,  cz: 0 },
+    { name: 'BodyShellCol',   sx: 0.52, sy: 0.28, sz: 1.00, cx: 0, cy:  0.03,  cz: 0 },
+    { name: 'FrontBumperCol', sx: 0.48, sy: 0.14, sz: 0.16, cx: 0, cy: -0.10,  cz: 0.86 },
+    { name: 'RearBumperCol',  sx: 0.40, sy: 0.18, sz: 0.18, cx: 0, cy: -0.08,  cz: -0.86 },
+  ],
+  mass: 17.0,
+  engineForce: 260, maxSpeed: 27, brakeForce: 221, reverseForce: 143, coastDrag: 30,
+  frontSpringStrength: 650, frontSpringDamping: 38,
+  rearSpringStrength: 400, rearSpringDamping: 32,
+  gripCoeff: 0.7,
+  comY: -0.10,
+  wheelRadius: 0.166,
+  restDistance: 0.20, overExtend: 0.08, minSpringLen: 0.032, maxSpringForce: 50,
+  sphereCastRadius: 0.15,
+  wheelMoI: 0.120,
+  steeringMax: 0.45,
+  overallLength: 1.69, overallWidth: 1.22, overallHeight: 0.54,
+  wheelbase: 1.36, track: 1.04, groundClearance: 0.117,
+  groundY: -0.366,
+};
+
+// ─── Physics Scaling ───────────────────────────────────────────
+function computeScaled(spec, S) {
+  const S2 = S * S, S3 = S2 * S, S5 = S3 * S2;
+  return {
+    wheelRadius: spec.wheelRadius * S,
+    restDistance: spec.restDistance * S,
+    overExtend: spec.overExtend * S,
+    minSpringLen: spec.minSpringLen * S,
+    sphereCastRadius: spec.sphereCastRadius * S,
+    comY: spec.comY * S,
+    overallLength: spec.overallLength * S,
+    overallWidth: spec.overallWidth * S,
+    overallHeight: spec.overallHeight * S,
+    wheelbase: spec.wheelbase * S,
+    track: spec.track * S,
+    groundClearance: spec.groundClearance * S,
+    rayLength: (spec.restDistance + spec.overExtend + spec.wheelRadius) * S,
+    mass: spec.mass * S3,
+    engineForce: spec.engineForce * S3,
+    brakeForce: spec.brakeForce * S3,
+    reverseForce: spec.reverseForce * S3,
+    coastDrag: spec.coastDrag * S3,
+    maxSpringForce: spec.maxSpringForce * S3,
+    frontSpringStrength: spec.frontSpringStrength * S2,
+    rearSpringStrength: spec.rearSpringStrength * S2,
+    frontSpringDamping: spec.frontSpringDamping * Math.pow(S, 2.5),
+    rearSpringDamping: spec.rearSpringDamping * Math.pow(S, 2.5),
+    maxSpeed: spec.maxSpeed * Math.sqrt(S),
+    wheelMoI: spec.wheelMoI * S5,
+    gripCoeff: spec.gripCoeff,
+    steeringMax: spec.steeringMax,
+  };
+}
+
+function getScaleLabel(S) {
+  if (Math.abs(S - 1.0) < 0.01) return '1/4 Scale (1.0\u00d7)';
+  if (Math.abs(S - 2.0) < 0.01) return '1/2 Scale (2.0\u00d7)';
+  if (Math.abs(S - 3.0) < 0.01) return '3/4 Scale (3.0\u00d7)';
+  if (Math.abs(S - 4.0) < 0.01) return '1/1 Full Size (4.0\u00d7)';
+  const pct = (S / 4 * 100).toFixed(0);
+  return `${S.toFixed(2)}\u00d7 (${pct}% of full)`;
+}
+
+function getViews(S) {
+  return {
+    quarter: { pos: [1.4*S, 0.8*S, 1.4*S], target: [0, -0.05*S, 0] },
+    front:   { pos: [0, 0, 2.0*S],          target: [0, -0.05*S, 0] },
+    side:    { pos: [2.0*S, 0.1*S, 0],      target: [0, -0.05*S, 0] },
+    top:     { pos: [0, 2.0*S, 0.001],      target: [0, -0.05*S, 0] },
+    rear:    { pos: [0, 0.1*S, -2.0*S],     target: [0, -0.05*S, 0] },
+  };
+}
+
+// ─── Formatting Helpers ────────────────────────────────────────
+function fmtDist(v) { return v.toFixed(2); }
+function fmtForce(v, S) { return S >= 2 ? v.toFixed(0) : v.toFixed(1); }
+function fmtMass(v, S) { return S >= 2 ? v.toFixed(0) : v.toFixed(1); }
+
+// ─── Three.js Setup ────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const wrap = document.getElementById('canvas-wrap');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(45, wrap.clientWidth / wrap.clientHeight, 0.01, 200);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, -0.05, 0);
+
+// Lighting
+const ambient = new THREE.AmbientLight(0x404060, 0.6);
+scene.add(ambient);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
+dirLight.position.set(2, 3, 1);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.camera.near = 0.1;
+dirLight.shadow.camera.far = 10;
+dirLight.shadow.camera.left = -2;
+dirLight.shadow.camera.right = 2;
+dirLight.shadow.camera.top = 2;
+dirLight.shadow.camera.bottom = -2;
+scene.add(dirLight);
+const fillLight = new THREE.DirectionalLight(0x6688cc, 0.4);
+fillLight.position.set(-1, 1, -2);
+scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
+rimLight.position.set(0, -1, -1);
+scene.add(rimLight);
+
+// Ground (large enough for max scale)
+const groundGeo = new THREE.PlaneGeometry(24, 24);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x222238, roughness: 0.9 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.366;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(24, 240, 0x333355, 0x282845);
+grid.position.y = -0.365;
+scene.add(grid);
+
+// ─── Materials ─────────────────────────────────────────────────
+function makeMat(color, opts = {}) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: opts.roughness ?? 0.6,
+    metalness: opts.metalness ?? 0.1,
+    transparent: opts.transparent ?? false,
+    opacity: opts.opacity ?? 1.0,
+    side: opts.transparent ? THREE.DoubleSide : THREE.FrontSide,
+  });
+}
+
+const matDarkGrey = makeMat(0x333333);
+const matMedGrey = makeMat(0x808080, { metalness: 0.2 });
+const matBodySemi = makeMat(0x2E73E6, { transparent: true, opacity: 0.85 });
+const matBodySolid = makeMat(0x2E73E6);
+const matTire = makeMat(0x0D0D0D, { roughness: 0.9 });
+const matHub = makeMat(0xE6E6E6, { metalness: 0.4, roughness: 0.3 });
+
+const matColliderSolid = new THREE.MeshStandardMaterial({
+  color: 0x44ff44, transparent: true, opacity: 0.15,
+  side: THREE.DoubleSide, depthWrite: false,
+});
+const matColliderEdge = new THREE.LineBasicMaterial({ color: 0x44ff44 });
+const matRaycast = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+const matSphereWire = new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true, transparent: true, opacity: 0.3 });
+const matTireCol = new THREE.MeshBasicMaterial({ color: 0xff44ff, wireframe: true, transparent: true, opacity: 0.35 });
+const matTireColFill = new THREE.MeshStandardMaterial({ color: 0xff44ff, transparent: true, opacity: 0.08, side: THREE.DoubleSide, depthWrite: false });
+
+// ─── Shared Unit Geometries ────────────────────────────────────
+const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 32);
+const unitCylinderX = unitCylinder.clone().rotateZ(Math.PI / 2);
+const unitSphere = new THREE.SphereGeometry(1, 16, 12);
+const unitCylinderOpen = new THREE.CylinderGeometry(1, 1, 1, 16, 1, true);
+
+// ─── Vehicle Group ─────────────────────────────────────────────
+const vehicle = new THREE.Group();
+scene.add(vehicle);
+
+const colliderGroup = new THREE.Group();
+colliderGroup.visible = false;
+scene.add(colliderGroup);
+
+const dimGroup = new THREE.Group();
+dimGroup.visible = false;
+scene.add(dimGroup);
+
+// Track all visual meshes for wireframe toggle
+const allMeshes = [];
+
+// References to meshes for fast rebuild
+const bodyMeshes = [];    // body parts (6)
+const wingMesh = { ref: null };
+const armMeshes = [];     // control arms (4)
+const wheelGroups = [];   // wheel groups (4), each with tire+hub children
+const colliderSolids = [];
+const colliderEdges = [];
+const sphereCastObjs = []; // per wheel: { topSphere, botSphere, sweep, rayLine, tireWire, tireFill }
+
+// ─── Build Vehicle Meshes (once) ───────────────────────────────
+function buildMeshes(spec) {
+  // Body parts
+  for (let i = 0; i < spec.bodyParts.length; i++) {
+    const p = spec.bodyParts[i];
+    const isShell = p.name === 'BodyShell';
+    const isShockTower = p.name.includes('ShockTower');
+    const mat = isShell ? matBodySemi : (isShockTower ? matMedGrey : matDarkGrey);
+    const mesh = new THREE.Mesh(unitBox, mat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.name = p.name;
+    mesh.userData.base = { sx: p.sx, sy: p.sy, sz: p.sz, px: p.px, py: p.py, pz: p.pz };
+    vehicle.add(mesh);
+    bodyMeshes.push(mesh);
+    allMeshes.push(mesh);
+  }
+
+  // Rear wing
+  {
+    const w = spec.rearWing;
+    const mesh = new THREE.Mesh(unitBox, matBodySolid);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.name = 'RearWing';
+    mesh.userData.base = { sx: w.sx, sy: w.sy, sz: w.sz, px: w.px, py: w.py, pz: w.pz, rotX: w.rotX };
+    mesh.rotation.x = w.rotX * Math.PI / 180;
+    vehicle.add(mesh);
+    wingMesh.ref = mesh;
+    allMeshes.push(mesh);
+  }
+
+  // Control arms
+  for (let i = 0; i < spec.controlArms.length; i++) {
+    const a = spec.controlArms[i];
+    const mesh = new THREE.Mesh(unitBox, matDarkGrey);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.name = a.name;
+    mesh.userData.base = { sx: a.sx, sy: a.sy, sz: a.sz, px: a.px, py: a.py, pz: a.pz };
+    vehicle.add(mesh);
+    armMeshes.push(mesh);
+    allMeshes.push(mesh);
+  }
+
+  // Wheels
+  for (let i = 0; i < spec.wheels.length; i++) {
+    const w = spec.wheels[i];
+    const group = new THREE.Group();
+    group.name = w.name;
+    group.userData.base = { px: w.px, py: 0, pz: w.pz };
+
+    const tire = new THREE.Mesh(unitCylinderX, matTire);
+    tire.castShadow = true;
+    tire.name = w.name + '_tire';
+    tire.userData.base = { r: w.tireR, h: w.tireH, py: -0.2 };
+    group.add(tire);
+    allMeshes.push(tire);
+
+    const hub = new THREE.Mesh(unitCylinderX, matHub);
+    hub.castShadow = true;
+    hub.name = w.name + '_hub';
+    hub.userData.base = { r: w.hubR, h: w.hubH, py: -0.2 };
+    group.add(hub);
+    allMeshes.push(hub);
+
+    vehicle.add(group);
+    wheelGroups.push(group);
+  }
+
+  // Colliders (4)
+  for (let i = 0; i < spec.colliders.length; i++) {
+    const c = spec.colliders[i];
+    const solid = new THREE.Mesh(unitBox, matColliderSolid);
+    solid.renderOrder = 1;
+    solid.userData.base = { sx: c.sx, sy: c.sy, sz: c.sz, cx: c.cx, cy: c.cy, cz: c.cz };
+    colliderGroup.add(solid);
+    colliderSolids.push(solid);
+
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(unitBox), matColliderEdge);
+    edges.renderOrder = 2;
+    edges.userData.base = { sx: c.sx, sy: c.sy, sz: c.sz, cx: c.cx, cy: c.cy, cz: c.cz };
+    colliderGroup.add(edges);
+    colliderEdges.push(edges);
+  }
+
+  // SphereCast visualization per wheel
+  for (let i = 0; i < spec.wheels.length; i++) {
+    const w = spec.wheels[i];
+    const scR = spec.sphereCastRadius;
+    const rLen = spec.restDistance + spec.overExtend + spec.wheelRadius;
+
+    const topSphere = new THREE.Mesh(unitSphere, matSphereWire);
+    colliderGroup.add(topSphere);
+
+    const botSphere = new THREE.Mesh(unitSphere, matSphereWire);
+    colliderGroup.add(botSphere);
+
+    const sweep = new THREE.Mesh(unitCylinderOpen, matSphereWire);
+    colliderGroup.add(sweep);
+
+    const pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0)];
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+    const rayLine = new THREE.Line(lineGeo, matRaycast);
+    colliderGroup.add(rayLine);
+
+    const tireWire = new THREE.Mesh(unitCylinderX, matTireCol);
+    colliderGroup.add(tireWire);
+
+    const tireFill = new THREE.Mesh(unitCylinderX, matTireColFill);
+    tireFill.renderOrder = 1;
+    colliderGroup.add(tireFill);
+
+    sphereCastObjs.push({
+      topSphere, botSphere, sweep, rayLine, tireWire, tireFill,
+      base: { px: w.px, pz: w.pz, scR, rLen, tireR: w.tireR, tireH: w.tireH }
+    });
+  }
+}
+
+buildMeshes(SPEC_2WD);
+
+// ─── Rebuild Function ──────────────────────────────────────────
+let activeSpec = SPEC_2WD;
+let S = 1.0;
+let currentView = 'quarter';
+let animating = false;
+let showDims = false;
+let showWire = false;
+let exploded = false;
+let displayMode = 'visuals';
+
+function rebuild(spec, scale) {
+  activeSpec = spec;
+  S = scale;
+
+  // Update body material color
+  matBodySemi.color.setHex(spec.bodyColor);
+  matBodySemi.opacity = spec.bodyOpacity;
+  matBodySolid.color.setHex(spec.bodyColor);
+
+  // 1. Body parts
+  for (let i = 0; i < bodyMeshes.length; i++) {
+    const p = spec.bodyParts[i];
+    const m = bodyMeshes[i];
+    m.userData.base = { sx: p.sx, sy: p.sy, sz: p.sz, px: p.px, py: p.py, pz: p.pz };
+    m.scale.set(p.sx * S, p.sy * S, p.sz * S);
+    m.position.set(p.px * S, p.py * S, p.pz * S);
+  }
+
+  // 2. Rear wing
+  {
+    const w = spec.rearWing;
+    const m = wingMesh.ref;
+    m.userData.base = { sx: w.sx, sy: w.sy, sz: w.sz, px: w.px, py: w.py, pz: w.pz, rotX: w.rotX };
+    m.scale.set(w.sx * S, w.sy * S, w.sz * S);
+    m.position.set(w.px * S, w.py * S, w.pz * S);
+    m.rotation.x = w.rotX * Math.PI / 180;
+  }
+
+  // 3. Control arms
+  for (let i = 0; i < armMeshes.length; i++) {
+    const a = spec.controlArms[i];
+    const m = armMeshes[i];
+    m.userData.base = { sx: a.sx, sy: a.sy, sz: a.sz, px: a.px, py: a.py, pz: a.pz };
+    m.scale.set(a.sx * S, a.sy * S, a.sz * S);
+    m.position.set(a.px * S, a.py * S, a.pz * S);
+  }
+
+  // 4. Wheels
+  for (let i = 0; i < wheelGroups.length; i++) {
+    const w = spec.wheels[i];
+    const g = wheelGroups[i];
+    g.userData.base = { px: w.px, py: 0, pz: w.pz };
+    g.position.set(w.px * S, 0, w.pz * S);
+
+    const tire = g.children[0];
+    tire.userData.base = { r: w.tireR, h: w.tireH, py: -0.2 };
+    tire.scale.set(w.tireH * S, w.tireR * S, w.tireR * S);
+    tire.position.set(0, -0.2 * S, 0);
+
+    const hub = g.children[1];
+    hub.userData.base = { r: w.hubR, h: w.hubH, py: -0.2 };
+    hub.scale.set(w.hubH * S, w.hubR * S, w.hubR * S);
+    hub.position.set(0, -0.2 * S, 0);
+  }
+
+  // 5. Colliders
+  for (let i = 0; i < colliderSolids.length; i++) {
+    const c = spec.colliders[i];
+    colliderSolids[i].userData.base = { sx: c.sx, sy: c.sy, sz: c.sz, cx: c.cx, cy: c.cy, cz: c.cz };
+    colliderSolids[i].scale.set(c.sx * S, c.sy * S, c.sz * S);
+    colliderSolids[i].position.set(c.cx * S, c.cy * S, c.cz * S);
+
+    colliderEdges[i].userData.base = { sx: c.sx, sy: c.sy, sz: c.sz, cx: c.cx, cy: c.cy, cz: c.cz };
+    colliderEdges[i].scale.set(c.sx * S, c.sy * S, c.sz * S);
+    colliderEdges[i].position.set(c.cx * S, c.cy * S, c.cz * S);
+  }
+
+  // 6. SphereCast visualization
+  for (let i = 0; i < sphereCastObjs.length; i++) {
+    const w = spec.wheels[i];
+    const scR = spec.sphereCastRadius;
+    const rLen = (spec.restDistance + spec.overExtend + spec.wheelRadius);
+    const obj = sphereCastObjs[i];
+    obj.base = { px: w.px, pz: w.pz, scR, rLen, tireR: w.tireR, tireH: w.tireH };
+
+    const originY = scR * S;
+    const endY = originY - rLen * S;
+    const px = w.px * S;
+    const pz = w.pz * S;
+
+    obj.topSphere.scale.setScalar(scR * S);
+    obj.topSphere.position.set(px, originY, pz);
+
+    obj.botSphere.scale.setScalar(scR * S);
+    obj.botSphere.position.set(px, endY, pz);
+
+    obj.sweep.scale.set(scR * S, rLen * S, scR * S);
+    obj.sweep.position.set(px, originY - rLen * S / 2, pz);
+
+    // Update ray line positions
+    const posAttr = obj.rayLine.geometry.attributes.position;
+    posAttr.setXYZ(0, px, originY, pz);
+    posAttr.setXYZ(1, px, endY, pz);
+    posAttr.needsUpdate = true;
+
+    // Tire collision volumes
+    obj.tireWire.scale.set(w.tireH * S, w.tireR * S, w.tireR * S);
+    obj.tireWire.position.set(px, -0.2 * S, pz);
+
+    obj.tireFill.scale.set(w.tireH * S, w.tireR * S, w.tireR * S);
+    obj.tireFill.position.set(px, -0.2 * S, pz);
+  }
+
+  // 7. Ground plane + grid
+  ground.position.y = spec.groundY * S;
+  grid.position.y = spec.groundY * S + 0.001;
+
+  // 8. Shadow camera
+  const extent = 2 * S;
+  dirLight.shadow.camera.left = -extent;
+  dirLight.shadow.camera.right = extent;
+  dirLight.shadow.camera.top = extent;
+  dirLight.shadow.camera.bottom = -extent;
+  dirLight.shadow.camera.far = 10 * S;
+  dirLight.shadow.camera.updateProjectionMatrix();
+
+  // 9. Rebuild dimension lines
+  rebuildDimensions(spec, S);
+
+  // 10. Rebuild collider labels
+  rebuildColliderLabels(spec, S);
+
+  // 11. Update camera target for current view
+  const views = getViews(S);
+  controls.target.set(...views[currentView].target);
+
+  // 12. Update info panel
+  updateInfoPanel(spec, S);
+
+  // 13. Update physics panel
+  updatePhysicsPanel(spec, S);
+
+  // 14. Update scale label
+  document.getElementById('scale-label').textContent = getScaleLabel(S);
+
+  // 15. Reapply explode if active
+  if (exploded) applyExplode(true);
+}
+
+// ─── Dimension Lines (rebuilt on each scale/vehicle change) ────
+const dimLineMat = new THREE.LineBasicMaterial({ color: 0xff6644, linewidth: 1 });
+const dimLineMat2 = new THREE.LineBasicMaterial({ color: 0x44bbff, linewidth: 1 });
+const dimLineMat3 = new THREE.LineBasicMaterial({ color: 0x44ff88, linewidth: 1 });
+
+function rebuildDimensions(spec, S) {
+  // Clear existing
+  while (dimGroup.children.length) {
+    const c = dimGroup.children[0];
+    dimGroup.remove(c);
+    if (c.geometry) c.geometry.dispose();
+    if (c.material && c.material.map) c.material.map.dispose();
+  }
+
+  const sc = computeScaled(spec, S);
+
+  function makeDimLine(points, mat) {
+    const geo = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(...p)));
+    const line = new THREE.Line(geo, mat);
+    dimGroup.add(line);
+  }
+
+  function makeLabel(text, pos, color = '#ff6644') {
+    const c2 = document.createElement('canvas');
+    c2.width = 256; c2.height = 64;
+    const ctx = c2.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.font = 'bold 28px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, 128, 40);
+    const tex = new THREE.CanvasTexture(c2);
+    const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.position.set(...pos);
+    sprite.scale.set(0.35 * S, 0.09 * S, 1);
+    dimGroup.add(sprite);
+  }
+
+  // Overall length
+  const halfLen = sc.overallLength / 2;
+  const lenY = spec.groundY * S;
+  const lenX = -0.7 * S;
+  makeDimLine([[lenX, lenY, -halfLen], [lenX, lenY, halfLen]], dimLineMat);
+  makeDimLine([[lenX, lenY, -halfLen], [lenX + 0.1 * S, lenY, -halfLen]], dimLineMat);
+  makeDimLine([[lenX, lenY, halfLen], [lenX + 0.1 * S, lenY, halfLen]], dimLineMat);
+  makeLabel(`${sc.overallLength.toFixed(2)}m length`, [lenX - 0.05 * S, lenY + 0.04 * S, 0]);
+
+  // Overall width
+  const halfWid = sc.overallWidth / 2;
+  const widZ = -0.9 * S;
+  makeDimLine([[-halfWid, lenY, widZ], [halfWid, lenY, widZ]], dimLineMat2);
+  makeDimLine([[-halfWid, lenY, widZ], [-halfWid, lenY, widZ + 0.08 * S]], dimLineMat2);
+  makeDimLine([[halfWid, lenY, widZ], [halfWid, lenY, widZ + 0.08 * S]], dimLineMat2);
+  makeLabel(`${sc.overallWidth.toFixed(2)}m width`, [0, lenY + 0.04 * S, widZ - 0.05 * S], '#44bbff');
+
+  // Wheelbase
+  const halfWb = sc.wheelbase / 2;
+  const wbX = 0.7 * S;
+  const wbY = -0.2 * S;
+  makeDimLine([[wbX, wbY, -halfWb], [wbX, wbY, halfWb]], dimLineMat3);
+  makeDimLine([[wbX, wbY, -halfWb], [wbX - 0.1 * S, wbY, -halfWb]], dimLineMat3);
+  makeDimLine([[wbX, wbY, halfWb], [wbX - 0.1 * S, wbY, halfWb]], dimLineMat3);
+  makeLabel(`${sc.wheelbase.toFixed(2)}m wheelbase`, [wbX + 0.05 * S, wbY + 0.04 * S, 0], '#44ff88');
+
+  // Track width
+  const halfTrack = sc.track / 2;
+  const trZ = 0.85 * S;
+  const trY = 0.15 * S;
+  makeDimLine([[-halfTrack, trY, trZ], [halfTrack, trY, trZ]], dimLineMat3);
+  makeDimLine([[-halfTrack, trY, trZ], [-halfTrack, trY, trZ - 0.07 * S]], dimLineMat3);
+  makeDimLine([[halfTrack, trY, trZ], [halfTrack, trY, trZ - 0.07 * S]], dimLineMat3);
+  makeLabel(`${sc.track.toFixed(2)}m track`, [0, trY + 0.04 * S, trZ], '#44ff88');
+
+  // Wheel diameter
+  const wd = sc.wheelRadius * 2;
+  const wdX = -0.72 * S;
+  const wdY = -0.2 * S;
+  const wdZ = spec.wheels[0].pz * S;
+  makeDimLine([[wdX, wdY - sc.wheelRadius, wdZ], [wdX, wdY + sc.wheelRadius, wdZ]], dimLineMat);
+  makeDimLine([[wdX, wdY - sc.wheelRadius, wdZ], [wdX + 0.07 * S, wdY - sc.wheelRadius, wdZ]], dimLineMat);
+  makeDimLine([[wdX, wdY + sc.wheelRadius, wdZ], [wdX + 0.07 * S, wdY + sc.wheelRadius, wdZ]], dimLineMat);
+  makeLabel(`\u2300${wd.toFixed(3)}m`, [wdX - 0.06 * S, wdY, wdZ]);
+}
+
+// ─── Collider Labels (rebuilt on change) ───────────────────────
+const colliderLabelSprites = [];
+
+function rebuildColliderLabels(spec, S) {
+  // Remove old sprites
+  for (const spr of colliderLabelSprites) {
+    colliderGroup.remove(spr);
+    if (spr.material.map) spr.material.map.dispose();
+    spr.material.dispose();
+  }
+  colliderLabelSprites.length = 0;
+
+  function addLabel(text, pos, color = '#44ff44') {
+    const c2 = document.createElement('canvas');
+    c2.width = 320; c2.height = 48;
+    const ctx = c2.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.font = '20px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, 160, 30);
+    const tex = new THREE.CanvasTexture(c2);
+    const sm = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    const sprite = new THREE.Sprite(sm);
+    sprite.position.set(...pos);
+    sprite.scale.set(0.38 * S, 0.06 * S, 1);
+    colliderGroup.add(sprite);
+    colliderLabelSprites.push(sprite);
+  }
+
+  const sc = computeScaled(spec, S);
+
+  // Collider size labels
+  for (const c of spec.colliders) {
+    const sx = (c.sx * S).toFixed(2);
+    const sy = (c.sy * S).toFixed(2);
+    const sz = (c.sz * S).toFixed(2);
+    const labelY = (c.cy + (c.name === 'ChassisSlab' ? -0.08 : 0.19)) * S;
+    const labelZ = (c.cz + (Math.abs(c.cz) > 0.5 ? 0 : 0)) * S;
+    addLabel(`${c.name} ${sx}\u00d7${sy}\u00d7${sz}`, [0, labelY, labelZ]);
+  }
+
+  // SphereCast label
+  addLabel(
+    `SphereCast r=${sc.sphereCastRadius.toFixed(2)} len=${sc.rayLength.toFixed(3)}`,
+    [spec.wheels[0].px * S, 0.22 * S, spec.wheels[0].pz * S],
+    '#ffaa00'
+  );
+
+  // Tire volume labels (front + rear)
+  const fw = spec.wheels[1];
+  const rw = spec.wheels[3];
+  addLabel(
+    `Tire vol \u2300${(fw.tireR * 2 * S).toFixed(3)}\u00d7${(fw.tireH * S).toFixed(3)}`,
+    [fw.px * S, -0.05 * S, fw.pz * S],
+    '#ff44ff'
+  );
+  addLabel(
+    `Tire vol \u2300${(rw.tireR * 2 * S).toFixed(3)}\u00d7${(rw.tireH * S).toFixed(3)}`,
+    [rw.px * S, -0.05 * S, rw.pz * S],
+    '#ff44ff'
+  );
+
+  // Legend labels
+  addLabel('\u25a0 Box Colliders', [-0.85 * S, 0.35 * S, 0], '#44ff44');
+  addLabel('\u25a0 SphereCast', [-0.85 * S, 0.30 * S, 0], '#ffaa00');
+  addLabel('\u25a0 Tire Volumes', [-0.85 * S, 0.25 * S, 0], '#ff44ff');
+}
+
+// ─── Info Panel ────────────────────────────────────────────────
+function updateInfoPanel(spec, S) {
+  const sc = computeScaled(spec, S);
+  const label = getScaleLabel(S);
+  document.getElementById('info').innerHTML =
+    `<strong>${spec.name}</strong> \u2014 ${label}<br>` +
+    `Overall: ${sc.overallLength.toFixed(2)}m L \u00d7 ${sc.overallWidth.toFixed(2)}m W \u00d7 ${sc.overallHeight.toFixed(2)}m H<br>` +
+    `Wheelbase: ${sc.wheelbase.toFixed(2)}m | Track: ${sc.track.toFixed(2)}m<br>` +
+    `Wheels: \u2300${(sc.wheelRadius * 2).toFixed(3)}m | Ground clearance: ${sc.groundClearance.toFixed(3)}m<br>` +
+    `<span style="color:#555">Drag to orbit \u00b7 Scroll to zoom \u00b7 Right-drag to pan</span>`;
+}
+
+// ─── Physics Panel ─────────────────────────────────────────────
+function updatePhysicsPanel(spec, S) {
+  const sc = computeScaled(spec, S);
+  const label = getScaleLabel(S);
+
+  function row(lbl, val, unit, rule) {
+    return `<div class="row"><span class="lbl">${lbl}</span><span><span class="val">${val}</span> ${unit}<span class="rule">${rule}</span></span></div>`;
+  }
+
+  let html = `<div class="panel-title">PHYSICS AT ${label} \u2014 ${spec.name}</div>`;
+
+  // BODY
+  html += `<div class="section-head">BODY</div>`;
+  html += row('Mass', fmtMass(sc.mass, S), 'kg', '\u00d7S\u00b3');
+  html += row('CoM Y', fmtDist(sc.comY), 'm', '\u00d7S');
+  html += row('Layout', spec.layout, '', '');
+
+  html += `<hr class="section-sep">`;
+
+  // ENGINE
+  html += `<div class="section-head">ENGINE</div>`;
+  html += row('Force', fmtForce(sc.engineForce, S), 'N', '\u00d7S\u00b3');
+  html += row('Max speed', fmtDist(sc.maxSpeed), 'm/s', '\u00d7\u221aS');
+  html += row('Brake', fmtForce(sc.brakeForce, S), 'N', '\u00d7S\u00b3');
+  html += row('Reverse', fmtForce(sc.reverseForce, S), 'N', '\u00d7S\u00b3');
+  html += row('Coast drag', fmtForce(sc.coastDrag, S), 'N', '\u00d7S\u00b3');
+
+  html += `<hr class="section-sep">`;
+
+  // SUSPENSION (FRONT)
+  html += `<div class="section-head">SUSPENSION (FRONT)</div>`;
+  html += row('Spring', fmtForce(sc.frontSpringStrength, S), 'N/m', '\u00d7S\u00b2');
+  html += row('Damping', fmtDist(sc.frontSpringDamping), 'N\u00b7s/m', '\u00d7S^2.5');
+  html += row('Rest dist', fmtDist(sc.restDistance), 'm', '\u00d7S');
+  html += row('Over-extend', fmtDist(sc.overExtend), 'm', '\u00d7S');
+  html += row('Min spring', fmtDist(sc.minSpringLen), 'm', '\u00d7S');
+  html += row('Max force', fmtForce(sc.maxSpringForce, S), 'N', '\u00d7S\u00b3');
+
+  html += `<hr class="section-sep">`;
+
+  // SUSPENSION (REAR)
+  html += `<div class="section-head">SUSPENSION (REAR)</div>`;
+  html += row('Spring', fmtForce(sc.rearSpringStrength, S), 'N/m', '\u00d7S\u00b2');
+  html += row('Damping', fmtDist(sc.rearSpringDamping), 'N\u00b7s/m', '\u00d7S^2.5');
+
+  html += `<hr class="section-sep">`;
+
+  // WHEELS
+  html += `<div class="section-head">WHEELS</div>`;
+  html += row('Radius', fmtDist(sc.wheelRadius), 'm', '\u00d7S');
+  html += row('SphereCast', fmtDist(sc.sphereCastRadius), 'm', '\u00d7S');
+  html += row('Ray length', fmtDist(sc.rayLength), 'm', '\u00d7S');
+  html += row('Inertia', sc.wheelMoI.toFixed(4), 'kg\u00b7m\u00b2', '\u00d7S\u2075');
+
+  html += `<hr class="section-sep">`;
+
+  // TRACTION
+  html += `<div class="section-head">TRACTION</div>`;
+  html += row('Grip coeff', sc.gripCoeff.toFixed(2), '', 'fixed');
+  html += row('Steering', sc.steeringMax.toFixed(2), 'rad', 'fixed');
+
+  html += `<hr class="section-sep">`;
+
+  // COLLIDERS
+  html += `<div class="section-head">COLLIDERS</div>`;
+  for (const c of spec.colliders) {
+    const sx = (c.sx * S).toFixed(2);
+    const sy = (c.sy * S).toFixed(2);
+    const sz = (c.sz * S).toFixed(2);
+    html += `<div class="row"><span class="lbl">${c.name}</span><span class="val">${sx}\u00d7${sy}\u00d7${sz}</span></div>`;
+  }
+
+  // Scaling Reference (collapsible)
+  html += `<div class="ref-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">\u2500 Scaling Reference \u2500</div>`;
+  html += `<div class="ref-body" style="display:none">`;
+  html += `Distance&nbsp;&nbsp;\u00d7S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(linear)<br>`;
+  html += `Mass&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u00d7S\u00b3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(volume)<br>`;
+  html += `Force&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u00d7S\u00b3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(F=ma)<br>`;
+  html += `Spring&nbsp;&nbsp;&nbsp;&nbsp;\u00d7S\u00b2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(sag ratio)<br>`;
+  html += `Damping&nbsp;&nbsp;&nbsp;\u00d7S^2.5&nbsp;&nbsp;&nbsp;(critical ratio)<br>`;
+  html += `Speed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\u00d7\u221aS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Froude)<br>`;
+  html += `Inertia&nbsp;&nbsp;&nbsp;\u00d7S\u2075&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mr\u00b2)<br>`;
+  html += `Grip&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fixed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dimensionless)<br>`;
+  html += `</div>`;
+
+  document.getElementById('physics-panel').innerHTML = html;
+}
+
+// ─── Explode ───────────────────────────────────────────────────
+function applyExplode(on) {
+  const factor = on ? 1.6 : 1.0;
+  vehicle.children.forEach(child => {
+    if (child.userData.base) {
+      const b = child.userData.base;
+      if (b.px !== undefined) {
+        child.position.set(
+          b.px * S * factor,
+          (b.py !== undefined ? b.py : 0) * S * (on ? 1.3 : 1),
+          (b.pz !== undefined ? b.pz : 0) * S * factor
+        );
+      }
+    }
+  });
+}
+
+// ─── Camera Animation ──────────────────────────────────────────
+function animateToView(name) {
+  const views = getViews(S);
+  const v = views[name];
+  if (!v) return;
+
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const endPos = new THREE.Vector3(...v.pos);
+  const endTarget = new THREE.Vector3(...v.target);
+  const duration = 600;
+  const startTime = performance.now();
+  animating = true;
+
+  function step(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    camera.position.lerpVectors(startPos, endPos, ease);
+    controls.target.lerpVectors(startTarget, endTarget, ease);
+    controls.update();
+    if (t < 1) requestAnimationFrame(step);
+    else animating = false;
+  }
+  requestAnimationFrame(step);
+}
+
+// ─── Window API ────────────────────────────────────────────────
+window.setView = function(name) {
+  currentView = name;
+  document.querySelectorAll('#toolbar .group:first-child button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + name)?.classList.add('active');
+  animateToView(name);
+};
+
+window.setVehicle = function(type) {
+  document.getElementById('btn-2wd').classList.toggle('active', type === '2wd');
+  document.getElementById('btn-4wd').classList.toggle('active', type === '4wd');
+  const spec = type === '4wd' ? SPEC_4WD : SPEC_2WD;
+  rebuild(spec, S);
+  animateToView(currentView);
+};
+
+window.onScaleSlider = function(val) {
+  const newS = parseFloat(val);
+  rebuild(activeSpec, newS);
+  animateToView(currentView);
+};
+
+window.setScale = function(val) {
+  document.getElementById('scale-slider').value = val;
+  rebuild(activeSpec, val);
+  animateToView(currentView);
+};
+
+window.setDisplay = function(mode) {
+  displayMode = mode;
+  document.querySelectorAll('#btn-visuals,#btn-colliders,#btn-both').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + mode)?.classList.add('active');
+  vehicle.visible = (mode === 'visuals' || mode === 'both');
+  colliderGroup.visible = (mode === 'colliders' || mode === 'both');
+};
+
+window.toggleDimensions = function() {
+  showDims = !showDims;
+  document.getElementById('dim-toggle').classList.toggle('on', showDims);
+  dimGroup.visible = showDims;
+};
+
+window.toggleWireframe = function() {
+  showWire = !showWire;
+  document.getElementById('wire-toggle').classList.toggle('on', showWire);
+  allMeshes.forEach(m => { m.material.wireframe = showWire; });
+};
+
+window.toggleExplode = function() {
+  exploded = !exploded;
+  document.getElementById('explode-toggle').classList.toggle('on', exploded);
+  applyExplode(exploded);
+};
+
+// ─── Init ──────────────────────────────────────────────────────
+rebuild(SPEC_2WD, 1.0);
+animateToView('quarter');
+
+// ─── Resize ────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = wrap.clientWidth / wrap.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+});
+
+// ─── Render Loop ───────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  if (!animating) controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
