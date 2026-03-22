@@ -7,13 +7,25 @@ namespace R8EOX.Track
     {
         [SerializeField] private TrackConfig config;
 
-        private SpawnPoint[] spawnPoints;
+        private SpawnPointData[] cachedSpawnData;
 
         public void Initialize(TrackConfig trackConfig)
         {
             config = trackConfig;
-            spawnPoints = GetComponentsInChildren<SpawnPoint>();
-            System.Array.Sort(spawnPoints, (a, b) => a.Index.CompareTo(b.Index));
+
+            var grid = GetComponentInChildren<SpawnGrid>();
+            if (grid != null)
+            {
+                cachedSpawnData = grid.ComputeSpawnPoints();
+            }
+            else
+            {
+                var points = GetComponentsInChildren<SpawnPoint>();
+                System.Array.Sort(points, (a, b) => a.Index.CompareTo(b.Index));
+                cachedSpawnData = new SpawnPointData[points.Length];
+                for (int i = 0; i < points.Length; i++)
+                    cachedSpawnData[i] = points[i].ToData();
+            }
         }
 
         public int GetCheckpointCount()
@@ -48,32 +60,29 @@ namespace R8EOX.Track
 
         public int GetSpawnPointCount()
         {
-            return spawnPoints != null ? spawnPoints.Length : 0;
+            return cachedSpawnData != null ? cachedSpawnData.Length : 0;
         }
 
         public SpawnPointData[] GetSpawnPoints()
         {
-            if (spawnPoints == null || spawnPoints.Length == 0)
+            if (cachedSpawnData == null || cachedSpawnData.Length == 0)
                 return System.Array.Empty<SpawnPointData>();
 
-            var data = new SpawnPointData[spawnPoints.Length];
-            for (int i = 0; i < spawnPoints.Length; i++)
-                data[i] = spawnPoints[i].ToData();
-            return data;
+            return cachedSpawnData;
         }
 
         public SpawnPointData GetPlayerSpawnPoint()
         {
-            if (spawnPoints == null || spawnPoints.Length == 0)
+            if (cachedSpawnData == null || cachedSpawnData.Length == 0)
                 return default;
 
-            foreach (var sp in spawnPoints)
+            foreach (var sp in cachedSpawnData)
             {
                 if (sp.IsPlayerSpawn)
-                    return sp.ToData();
+                    return sp;
             }
             // Fallback: first spawn point
-            return spawnPoints[0].ToData();
+            return cachedSpawnData[0];
         }
 
         public bool HasCenterline()
