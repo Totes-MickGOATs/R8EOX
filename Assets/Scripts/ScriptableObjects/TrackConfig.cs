@@ -10,6 +10,9 @@ namespace R8EOX
         [SerializeField] private float trackLength = 5000f;
         [SerializeField] private int checkpointCount = 10;
 
+        [Header("Track Type")]
+        [SerializeField] private TrackType trackType = TrackType.Circuit;
+
         [Header("Surface")]
         [SerializeField] private float defaultGripMultiplier = 1.0f;
 
@@ -20,6 +23,7 @@ namespace R8EOX
         [Header("Environment")]
         [SerializeField] private float ambientTemperature = 25f;
 
+        public TrackType TrackType => trackType;
         public string TrackName => trackName;
         public float TrackLength => trackLength;
         public int CheckpointCount => checkpointCount;

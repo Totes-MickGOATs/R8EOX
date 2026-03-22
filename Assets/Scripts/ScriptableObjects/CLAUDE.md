@@ -14,7 +14,11 @@ ScriptableObject class definitions. Asset instances created from these go in app
 - `SuspensionConfig.cs` — Suspension spring strength, damping, rest distance
 - `TractionConfig.cs` — Traction and grip curve configuration
 - `WheelInertiaConfig.cs` — Wheel rotational inertia parameters
-- `TrackConfig.cs` — Track configuration
+- `TrackConfig.cs` — Track configuration (includes TrackType)
+- `TrackType.cs` — Enum: Circuit, PointToPoint
+- `SessionMode.cs` — Enum: Practice, Race, TimeTrial
+- `SessionConfig.cs` — Session parameters (mode, track, vehicle, laps, AI, countdown, time limit)
+- `SessionChannel.cs` — Runtime data channel for sharing active SessionConfig between systems
 - `RaceConfig.cs` — Race configuration
 - `EnvironmentSettings.cs` — Skybox, fog, ambient light, and sun settings
 - `TerrainSettings.cs` — Terrain dimensions and resolution settings
