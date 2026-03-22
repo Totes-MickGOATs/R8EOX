@@ -46,13 +46,13 @@ namespace R8EOX.Editor.Builders
             AddControlArms(root, darkGrey);
 
             BuildWheel(root, "WheelFL", new Vector3(-1.25f, 0f,  1.7f),
-                isSteer: true,  isMotor: false, 1.66f, 1.12f, 0.275f, 1.28f, tireMat, hubMat, carLayer);
+                isSteer: true,  isMotor: false, 0.38f, 0.25f, 0.215f, 0.22f, tireMat, hubMat, carLayer);
             BuildWheel(root, "WheelFR", new Vector3( 1.25f, 0f,  1.7f),
-                isSteer: true,  isMotor: false, 1.66f, 1.12f, 0.275f, 1.28f, tireMat, hubMat, carLayer);
+                isSteer: true,  isMotor: false, 0.38f, 0.25f, 0.215f, 0.22f, tireMat, hubMat, carLayer);
             BuildWheel(root, "WheelRL", new Vector3(-1.25f, 0f, -1.7f),
-                isSteer: false, isMotor: true,  1.66f, 1.68f, 0.275f, 1.84f, tireMat, hubMat, carLayer);
+                isSteer: false, isMotor: true,  0.38f, 0.30f, 0.215f, 0.26f, tireMat, hubMat, carLayer);
             BuildWheel(root, "WheelRR", new Vector3( 1.25f, 0f, -1.7f),
-                isSteer: false, isMotor: true,  1.66f, 1.68f, 0.275f, 1.84f, tireMat, hubMat, carLayer);
+                isSteer: false, isMotor: true,  0.38f, 0.30f, 0.215f, 0.26f, tireMat, hubMat, carLayer);
 
             GameObject airPhysGO = new GameObject("AirPhysics");
             airPhysGO.transform.SetParent(root.transform, false);
@@ -132,12 +132,13 @@ namespace R8EOX.Editor.Builders
             var wheel = pivot.AddComponent<R8EOX.Vehicle.Internal.RaycastWheel>();
             wheel.IsSteer = isSteer;
             wheel.IsMotor = isMotor;
-            wheel.SpringStrength = 75f;
-            wheel.SpringDamping = 4.25f;
-            wheel.RestDistance = 2.0f;
+            wheel.SpringStrength = 400f;
+            wheel.SpringDamping = 22.5f;
+            wheel.RestDistance = 0.30f;
             var so = new SerializedObject(wheel);
-            so.FindProperty("_overExtend").floatValue = 0.8f;
-            so.FindProperty("_minSpringLen").floatValue = 0.32f;
+            so.FindProperty("_overExtend").floatValue = 0.12f;
+            so.FindProperty("_minSpringLen").floatValue = 0.05f;
+            so.FindProperty("_wheelRadius").floatValue = tireRadius;
             so.ApplyModifiedProperties();
 
             BuildWheelVisual(pivot, "WheelVisual", tireRadius, tireHeight, tireMat, layer);
@@ -150,7 +151,7 @@ namespace R8EOX.Editor.Builders
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             go.name = name;
             go.transform.SetParent(pivot.transform, false);
-            go.transform.localPosition = new Vector3(0f, -0.2f, 0f);
+            go.transform.localPosition = new Vector3(0f, -0.05f, 0f);
             go.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             go.transform.localScale = new Vector3(radius * 2f, height * 0.5f, radius * 2f);
             go.GetComponent<Renderer>().material = mat;
