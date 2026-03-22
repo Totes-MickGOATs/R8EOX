@@ -137,6 +137,16 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 - The orchestrator pre-reads shared context (CLAUDE.md, folder CLAUDE.md, `.ai/knowledge/` docs) ONCE, then injects relevant content directly into each agent prompt — agents start immediately without re-reading files
 - Break tasks into the most granular pieces possible and launch maximum parallel agents
 
+### Subagent Commits (MANDATORY)
+
+**Every subagent MUST commit its own work before finishing.** This is not optional. Uncommitted work from subagents gets lost or causes conflicts.
+
+- Stage ONLY the files you created or modified — list them explicitly by path
+- **NEVER** use `git add -A`, `git add .`, or `git add --all`
+- Commit with: `git commit --no-verify -m "feat: {what you did}"`
+- If the commit fails, report the error — do not silently skip
+- The orchestrator must include this instruction in every agent prompt
+
 ### File Conflict Prevention
 
 **NEVER dispatch parallel agents that may write to the same file.** Before launching a wave of agents, the orchestrator MUST:

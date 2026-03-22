@@ -2,6 +2,27 @@
 
 Every subagent must follow this process. The orchestrator injects this into your prompt.
 
+## CRITICAL: You MUST Commit Your Work
+
+**Every subagent MUST git commit before finishing. No exceptions.** Uncommitted work is invisible to other agents and the orchestrator — it WILL be lost or cause conflicts.
+
+```bash
+# Stage ONLY your files — list every file explicitly by path
+git add path/to/File1.cs path/to/File2.cs path/to/CLAUDE.md
+
+# NEVER use these — they stage OTHER agents' uncommitted work:
+# git add -A    ← BANNED
+# git add .     ← BANNED
+# git add --all ← BANNED
+
+# Commit with --no-verify (subagents skip the pre-commit hook)
+git commit --no-verify -m "feat: {what you did}"
+```
+
+If the commit fails, **report the error** — do not silently skip.
+
+---
+
 ## Before You Start
 
 - [ ] Read the pre-loaded context in your prompt — do NOT re-read CLAUDE.md or .ai/knowledge/ files if already provided
@@ -17,10 +38,6 @@ Every subagent must follow this process. The orchestrator injects this into your
 - [ ] Internal classes: `namespace R8EOX.{System}.Internal`, `internal class`
 - [ ] No banned patterns: `SendMessage`, `FindObjectOfType`, `.Instance`, legacy `Input.GetKey/GetAxis`
 - [ ] After creating/modifying C# files, check `read_console` for compilation errors
-
-## After Each File
-
-- [ ] Stage the file: the auto-stage hook handles this, but verify if needed
 
 ## After All Work Is Done
 
@@ -41,13 +58,15 @@ Every subagent must follow this process. The orchestrator injects this into your
   ```
 - [ ] If you created a NEW directory, it needs a CLAUDE.md
 
-### 2. Commit Your Work
+### 2. Commit Your Work (MANDATORY)
 - [ ] Stage ONLY the files you created or modified — list them explicitly by path: `git add path/to/File1.cs path/to/File2.cs`
 - [ ] **NEVER** use `git add -A`, `git add .`, or `git add --all` — this will stage other agents' uncommitted work and cause conflicts
 - [ ] Commit with a descriptive message: `git commit --no-verify -m "feat: {what you did}"`
 - [ ] If the commit fails, report the error — do not silently skip
+- [ ] **DO NOT FINISH without committing** — this is the most important step
 
 ### 3. Report Results
 - [ ] List every file you created or modified (full paths)
+- [ ] Confirm your commit hash (run `git log --oneline -1`)
 - [ ] Note any compilation errors from read_console
 - [ ] Flag anything that needs follow-up by another agent or the orchestrator
