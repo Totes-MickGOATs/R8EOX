@@ -12,6 +12,6 @@ Internal implementation classes for the Session system. Only `SessionManager` sh
 - `TrackReadiness.cs` — Struct: flags for spawn points, checkpoints, centerline, finish trigger; readiness queries per mode + track type; missing-component report
 - `SessionState.cs` — FSM with validated phase transitions (TODO)
 - `SessionBootstrapper.cs` — Scene-resident MonoBehaviour: editor-play detection via SessionChannel (TODO)
-- `VehicleSpawner.cs` — Instantiates vehicle prefabs at SpawnPointData positions with terrain safety (TODO)
-- `SpawnSafety.cs` — Pure static class: raycast terrain height, compute safe spawn Y (TODO)
+- `VehicleSpawner.cs` — Instantiates vehicle prefabs at SpawnPointData positions with terrain safety
+- `SpawnSafety.cs` — Pure static class: raycast terrain height, compute safe spawn Y
 - `TrackValidator.cs` — Validates track components against mode requirements (TODO)
