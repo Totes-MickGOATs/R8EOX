@@ -86,6 +86,8 @@ namespace R8EOX.Vehicle
         public bool  IsAirborne     { get; private set; }     public float TumbleFactor       { get; private set; }
         public float TiltAngle      { get; private set; }     public bool  ReverseEngaged     { get; private set; }
         public float ForwardSpeed   { get; private set; }     internal MotorPreset ActiveMotorPreset => _motorPreset;
+        public float LastCollisionImpulse => _collision != null ? _collision.LastImpulse : 0f;
+        public float CumulativeDamage     => _collision != null ? _collision.CumulativeDamage : 0f;
 
         // Tuning accessors
         public float EngineForceMax => _engineForceMax; public float MaxSpeed    => _maxSpeed;
@@ -106,6 +108,7 @@ namespace R8EOX.Vehicle
         Rigidbody _rb; R8EOX.Input.IVehicleInput _input; RCAirPhysics _airPhysics; Drivetrain _drivetrain;
         WheelManager _wheels = new WheelManager(); TumbleController _tumble;
         AirborneDetector _airDetect = new AirborneDetector(5); bool _flipRequested;
+        CollisionTracker _collision; float _gearRatio = 7.5f; float _brakeInput;
 #if UNITY_EDITOR || DEBUG
         float _debugLogTimer;
 #endif
@@ -113,7 +116,7 @@ namespace R8EOX.Vehicle
         void Awake()
         {
             _rb = GetComponent<Rigidbody>(); _input = GetComponent<R8EOX.Input.IVehicleInput>();
-            _airPhysics = GetComponentInChildren<RCAirPhysics>(); _drivetrain = GetComponentInChildren<Drivetrain>();
+            _airPhysics = GetComponentInChildren<RCAirPhysics>(); _drivetrain = GetComponentInChildren<Drivetrain>(); _collision = GetComponent<CollisionTracker>();
         }
 
         void Start()
@@ -148,6 +151,7 @@ namespace R8EOX.Vehicle
         void FixedUpdate()
         {
             float dt = Time.fixedDeltaTime;
+            if (_collision != null) _collision.ResetFrame();
             if (_flipRequested) { _flipRequested = false; DoFlip(); }
 
             IsAirborne = _airDetect.Update(!_wheels.AnyOnGround());
@@ -157,7 +161,7 @@ namespace R8EOX.Vehicle
             _rb.centerOfMass = _comGround;
 
             float throttleRaw = _input != null ? _input.Throttle : 0f;
-            float brakeIn     = _input != null ? _input.Brake    : 0f;
+            float brakeIn     = _input != null ? _input.Brake    : 0f; _brakeInput = brakeIn;
             float steerIn     = _input != null ? _input.Steer    : 0f;
             float rampRate    = throttleRaw > SmoothThrottle ? _throttleRampUp : _throttleRampDown;
             SmoothThrottle = Mathf.MoveTowards(SmoothThrottle, throttleRaw, rampRate * dt);
@@ -200,6 +204,26 @@ namespace R8EOX.Vehicle
             return count > 0 ? slip / count : 0f;
         }
 
+        public VehicleTelemetry GetTelemetry()
+        {
+            var allWheels = _wheels.All;
+            var wt = new WheelTelemetry[allWheels.Length];
+            int grounded = 0; float rpmSum = 0f; int motorCount = 0;
+            for (int i = 0; i < allWheels.Length; i++)
+            {
+                var w = allWheels[i];
+                wt[i] = new WheelTelemetry(w.ContactPoint, w.ContactNormal, w.SlipRatio, w.GripFactor,
+                    w.WheelRpm, w.SuspensionForce, w.IsOnGround, 0);
+                if (w.IsOnGround) grounded++;
+                if (w.IsMotor) { rpmSum += w.WheelRpm; motorCount++; }
+            }
+            float engineRpm = motorCount > 0 ? (rpmSum / motorCount) * _gearRatio : 0f;
+            float impulse = _collision != null ? _collision.LastImpulse : 0f;
+            return new VehicleTelemetry(ForwardSpeed, GetSpeedKmh(), engineRpm,
+                SmoothThrottle, _brakeInput, CurrentSteering,
+                IsAirborne, TumbleFactor, TiltAngle, grounded, impulse, wt);
+        }
+
         internal RaycastWheel[] GetAllWheels()
         { if (_wheels.All.Length == 0) _wheels.Discover(transform); return _wheels.All; }
 
@@ -221,7 +245,17 @@ namespace R8EOX.Vehicle
         { _tumbleEngageDeg = engageDeg; _tumbleFullDeg = fullDeg; _tumbleBounce = bounce; _tumbleFriction = friction; }
         public void SetCentreOfMass(float groundY) => _comGround = new Vector3(0f, groundY, 0f);
         public void SetMass(float mass) { if (_rb != null) _rb.mass = mass; }
+        public void SetGearRatio(float ratio) { _gearRatio = ratio; }
         internal void SelectMotorPreset(MotorPreset preset) { _motorPreset = preset; ApplyMotorPreset(); }
+
+        public void Respawn(Vector3 position, Quaternion rotation)
+        { transform.SetPositionAndRotation(position, rotation); ResetPhysics(); if (_collision != null) _collision.ResetDamage(); }
+
+        public void ResetPhysics()
+        { _rb.linearVelocity = _rb.angularVelocity = Vector3.zero; SmoothThrottle = 0f; CurrentSteering = 0f;
+          CurrentEngineForce = 0f; CurrentBrakeForce = 0f; ReverseEngaged = false; _flipRequested = false; }
+
+        public void SetPaused(bool paused) { _rb.isKinematic = paused; }
 
         // Private
         void ApplyMotorPreset()
