@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); LAST_FILE=$(cat /tmp/r8eox_last_edit 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -n \"$LAST_FILE\" ] && [ \"$FILE_PATH\" != \"$LAST_FILE\" ]; then REPO=$(git -C \"$(dirname \"$LAST_FILE\")\" rev-parse --show-toplevel 2>/dev/null); if [ -n \"$REPO\" ]; then STAGED=$(git -C \"$REPO\" diff --cached --name-only 2>/dev/null); if [ -n \"$STAGED\" ]; then git -C \"$REPO\" commit --no-verify -m \"auto: update $(basename \"$LAST_FILE\")\" 2>/dev/null; fi; fi; fi; echo \"$FILE_PATH\" > /tmp/r8eox_last_edit"
+            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); LAST_FILE=$(cat /tmp/r8eox_last_edit 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -n \"$LAST_FILE\" ] && [ \"$FILE_PATH\" != \"$LAST_FILE\" ]; then REPO=$(git -C \"$(dirname \"$LAST_FILE\")\" rev-parse --show-toplevel 2>/dev/null); if [ -n \"$REPO\" ]; then STAGED=$(git -C \"$REPO\" diff --cached --name-only 2>/dev/null); if [ -n \"$STAGED\" ]; then git -C \"$REPO\" commit -m \"auto: update $(basename \"$LAST_FILE\")\" 2>/dev/null; fi; fi; fi; echo \"$FILE_PATH\" > /tmp/r8eox_last_edit"
           }
         ]
       }

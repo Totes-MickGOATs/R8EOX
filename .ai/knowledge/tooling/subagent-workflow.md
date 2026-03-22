@@ -15,8 +15,8 @@ git add path/to/File1.cs path/to/File2.cs path/to/CLAUDE.md
 # git add .     ← BANNED
 # git add --all ← BANNED
 
-# Commit with --no-verify (subagents skip the pre-commit hook)
-git commit --no-verify -m "feat: {what you did}"
+# Commit (pre-commit hook validates linting)
+git commit -m "feat: {what you did}"
 ```
 
 If the commit fails, **report the error** — do not silently skip.
@@ -61,7 +61,7 @@ If the commit fails, **report the error** — do not silently skip.
 ### 2. Commit Your Work (MANDATORY)
 - [ ] Stage ONLY the files you created or modified — list them explicitly by path: `git add path/to/File1.cs path/to/File2.cs`
 - [ ] **NEVER** use `git add -A`, `git add .`, or `git add --all` — this will stage other agents' uncommitted work and cause conflicts
-- [ ] Commit with a descriptive message: `git commit --no-verify -m "feat: {what you did}"`
+- [ ] Commit with a descriptive message: `git commit -m "feat: {what you did}"`
 - [ ] If the commit fails, report the error — do not silently skip
 - [ ] **DO NOT FINISH without committing** — this is the most important step
 

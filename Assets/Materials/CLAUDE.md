@@ -10,4 +10,4 @@ Materials and shader assets for rendering.
 - Never use Built-in RP shaders — they render pink/magenta in URP
 
 ## Contents
-No materials yet — create as needed.
+- `Vehicle/` — RC Buggy vehicle materials (6 URP Lit color-only materials: DarkGrey, MediumGrey, BlueSolid, BlueSemi, BlackTire, WhiteHub)

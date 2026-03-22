@@ -126,7 +126,7 @@ namespace R8EOX.Tests
 ## Subagent Workflow
 Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
 - After creating test files, update the folder's CLAUDE.md (create one if missing)
-- After all work is done, stage and commit with `git commit --no-verify -m "test: {what you tested}"`
+- After all work is done, stage and commit with `git commit -m "test: {what you tested}"`
 - Report all test files created and test results
 
 ## Pre-loaded Context

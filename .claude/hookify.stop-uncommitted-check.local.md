@@ -11,5 +11,5 @@ pattern: .*
 Run `git status` and verify there are no uncommitted `.cs` file changes. If there are:
 
 1. `git add <specific files>` (never `git add -A` or `git add .`)
-2. `git commit --no-verify -m "feat/fix/test: {description}"`
+2. `git commit -m "feat/fix/test: {description}"`
 3. Then you may stop.

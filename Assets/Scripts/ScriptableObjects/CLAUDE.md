@@ -10,7 +10,10 @@ ScriptableObject class definitions. Asset instances created from these go in app
 - ScriptableObjects are data containers — no MonoBehaviour lifecycle methods
 
 ## Contents
-- `VehicleConfig.cs` — Vehicle tuning: engine, transmission, chassis, wheels, handling
+- `MotorPresetConfig.cs` — Predefined motor tuning parameters (engine force, max speed, brake force)
+- `SuspensionConfig.cs` — Suspension spring strength, damping, rest distance
+- `TractionConfig.cs` — Traction and grip curve configuration
+- `WheelInertiaConfig.cs` — Wheel rotational inertia parameters
 - `TrackConfig.cs` — Track configuration
 - `RaceConfig.cs` — Race configuration
 - `EnvironmentSettings.cs` — Skybox, fog, ambient light, and sun settings

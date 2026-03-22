@@ -54,7 +54,7 @@ You are a C# script specialist for a Unity 6 URP project (R8EOX).
 ## Subagent Workflow
 Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
 - After creating files, update the folder's CLAUDE.md (create one if missing)
-- After all work is done, stage and commit with `git commit --no-verify -m "feat: {what you did}"`
+- After all work is done, stage and commit with `git commit -m "feat: {what you did}"`
 - Report all files created/modified and any compilation errors
 
 ## Pre-loaded Context

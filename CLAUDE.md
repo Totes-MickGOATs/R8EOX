@@ -143,7 +143,7 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 
 - Stage ONLY the files you created or modified — list them explicitly by path
 - **NEVER** use `git add -A`, `git add .`, or `git add --all`
-- Commit with: `git commit --no-verify -m "feat: {what you did}"`
+- Commit with: `git commit -m "feat: {what you did}"`
 - If the commit fails, report the error — do not silently skip
 - The orchestrator must include this instruction in every agent prompt
 
