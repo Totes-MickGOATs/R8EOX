@@ -32,6 +32,9 @@ namespace R8EOX.Session.Internal
         [SerializeField]
         private R8EOX.Camera.CameraManager cameraManager;
 
+        [SerializeField]
+        private R8EOX.UI.UIManager uiManager;
+
         private void Awake()
         {
             if (sessionChannel != null && sessionChannel.HasActiveSession)
@@ -63,7 +66,7 @@ namespace R8EOX.Session.Internal
             }
 
             sessionManager.OnSceneReady(
-                trackManager, raceManager, cameraManager);
+                trackManager, raceManager, cameraManager, uiManager);
 
             Debug.Log(
                 "[SessionBootstrapper] Full flow — passed scene " +
@@ -86,9 +89,18 @@ namespace R8EOX.Session.Internal
                 managerGO.AddComponent<SessionManager>();
 
             sessionManager.OnSceneReady(
-                trackManager, raceManager, cameraManager);
+                trackManager, raceManager, cameraManager, uiManager);
 
-            var config = CreateDefaultConfig();
+            var registry = sessionChannel != null
+                ? sessionChannel.VehicleRegistry : null;
+            bool useOverlay = registry != null && registry.Count > 1;
+
+            var config = useOverlay
+                ? SessionConfig.CreateRuntime(
+                    SessionMode.Practice,
+                    registry.GetDefault().VehiclePrefab)
+                : CreateDefaultConfig();
+
             sessionManager.BeginSession(config);
 
             Debug.Log(

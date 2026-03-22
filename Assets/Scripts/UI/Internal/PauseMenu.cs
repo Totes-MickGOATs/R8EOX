@@ -4,6 +4,15 @@ namespace R8EOX.UI.Internal
 {
     internal class PauseMenu : MonoBehaviour
     {
+        [SerializeField] private R8EOX.UI.UIManager uiManager;
+
+        internal void OnChangeVehiclePressed()
+        {
+            Hide();
+            if (uiManager != null)
+                uiManager.RequestVehicleSwap();
+        }
+
         internal void Show()
         {
             gameObject.SetActive(true);
