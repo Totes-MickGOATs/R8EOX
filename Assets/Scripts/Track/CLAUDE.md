@@ -12,9 +12,15 @@ Track/circuit definition — path, checkpoints, boundaries, and surface types.
 
 ## Contents
 - `SpawnPointData.cs` — Public struct (DTO) exposing spawn point data across system boundaries
-- `TrackManager.cs` — Top-level API: track queries, checkpoint tracking
+- `TrackManager.cs` — Top-level API: track queries, checkpoint tracking; discovers SpawnGrid (preferred) or individual SpawnPoints
 - `Internal/Centerline.cs` — Spline/path defining track center
 - `Internal/Checkpoint.cs` — Lap tracking, position detection triggers
-- `Internal/SpawnPoint.cs` — Vehicle spawn location markers with index and player flag
+- `Internal/SpawnPoint.cs` — Vehicle spawn location markers with index and player flag (fallback when no SpawnGrid)
+- `Internal/SpawnGrid.cs` — Configurable grid-based spawn layout: dimensions, spacing, fill order, stagger, grouping; live editor gizmos
+- `Internal/SpawnGridMath.cs` — Pure static math: computes grid positions from parameters, validates groupings
+- `Internal/FillDirection.cs` — Enum: LeftToRight, RightToLeft (grid fill order within rows)
+- `Internal/RowOrder.cs` — Enum: FrontToBack, BackToFront (grid row iteration order)
+- `Internal/StaggerMode.cs` — Enum: Alternating, Cumulative (row stagger behavior)
+- `Internal/GridGrouping.cs` — Serializable struct: group sizes + gap between groups (for column/row grouping)
 - `Internal/TrackBoundary.cs` — Walls, barriers, out-of-bounds detection
 - `Internal/TrackSurface.cs` — Surface types (asphalt, dirt, grass) and grip modifiers
