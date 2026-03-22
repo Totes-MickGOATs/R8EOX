@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# =============================================================================
+# R8EOX Pre-Commit Hook
+# Runs linting ONLY on staged files. Fast and focused.
+# All checks use git show ":file" to lint staged content, not working tree.
+# =============================================================================
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+source "${REPO_ROOT}/tools/lint/lint-csharp.sh"
+source "${REPO_ROOT}/tools/lint/lint-docs.sh"
+
+TOTAL_ERRORS=0
+
+# Get staged files (Added, Copied, Modified — not Deleted)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Lint C# files
+# ---------------------------------------------------------------------------
+while IFS= read -r file; do
+  [[ "$file" == *.cs ]] || continue
+  is_unity_generated "$file" && continue
+  [ -f "$file" ] || continue
+
+  lint_cs_file "$file"
+  TOTAL_ERRORS=$((TOTAL_ERRORS + $?))
+done <<< "$STAGED_FILES"
+
+# ---------------------------------------------------------------------------
+# Lint AI documentation files
+# ---------------------------------------------------------------------------
+while IFS= read -r file; do
+  [[ "$file" == *.md ]] || continue
+
+  if is_ai_doc "$file"; then
+    lint_ai_doc "$file"
+    TOTAL_ERRORS=$((TOTAL_ERRORS + $?))
+  fi
+
+  # Knowledge docs
+  if [[ "$file" == .ai/knowledge/*.md ]]; then
+    lint_knowledge_doc "$file"
+    TOTAL_ERRORS=$((TOTAL_ERRORS + $?))
+  fi
+done <<< "$STAGED_FILES"
+
+# ---------------------------------------------------------------------------
+# Report
+# ---------------------------------------------------------------------------
+if [ $TOTAL_ERRORS -gt 0 ]; then
+  echo ""
+  echo "========================================"
+  echo "  PRE-COMMIT: ${TOTAL_ERRORS} error(s)"
+  echo "  Commit BLOCKED. Fix issues above."
+  echo "========================================"
+  echo "  Bypass: git commit --no-verify"
+  exit 1
+fi
+
+echo "All lint checks passed."
+exit 0

@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -q '\\.cs'; then echo '⚠️ C# file modified — check mcp__UnityMCP__read_console for compilation errors before proceeding.'; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | grep -oE '\"[^\"]*Assets/[^\"]*\"' | head -1 | tr -d '\"'); if [ -n \"$FILE_PATH\" ]; then DIR=$(dirname \"$FILE_PATH\"); if [ -d \"$DIR\" ] && [ ! -f \"$DIR/CLAUDE.md\" ]; then echo 'Note: No CLAUDE.md in '\"$DIR\"' — consider creating one.'; fi; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -f \"$FILE_PATH\" ]; then REPO=$(git -C \"$(dirname \"$FILE_PATH\")\" rev-parse --show-toplevel 2>/dev/null); if [ -n \"$REPO\" ]; then git -C \"$REPO\" add \"$FILE_PATH\" 2>/dev/null; fi; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); LAST_FILE=$(cat /tmp/r8eox_last_edit 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -n \"$LAST_FILE\" ] && [ \"$FILE_PATH\" != \"$LAST_FILE\" ]; then REPO=$(git -C \"$(dirname \"$LAST_FILE\")\" rev-parse --show-toplevel 2>/dev/null); if [ -n \"$REPO\" ]; then STAGED=$(git -C \"$REPO\" diff --cached --name-only 2>/dev/null); if [ -n \"$STAGED\" ]; then git -C \"$REPO\" commit --no-verify -m \"auto: update $(basename \"$LAST_FILE\")\" 2>/dev/null; fi; fi; fi; echo \"$FILE_PATH\" > /tmp/r8eox_last_edit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -qE '(ProjectSettings/|Packages/manifest\\.json|_RPAsset\\.asset|_Renderer\\.asset|UniversalRenderPipelineGlobalSettings)'; then echo 'BLOCKED: Do not directly edit pipeline assets, ProjectSettings, or package manifest. Use Unity Editor or MCP tools instead.' >&2; exit 2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
