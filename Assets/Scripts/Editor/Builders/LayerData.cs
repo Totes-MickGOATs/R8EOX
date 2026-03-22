@@ -13,6 +13,7 @@ namespace R8EOX.Editor.Builders
         internal string NormalPath { get; }
         internal string ArmPath { get; }
         internal LayerSettings LayerSettingsAsset { get; }
+        internal string BlendMaskPath { get; }
 
         internal LayerData(
             int index,
@@ -20,7 +21,8 @@ namespace R8EOX.Editor.Builders
             string diffusePath,
             string normalPath,
             string armPath,
-            LayerSettings layerSettings)
+            LayerSettings layerSettings,
+            string blendMaskPath)
         {
             Index = index;
             Name = name;
@@ -28,6 +30,7 @@ namespace R8EOX.Editor.Builders
             NormalPath = normalPath;
             ArmPath = armPath;
             LayerSettingsAsset = layerSettings;
+            BlendMaskPath = blendMaskPath;
         }
     }
 }

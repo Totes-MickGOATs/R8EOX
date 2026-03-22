@@ -120,12 +120,9 @@ namespace R8EOX.Editor
             TerrainLayerBuilder.ConfigureTerrainLayers(
                 terrainData, scan.Layers, scan.GeneratedFolder);
 
-            // 4. Apply blend mask splatmap
-            if (!string.IsNullOrEmpty(scan.BlendMaskPath))
-            {
-                TerrainSplatmapBuilder.ApplyBlendMaskSplatmap(
-                    terrainData, scan.BlendMaskPath);
-            }
+            // 4. Apply per-layer blend mask splatmap
+            TerrainSplatmapBuilder.ApplyBlendMaskSplatmap(
+                terrainData, scan.Layers);
 
             EditorUtility.SetDirty(terrainData);
             AssetDatabase.SaveAssets();

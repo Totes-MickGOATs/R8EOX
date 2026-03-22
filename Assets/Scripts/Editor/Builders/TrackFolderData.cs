@@ -12,7 +12,6 @@ namespace R8EOX.Editor.Builders
         internal string TrackName { get; }
         internal string HeightmapPath { get; }
         internal TerrainSettings TerrainSettingsAsset { get; }
-        internal string BlendMaskPath { get; }
         internal IReadOnlyList<LayerData> Layers { get; }
         internal string SkyboxHdrPath { get; }
         internal EnvironmentSettings EnvironmentSettingsAsset { get; }
@@ -22,7 +21,6 @@ namespace R8EOX.Editor.Builders
             string trackName,
             string heightmapPath,
             TerrainSettings terrainSettings,
-            string blendMaskPath,
             IReadOnlyList<LayerData> layers,
             string skyboxHdrPath,
             EnvironmentSettings environmentSettings,
@@ -31,7 +29,6 @@ namespace R8EOX.Editor.Builders
             TrackName = trackName;
             HeightmapPath = heightmapPath;
             TerrainSettingsAsset = terrainSettings;
-            BlendMaskPath = blendMaskPath;
             Layers = layers;
             SkyboxHdrPath = skyboxHdrPath;
             EnvironmentSettingsAsset = environmentSettings;

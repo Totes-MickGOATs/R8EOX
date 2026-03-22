@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -7,14 +8,15 @@ namespace R8EOX.Editor.Builders
 {
     /// <summary>
     /// Configures Unity TerrainLayer assets with PBR textures (diffuse, normal, ARM).
-    /// Reads layer data from scanned folder structure via LayerData objects.
+    /// Remaps ARM (AO=R, Roughness=G, Metallic=B) to URP MOHS
+    /// (Metallic=R, Occlusion=G, Height=B, Smoothness=A) at build time.
     /// </summary>
     internal static class TerrainLayerBuilder
     {
         // -- Defaults matching LayerSettings ScriptableObject defaults --
         const float k_DefaultTileSize = 25f;
         const float k_DefaultMetallic = 0f;
-        const float k_DefaultSmoothness = 0.3f;
+        const float k_DefaultSmoothness = 0f;
         const float k_DefaultNormalScale = 1.0f;
 
         /// <summary>
@@ -103,21 +105,14 @@ namespace R8EOX.Editor.Builders
                         $"[TrackBuilder] Missing normal: {layerData.NormalPath}");
             }
 
-            // ARM map (AO=R, Roughness=G, Metallic=B) — import as linear
+            // ARM map → remap to URP MOHS mask map
             if (!string.IsNullOrEmpty(layerData.ArmPath))
             {
-                var armImporter =
-                    AssetImporter.GetAtPath(layerData.ArmPath) as TextureImporter;
-                if (armImporter != null && armImporter.sRGBTexture)
-                {
-                    armImporter.sRGBTexture = false;
-                    armImporter.SaveAndReimport();
-                }
-
-                Texture2D arm =
-                    AssetDatabase.LoadAssetAtPath<Texture2D>(layerData.ArmPath);
-                if (arm != null)
-                    layer.maskMapTexture = arm;
+                Texture2D maskMap = RemapArmToMohs(
+                    layerData.ArmPath, generatedFolder,
+                    layerData.Index, layerData.Name);
+                if (maskMap != null)
+                    layer.maskMapTexture = maskMap;
             }
 
             layer.metallic = metallic;
@@ -130,6 +125,93 @@ namespace R8EOX.Editor.Builders
                 EditorUtility.SetDirty(layer);
 
             return layer;
+        }
+
+        /// <summary>
+        /// Remap ARM (AO=R, Roughness=G, Metallic=B) to URP terrain
+        /// mask map MOHS (Metallic=R, Occlusion=G, Height=B, Smoothness=A).
+        /// Saves the remapped texture to the Generated folder.
+        /// </summary>
+        static Texture2D RemapArmToMohs(
+            string armAssetPath, string generatedFolder,
+            int layerIndex, string layerName)
+        {
+            // Ensure ARM source is readable and linear
+            var armImporter =
+                AssetImporter.GetAtPath(armAssetPath) as TextureImporter;
+            bool reimport = false;
+            if (armImporter != null && armImporter.sRGBTexture)
+            {
+                armImporter.sRGBTexture = false;
+                reimport = true;
+            }
+            if (armImporter != null && !armImporter.isReadable)
+            {
+                armImporter.isReadable = true;
+                reimport = true;
+            }
+            if (reimport)
+                armImporter.SaveAndReimport();
+
+            Texture2D arm =
+                AssetDatabase.LoadAssetAtPath<Texture2D>(armAssetPath);
+            if (arm == null) return null;
+
+            int w = arm.width;
+            int h = arm.height;
+            Color[] armPixels = arm.GetPixels();
+            var mohsPixels = new Color[armPixels.Length];
+
+            for (int i = 0; i < armPixels.Length; i++)
+                mohsPixels[i] = RemapArmPixelToMohs(armPixels[i]);
+
+            var mohs = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            mohs.SetPixels(mohsPixels);
+            mohs.Apply();
+
+            string maskPath = $"{generatedFolder}/" +
+                $"MaskMap_{layerIndex}_{layerName}.png";
+            string absPath = Application.dataPath.Replace("Assets", "")
+                + maskPath;
+            File.WriteAllBytes(absPath, mohs.EncodeToPNG());
+            Object.DestroyImmediate(mohs);
+
+            AssetDatabase.ImportAsset(maskPath);
+            var maskImporter =
+                AssetImporter.GetAtPath(maskPath) as TextureImporter;
+            if (maskImporter != null)
+            {
+                bool needsReimport = false;
+                if (maskImporter.sRGBTexture)
+                {
+                    maskImporter.sRGBTexture = false;
+                    needsReimport = true;
+                }
+                if (!maskImporter.isReadable)
+                {
+                    maskImporter.isReadable = true;
+                    needsReimport = true;
+                }
+                if (needsReimport)
+                    maskImporter.SaveAndReimport();
+            }
+
+            Debug.Log($"[TrackBuilder] ARM→MOHS remap: {maskPath}");
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(maskPath);
+        }
+
+        /// <summary>
+        /// Remap a single ARM pixel to URP MOHS channel layout.
+        /// ARM: R=AO, G=Roughness, B=Metallic
+        /// MOHS: R=Metallic, G=Occlusion, B=Height, A=Smoothness
+        /// </summary>
+        internal static Color RemapArmPixelToMohs(Color arm)
+        {
+            return new Color(
+                arm.b,          // R = Metallic  (ARM.B)
+                arm.r,          // G = Occlusion (ARM.R = AO)
+                0.5f,           // B = Height    (default)
+                1f - arm.g);    // A = Smoothness (1 - Roughness)
         }
     }
 }

@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -12,55 +13,43 @@ namespace R8EOX.Editor.Builders
     internal static class TerrainSplatmapBuilder
     {
         /// <summary>
-        /// Apply a blend-mask PNG as the splatmap. Uses pixel.grayscale.
-        /// blendMaskPath is the direct asset path to the blend-mask.png.
+        /// Apply per-layer blend masks as the splatmap. Each non-base
+        /// layer can optionally provide a blend-mask.png. Composites
+        /// N layers using a top-down remaining-weight algorithm.
         /// </summary>
         internal static void ApplyBlendMaskSplatmap(
-            TerrainData terrainData, string blendMaskPath)
+            TerrainData terrainData, IReadOnlyList<LayerData> layers)
         {
-            if (string.IsNullOrEmpty(blendMaskPath))
+            int layerCount = layers.Count;
+            if (layerCount < 1) return;
+
+            // Load blend mask textures (index 0 = base, never has mask)
+            var masks = new Texture2D[layerCount];
+            int maskCount = 0;
+            for (int i = 1; i < layerCount; i++)
             {
-                Debug.LogWarning(
-                    "[TrackBuilder] No blend mask path -- skipping splatmap.");
-                return;
+                masks[i] = LoadReadableMask(layers[i].BlendMaskPath);
+                if (masks[i] != null) maskCount++;
             }
-
-            string absolutePath = blendMaskPath.StartsWith("Assets")
-                ? Path.Combine(
-                    Application.dataPath.Replace("Assets", ""),
-                    blendMaskPath)
-                : blendMaskPath;
-
-            if (!File.Exists(absolutePath))
-            {
-                Debug.LogWarning(
-                    "[TrackBuilder] Blend mask not found, using uniform blend.");
-                return;
-            }
-
-            AssetDatabase.ImportAsset(blendMaskPath);
-            var maskImporter =
-                AssetImporter.GetAtPath(blendMaskPath) as TextureImporter;
-            if (maskImporter != null && !maskImporter.isReadable)
-            {
-                maskImporter.isReadable = true;
-                maskImporter.SaveAndReimport();
-            }
-
-            Texture2D maskTex =
-                AssetDatabase.LoadAssetAtPath<Texture2D>(blendMaskPath);
-            if (maskTex == null)
-            {
-                maskTex = new Texture2D(2, 2);
-                maskTex.LoadImage(File.ReadAllBytes(absolutePath));
-            }
-
-            int layerCount = terrainData.terrainLayers != null
-                ? terrainData.terrainLayers.Length : 2;
-            if (layerCount < 2) layerCount = 2;
 
             int alphaRes = terrainData.alphamapResolution;
-            float[,,] splatmap = new float[alphaRes, alphaRes, layerCount];
+            float[,,] splatmap =
+                ComputeSplatmap(alphaRes, layerCount, masks);
+
+            terrainData.SetAlphamaps(0, 0, splatmap);
+            Debug.Log(
+                $"[TrackBuilder] Splatmap applied: {layerCount} layers, " +
+                $"{maskCount} blend masks.");
+        }
+
+        /// <summary>
+        /// Pure computation: build an N-layer splatmap from blend masks.
+        /// Processes layers top-down with a remaining-weight algorithm.
+        /// </summary>
+        internal static float[,,] ComputeSplatmap(
+            int alphaRes, int layerCount, Texture2D[] masks)
+        {
+            var splatmap = new float[alphaRes, alphaRes, layerCount];
 
             for (int y = 0; y < alphaRes; y++)
             {
@@ -68,16 +57,66 @@ namespace R8EOX.Editor.Builders
                 {
                     float u = (float)x / (alphaRes - 1);
                     float v = 1f - (float)y / (alphaRes - 1);
-                    Color pixel = maskTex.GetPixelBilinear(u, v);
 
-                    float maskValue = pixel.grayscale;
-                    splatmap[y, x, 0] = 1f - maskValue;
-                    splatmap[y, x, 1] = maskValue;
+                    float remaining = 1f;
+                    for (int i = layerCount - 1; i >= 1; i--)
+                    {
+                        float maskValue = 0f;
+                        if (masks[i] != null)
+                        {
+                            maskValue = masks[i]
+                                .GetPixelBilinear(u, v).grayscale;
+                        }
+
+                        float weight = remaining * maskValue;
+                        splatmap[y, x, i] = weight;
+                        remaining -= weight;
+                    }
+                    splatmap[y, x, 0] = remaining;
                 }
             }
 
-            terrainData.SetAlphamaps(0, 0, splatmap);
-            Debug.Log("[TrackBuilder] Blend mask splatmap applied.");
+            return splatmap;
+        }
+
+        static Texture2D LoadReadableMask(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath)) return null;
+
+            string absolutePath = assetPath.StartsWith("Assets")
+                ? Path.Combine(
+                    Application.dataPath.Replace("Assets", ""),
+                    assetPath)
+                : assetPath;
+
+            if (!File.Exists(absolutePath)) return null;
+
+            AssetDatabase.ImportAsset(assetPath);
+            var importer =
+                AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            bool reimport = false;
+            if (importer != null && !importer.isReadable)
+            {
+                importer.isReadable = true;
+                reimport = true;
+            }
+            if (importer != null && importer.sRGBTexture)
+            {
+                importer.sRGBTexture = false;
+                reimport = true;
+            }
+            if (reimport)
+                importer.SaveAndReimport();
+
+            Texture2D tex =
+                AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+            if (tex == null)
+            {
+                tex = new Texture2D(2, 2);
+                tex.LoadImage(File.ReadAllBytes(absolutePath));
+            }
+
+            return tex;
         }
 
         /// <summary>

@@ -30,8 +30,6 @@ namespace R8EOX.Editor.Builders
             string heightmapPath = FindHeightmap(terrainFolder);
             TerrainSettings terrainSettings =
                 FindScriptableObject<TerrainSettings>(terrainFolder);
-            string blendMaskPath = FindBlendMask(terrainFolder);
-
             // Layers
             List<LayerData> layers = ScanLayers(trackFolderPath);
 
@@ -39,7 +37,6 @@ namespace R8EOX.Editor.Builders
                 trackName,
                 heightmapPath,
                 terrainSettings,
-                blendMaskPath,
                 layers,
                 skyboxHdrPath,
                 envSettings,
@@ -65,21 +62,6 @@ namespace R8EOX.Editor.Builders
             string absolute =
                 Application.dataPath.Replace("Assets", "") + relative;
             return File.Exists(absolute) ? relative : null;
-        }
-
-        static string FindBlendMask(string terrainFolder)
-        {
-            string[] guids = AssetDatabase.FindAssets(
-                "t:Texture2D", new[] { terrainFolder });
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                string fileName = Path.GetFileNameWithoutExtension(path);
-                if (fileName.Equals(
-                        "blend-mask", StringComparison.OrdinalIgnoreCase))
-                    return path;
-            }
-            return null;
         }
 
         static T FindScriptableObject<T>(string folder) where T : ScriptableObject
@@ -120,9 +102,11 @@ namespace R8EOX.Editor.Builders
                 string arm = FindTextureInFolder(relDir, "arm");
                 LayerSettings ls =
                     FindScriptableObject<LayerSettings>(relDir);
+                string blendMask =
+                    FindTextureInFolder(relDir, "blend-mask");
 
                 layers.Add(new LayerData(
-                    index, name, diffuse, normal, arm, ls));
+                    index, name, diffuse, normal, arm, ls, blendMask));
             }
 
             return layers;
@@ -144,7 +128,7 @@ namespace R8EOX.Editor.Builders
             return null;
         }
 
-        static int ParsePrefix(string folderName)
+        internal static int ParsePrefix(string folderName)
         {
             int underscoreIdx = folderName.IndexOf('_');
             if (underscoreIdx > 0 &&
@@ -154,7 +138,7 @@ namespace R8EOX.Editor.Builders
             return int.MaxValue;
         }
 
-        static string ParseLayerName(string folderName)
+        internal static string ParseLayerName(string folderName)
         {
             int underscoreIdx = folderName.IndexOf('_');
             return underscoreIdx > 0

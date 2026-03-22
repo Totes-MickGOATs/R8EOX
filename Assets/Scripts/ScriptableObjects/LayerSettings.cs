@@ -10,7 +10,7 @@ namespace R8EOX
 
         [Header("Surface")]
         [SerializeField] private float metallic = 0f;
-        [SerializeField] private float smoothness = 0.3f;
+        [SerializeField] private float smoothness = 0f;
         [SerializeField] private float normalScale = 1.0f;
 
         public float TileSize => tileSize;

@@ -65,13 +65,15 @@ Assets/Tracks/{TrackName}/
 │   ├── heightmap.raw               # Raw heightmap file
 │   ├── TerrainSettings.asset       # Dimensions, resolutions
 │   ├── Layers/
-│   │   ├── 0_{LayerName}/          # Prefix = layer index
+│   │   ├── 0_{LayerName}/          # Base layer (no blend mask needed)
 │   │   │   ├── diffuse.*           # PBR textures by convention
 │   │   │   ├── normal.*
 │   │   │   ├── arm.*
 │   │   │   └── LayerSettings.asset # Optional: tile size, metallic, smoothness
 │   │   └── 1_{LayerName}/
-│   ├── blend-mask.*                # Splatmap blend control
+│   │       ├── diffuse.*, normal.*, arm.*
+│   │       ├── blend-mask.*        # Optional: white=visible, black=transparent
+│   │       └── LayerSettings.asset
 │   └── Macro/
 │       ├── normal-map.*
 │       └── specular-map.*

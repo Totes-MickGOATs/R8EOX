@@ -100,29 +100,44 @@ namespace R8EOX.Editor.Builders
             }
 
             byte[] rawBytes = File.ReadAllBytes(absolutePath);
-            int expectedSize = heightmapRes * heightmapRes * 2;
-            if (rawBytes.Length != expectedSize)
+            float[,] heights =
+                ParseRawHeightmap(rawBytes, heightmapRes);
+            if (heights == null)
             {
                 Debug.LogError(
                     $"[TrackBuilder] Heightmap size mismatch: " +
-                    $"{rawBytes.Length} vs {expectedSize}");
+                    $"{rawBytes.Length} vs {heightmapRes * heightmapRes * 2}");
                 return;
             }
 
-            float[,] heights = new float[heightmapRes, heightmapRes];
-            for (int y = 0; y < heightmapRes; y++)
+            terrainData.SetHeights(0, 0, heights);
+            Debug.Log("[TrackBuilder] Heightmap imported successfully.");
+        }
+
+        /// <summary>
+        /// Parse a 16-bit little-endian RAW heightmap into a float[,] array.
+        /// Returns null if the byte array size doesn't match the resolution.
+        /// </summary>
+        internal static float[,] ParseRawHeightmap(
+            byte[] rawBytes, int resolution)
+        {
+            int expectedSize = resolution * resolution * 2;
+            if (rawBytes == null || rawBytes.Length != expectedSize)
+                return null;
+
+            var heights = new float[resolution, resolution];
+            for (int y = 0; y < resolution; y++)
             {
-                for (int x = 0; x < heightmapRes; x++)
+                for (int x = 0; x < resolution; x++)
                 {
-                    int idx = (y * heightmapRes + x) * 2;
+                    int idx = (y * resolution + x) * 2;
                     ushort raw =
                         (ushort)(rawBytes[idx] | (rawBytes[idx + 1] << 8));
                     heights[y, x] = raw / 65535f;
                 }
             }
 
-            terrainData.SetHeights(0, 0, heights);
-            Debug.Log("[TrackBuilder] Heightmap imported successfully.");
+            return heights;
         }
 
         /// <summary>
