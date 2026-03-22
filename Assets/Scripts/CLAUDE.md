@@ -42,4 +42,15 @@ Scripts/
 - State machines owned by top-level class
 
 ## Contents
-No scripts yet — organized by system as they are created.
+- `Vehicle/` — RC car physics: suspension, drivetrain, grip, handling (complete)
+- `Input/` — Player input routing via new Input System, IVehicleInput interface (complete)
+- `Track/` — Track definition: spawn points, checkpoints, centerline, boundaries, surfaces
+- `Race/` — Race coordination: FSM, standings, timer (skeleton)
+- `Session/` — Session orchestration: editor-play detection, vehicle spawning, track validation, mode degradation
+- `Camera/` — Camera control: chase cam, cinematic views, screen effects (skeleton)
+- `UI/` — HUD, menus, user interface (skeleton)
+- `Audio/` — Engine, tire, ambient, music (skeleton)
+- `AI/` — AI opponents: pathfinding, racing behavior (skeleton)
+- `VFX/` — Tire marks, exhaust, sparks, screen effects (skeleton)
+- `ScriptableObjects/` — Data containers: SessionConfig, TrackConfig, RaceConfig, motor/suspension/traction configs
+- `Editor/` — Builder tools: TrackBuilder, RCBuggyBuilder, material tools
