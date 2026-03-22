@@ -12,3 +12,6 @@ Editor-only scripts excluded from runtime builds by Unity's convention.
 
 ## Contents
 - `Builders/` — Editor builder scripts for constructing vehicles, terrain, and scenes programmatically
+- `AddBuggyMaterials.cs` — Menu item to create persistent URP Lit material assets and assign them to RCBuggy prefab meshes
+- `OutpostTrackSetup.cs` — Menu item to create/configure the OutpostTrack scene
+- `TrackBuilder.cs` — Assembles complete track scenes from terrain, environment, and vehicle
