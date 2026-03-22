@@ -15,3 +15,5 @@ Internal implementation classes for the Session system. Only `SessionManager` sh
 - `VehicleSpawner.cs` — Instantiates vehicle prefabs at SpawnPointData positions with terrain safety
 - `SpawnSafety.cs` — Pure static class: raycast terrain height, compute safe spawn Y
 - `TrackValidator.cs` — Validates track components against mode requirements (TODO)
+- `VehicleReadiness.cs` — Struct: flags for rigidbody, input, wheels, drivetrain, colliders, attachment points; readiness tiers (IsPlayable, IsRaceReady, IsFullyEquipped); missing-component report
+- `VehicleValidator.cs` — Static: inspects a vehicle GameObject for required components/transforms; populates VehicleReadiness; logs per-tier warnings/errors
