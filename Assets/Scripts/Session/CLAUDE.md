@@ -11,7 +11,7 @@ Session orchestration — manages the lifecycle of play sessions (practice, race
 - Configuration via `SessionConfig` ScriptableObject
 
 ## Contents
-- `SessionManager.cs` — Top-level API: begin/end session, coordinate systems (TODO)
+- `SessionManager.cs` — Top-level API: begin/end session, coordinate systems
 - `Internal/SessionBootstrapper.cs` — Scene-resident: detects editor-play vs session flow (TODO)
 - `Internal/SessionPhase.cs` — Enum: Idle, Loading, Spawning, Ready, Teardown
 - `Internal/SessionState.cs` — FSM with validated phase transitions (TODO)
