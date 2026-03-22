@@ -72,8 +72,8 @@ namespace R8EOX.Editor.Builders
         {
             var rb = root.AddComponent<Rigidbody>();
             rb.mass = 15f;
-            rb.drag = 0f;
-            rb.angularDrag = 0.05f;
+            rb.linearDamping = 0f;
+            rb.angularDamping = 0.05f;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         }

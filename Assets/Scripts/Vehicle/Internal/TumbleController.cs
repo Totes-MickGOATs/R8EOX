@@ -7,13 +7,13 @@ namespace R8EOX.Vehicle.Internal
     {
         const float k_DefaultBounciness = 0.05f;
 
-        readonly PhysicMaterial _physMat;
+        readonly PhysicsMaterial _physMat;
         bool _wasTumbling;
 
         public float TiltAngle   { get; private set; }
         public float TumbleFactor { get; private set; }
 
-        public TumbleController(PhysicMaterial physMat) { _physMat = physMat; }
+        public TumbleController(PhysicsMaterial physMat) { _physMat = physMat; }
 
         public void Update(Transform t, bool isAirborne,
             float engageDeg, float fullDeg, float hysteresisDeg,
