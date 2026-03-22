@@ -109,7 +109,7 @@ namespace R8EOX.Session
         {
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
-            if (registry != null && registry.Count > 1
+            if (registry != null && registry.Count > 0
                 && registry.OverlayPrefab != null)
             {
                 state.BeginVehicleSelect();

@@ -93,7 +93,7 @@ namespace R8EOX.Session.Internal
 
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
-            bool useOverlay = registry != null && registry.Count > 1;
+            bool useOverlay = registry != null && registry.Count > 0;
 
             var config = useOverlay
                 ? SessionConfig.CreateRuntime(
