@@ -1,4 +1,3 @@
-using System.Reflection;
 using UnityEngine;
 
 namespace R8EOX.Session.Internal
@@ -109,26 +108,9 @@ namespace R8EOX.Session.Internal
             return null;
         }
 
-        /// <summary>
-        /// Creates a runtime SessionConfig for editor-play.
-        /// Defaults are Practice mode, 0 laps, 0 AI — which is
-        /// exactly what we want. The vehicle prefab is set via
-        /// reflection because the field is private with no setter.
-        /// This runs once at startup and avoids modifying
-        /// SessionConfig's public API.
-        /// </summary>
         private SessionConfig CreateDefaultConfig()
         {
-            var config =
-                ScriptableObject.CreateInstance<SessionConfig>();
-            config.name = "EditorPlayConfig";
-
-            if (defaultVehiclePrefab != null)
-            {
-                SetPrivateField(
-                    config, "vehiclePrefab", defaultVehiclePrefab);
-            }
-            else
+            if (defaultVehiclePrefab == null)
             {
                 Debug.LogWarning(
                     "[SessionBootstrapper] No default vehicle " +
@@ -136,31 +118,9 @@ namespace R8EOX.Session.Internal
                     "skipped.");
             }
 
-            return config;
-        }
-
-        private static void SetPrivateField(
-            object target, string fieldName, object value)
-        {
-            // Combine NonPublic + instance-level flags.
-            const BindingFlags flags =
-                BindingFlags.NonPublic |
-                (BindingFlags)(1 << 2); // BindingFlags 4 = instance member
-
-            var field = target.GetType().GetField(
-                fieldName, flags);
-
-            if (field != null)
-            {
-                field.SetValue(target, value);
-            }
-            else
-            {
-                Debug.LogError(
-                    $"[SessionBootstrapper] Could not find " +
-                    $"field '{fieldName}' on " +
-                    $"{target.GetType().Name}.");
-            }
+            return SessionConfig.CreateRuntime(
+                SessionMode.Practice,
+                defaultVehiclePrefab);
         }
     }
 }
