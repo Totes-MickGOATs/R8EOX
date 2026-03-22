@@ -9,3 +9,4 @@ Internal implementation for the Input system. Only top-level Input classes shoul
 
 ## Contents
 - `InputMath.cs` — Pure math for input processing: deadzone remapping, steering curves, input merging
+- `ScriptedInput.cs` — MonoBehaviour implementing IVehicleInput with externally settable properties; used by autopilot/path-following systems
