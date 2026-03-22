@@ -80,6 +80,11 @@ namespace R8EOX.Editor.Builders
         public readonly float SteeringMax;
 
 
+        // ---- Drivetrain Ratio ----
+
+        public readonly float GearRatio;
+
+
         // ---- Appearance ----
 
         public readonly Color BodyColor;
@@ -102,6 +107,7 @@ namespace R8EOX.Editor.Builders
             float frontSpringStrength, float frontSpringDamping,
             float rearSpringStrength, float rearSpringDamping,
             float gripCoeff, float steeringMax,
+            float gearRatio,
             Color bodyColor)
         {
             Name = name; Motor = motor;
@@ -119,6 +125,7 @@ namespace R8EOX.Editor.Builders
             FrontSpringStrength = frontSpringStrength; FrontSpringDamping = frontSpringDamping;
             RearSpringStrength = rearSpringStrength; RearSpringDamping = rearSpringDamping;
             GripCoeff = gripCoeff; SteeringMax = steeringMax;
+            GearRatio = gearRatio;
             BodyColor = bodyColor;
         }
     }

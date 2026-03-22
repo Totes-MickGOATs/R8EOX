@@ -21,6 +21,7 @@ namespace R8EOX.Editor.Builders
             frontSpringStrength: 700f, frontSpringDamping: 41f,
             rearSpringStrength: 350f, rearSpringDamping: 29f,
             gripCoeff: 0.7f, steeringMax: 0.50f,
+            gearRatio: 7.5f,
             bodyColor: new Color(0.18f, 0.45f, 0.9f, 0.85f)
         );
 
@@ -40,6 +41,7 @@ namespace R8EOX.Editor.Builders
             frontSpringStrength: 650f, frontSpringDamping: 38f,
             rearSpringStrength: 400f, rearSpringDamping: 32f,
             gripCoeff: 0.7f, steeringMax: 0.45f,
+            gearRatio: 7.5f,
             bodyColor: new Color(0.18f, 0.75f, 0.35f, 0.85f)
         );
     }
