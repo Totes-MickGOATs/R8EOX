@@ -131,7 +131,8 @@ namespace R8EOX.Session
                 SetupSession();
                 return;
             }
-            uiManager.ShowVehicleSelectOverlay(registry, OnVehicleSelected);
+            uiManager.ShowVehicleSelectOverlay(
+                registry, OnVehicleSelected, OnVehicleSelectCancelled);
             Debug.Log("[SessionManager] Vehicle selection overlay shown.");
         }
 
@@ -152,6 +153,27 @@ namespace R8EOX.Session
             else
             {
                 SetupSession();
+            }
+        }
+
+        private void OnVehicleSelectCancelled()
+        {
+            CleanupOverlay();
+            if (isSwapping)
+            {
+                isSwapping = false;
+                vehicleSpawner.SpawnPlayerVehicleAt(
+                    activeConfig.VehiclePrefab, swapPosition, swapRotation);
+                WireCamera();
+                state.EndVehicleSelect();
+                state.MarkReady();
+                Debug.Log("[SessionManager] Vehicle swap cancelled — respawned previous vehicle.");
+            }
+            else
+            {
+                state.BeginSpawning();
+                SetupSession();
+                Debug.Log("[SessionManager] Vehicle selection cancelled — using default.");
             }
         }
 

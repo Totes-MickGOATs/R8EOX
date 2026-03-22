@@ -25,7 +25,8 @@ namespace R8EOX.UI
         /// <summary>Instantiate and show the vehicle selection overlay.</summary>
         public void ShowVehicleSelectOverlay(
             VehicleRegistry registry,
-            Action<VehicleDefinition> confirmCallback)
+            Action<VehicleDefinition> confirmCallback,
+            Action cancelCallback = null)
         {
             CleanupVehicleSelectOverlay();
             overlayInstance = Instantiate(registry.OverlayPrefab);
@@ -39,7 +40,7 @@ namespace R8EOX.UI
                 overlayInstance = null;
                 return;
             }
-            activeOverlay.Show(registry, confirmCallback);
+            activeOverlay.Show(registry, confirmCallback, cancelCallback);
         }
 
         /// <summary>Destroy the vehicle selection overlay if active.</summary>

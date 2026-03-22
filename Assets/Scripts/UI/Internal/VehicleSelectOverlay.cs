@@ -16,13 +16,16 @@ namespace R8EOX.UI.Internal
         private const string LastSelectedKey = "R8EOX_LastSelectedVehicle";
 
         private Action<VehicleDefinition> onConfirmed;
+        private Action onCancelled;
         private VehicleDefinition currentSelection;
 
         internal void Show(
             VehicleRegistry registry,
-            Action<VehicleDefinition> confirmCallback)
+            Action<VehicleDefinition> confirmCallback,
+            Action cancelCallback = null)
         {
             onConfirmed = confirmCallback;
+            onCancelled = cancelCallback;
 
             if (titleText != null)
             {
@@ -82,8 +85,7 @@ namespace R8EOX.UI.Internal
 
         private void OnBackPressed()
         {
-            // TODO: handle back navigation (return to track select or cancel swap)
-            Hide();
+            onCancelled?.Invoke();
         }
 
         private void RestoreLastSelection()

@@ -13,7 +13,7 @@ namespace R8EOX.UI.Internal
 
         private GameObject stageRoot;
         private Transform turntable;
-        private Camera previewCamera;
+        private UnityEngine.Camera previewCamera;
         private RenderTexture previewTexture;
         private GameObject currentPreviewInstance;
         private float currentRotationVelocity;
@@ -139,7 +139,7 @@ namespace R8EOX.UI.Internal
             var camObj = new GameObject("PreviewCamera");
             camObj.transform.SetParent(stageRoot.transform, false);
 
-            previewCamera = camObj.AddComponent<Camera>();
+            previewCamera = camObj.AddComponent<UnityEngine.Camera>();
             previewCamera.cullingMask = 1 << LayerMask.NameToLayer("VehiclePreview");
             previewCamera.fieldOfView = 35f;
             previewCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -190,6 +190,11 @@ namespace R8EOX.UI.Internal
                 if (c is MeshFilter) continue;
                 if (c is MeshRenderer) continue;
                 if (c is SkinnedMeshRenderer) continue;
+                if (c is Collider col)
+                {
+                    Destroy(col);
+                    continue;
+                }
                 if (c is Rigidbody rb)
                 {
                     Destroy(rb);
