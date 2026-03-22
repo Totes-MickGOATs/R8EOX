@@ -83,16 +83,15 @@ namespace R8EOX.Editor.Builders
                 spec.TireRadius, spec.RearTireWidth, spec.HubRadius, spec.RearHubWidth,
                 spec, tireMat, hubMat, carLayer);
 
-            GameObject airPhysGO = new GameObject("AirPhysics");
-            airPhysGO.transform.SetParent(root.transform, false);
-            airPhysGO.AddComponent<R8EOX.Vehicle.Internal.RCAirPhysics>();
-
-            GameObject drivetrainGO = new GameObject("Drivetrain");
-            drivetrainGO.transform.SetParent(root.transform, false);
-            var drivetrain = drivetrainGO.AddComponent<R8EOX.Vehicle.Internal.Drivetrain>();
+            var airGO = new GameObject("AirPhysics"); airGO.transform.SetParent(root.transform, false);
+            airGO.AddComponent<R8EOX.Vehicle.Internal.RCAirPhysics>();
+            var dtGO = new GameObject("Drivetrain"); dtGO.transform.SetParent(root.transform, false);
+            var drivetrain = dtGO.AddComponent<R8EOX.Vehicle.Internal.Drivetrain>();
 
             ConfigureDrivetrain(drivetrain, spec);
             ConfigureVehicleManager(vehicleManager, spec);
+            root.AddComponent<R8EOX.Vehicle.Internal.CollisionTracker>();
+            AddAttachmentPoints(root, spec);
 
             SetLayerRecursive(root, carLayer);
             return root;
@@ -155,9 +154,7 @@ namespace R8EOX.Editor.Builders
         static void AddRigidbody(GameObject root, BuggySpec spec)
         {
             var rb = root.AddComponent<Rigidbody>();
-            rb.mass = spec.Mass;
-            rb.linearDamping = 0f;
-            rb.angularDamping = 0.05f;
+            rb.mass = spec.Mass; rb.linearDamping = 0f; rb.angularDamping = 0.05f;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         }
@@ -192,16 +189,12 @@ namespace R8EOX.Editor.Builders
 
         static void AddControlArms(GameObject root, Material darkGrey, BuggySpec spec)
         {
-            float armX = spec.TrackHalf * 0.52f;
-            float wh   = spec.WheelbaseHalf;
-            AddBoxMesh(root, "FrontArmL", new Vector3(armX, 0.02f, 0.08f),
-                new Vector3(-armX, -0.213f,  wh), darkGrey);
-            AddBoxMesh(root, "FrontArmR", new Vector3(armX, 0.02f, 0.08f),
-                new Vector3( armX, -0.213f,  wh), darkGrey);
-            AddBoxMesh(root, "RearArmL",  new Vector3(armX, 0.02f, 0.08f),
-                new Vector3(-armX, -0.213f, -wh), darkGrey);
-            AddBoxMesh(root, "RearArmR",  new Vector3(armX, 0.02f, 0.08f),
-                new Vector3( armX, -0.213f, -wh), darkGrey);
+            float armX = spec.TrackHalf * 0.52f; float wh = spec.WheelbaseHalf;
+            var armSize = new Vector3(armX, 0.02f, 0.08f);
+            AddBoxMesh(root, "FrontArmL", armSize, new Vector3(-armX, -0.213f,  wh), darkGrey);
+            AddBoxMesh(root, "FrontArmR", armSize, new Vector3( armX, -0.213f,  wh), darkGrey);
+            AddBoxMesh(root, "RearArmL",  armSize, new Vector3(-armX, -0.213f, -wh), darkGrey);
+            AddBoxMesh(root, "RearArmR",  armSize, new Vector3( armX, -0.213f, -wh), darkGrey);
         }
 
         static void BuildWheel(GameObject parent, string name, Vector3 localPos,
@@ -235,22 +228,16 @@ namespace R8EOX.Editor.Builders
             float radius, float height, Material mat, int layer)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            go.name = name;
-            go.transform.SetParent(pivot.transform, false);
+            go.name = name; go.transform.SetParent(pivot.transform, false);
             go.transform.localPosition = new Vector3(0f, -0.2f, 0f);
             go.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             go.transform.localScale    = new Vector3(radius * 2f, height * 0.5f, radius * 2f);
             go.GetComponent<Renderer>().material = mat;
-            Object.DestroyImmediate(go.GetComponent<Collider>());
-            go.layer = layer;
+            Object.DestroyImmediate(go.GetComponent<Collider>()); go.layer = layer;
         }
 
         static void AddBoxCollider(GameObject parent, Vector3 size, Vector3 center)
-        {
-            var col = parent.AddComponent<BoxCollider>();
-            col.size   = size;
-            col.center = center;
-        }
+        { var col = parent.AddComponent<BoxCollider>(); col.size = size; col.center = center; }
 
         static GameObject AddBoxMesh(GameObject parent, string name,
             Vector3 size, Vector3 localPos, Material mat)
@@ -287,6 +274,19 @@ namespace R8EOX.Editor.Builders
             }
             return mat;
         }
+
+        static void AddAttachmentPoints(GameObject root, BuggySpec spec)
+        {
+            AddEmptyChild(root, "CameraTarget",    new Vector3(0f,  0.15f,  0.3f));
+            AddEmptyChild(root, "CameraMountPoint",new Vector3(0f,  3f,    -8f));
+            AddEmptyChild(root, "ExhaustPoint",    new Vector3(0f, -0.15f, -spec.ChassisLength * 0.5f));
+            foreach (Transform child in root.transform)
+                if (child.GetComponent<R8EOX.Vehicle.Internal.RaycastWheel>() != null)
+                    AddEmptyChild(child.gameObject, "VFXPoint", new Vector3(0f, -spec.RestDistance, 0f));
+        }
+
+        static void AddEmptyChild(GameObject parent, string name, Vector3 localPos)
+        { var go = new GameObject(name); go.transform.SetParent(parent.transform, false); go.transform.localPosition = localPos; }
 
         static void SetLayerRecursive(GameObject go, int layer)
         {
