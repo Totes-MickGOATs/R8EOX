@@ -27,5 +27,24 @@ namespace R8EOX
         public float MaxRaceTime => maxRaceTime;
         public int AiOpponentCount => aiOpponentCount;
         public int AiDifficultyLevel => aiDifficultyLevel;
+
+        /// <summary>
+        /// Create a runtime SessionConfig for editor-play or programmatic sessions.
+        /// </summary>
+        public static SessionConfig CreateRuntime(
+            SessionMode mode,
+            GameObject vehicle,
+            string scenePath = null,
+            int laps = 0,
+            int aiCount = 0)
+        {
+            var config = CreateInstance<SessionConfig>();
+            config.sessionMode = mode;
+            config.vehiclePrefab = vehicle;
+            config.trackScenePath = scenePath ?? string.Empty;
+            config.totalLaps = laps;
+            config.aiOpponentCount = aiCount;
+            return config;
+        }
     }
 }
