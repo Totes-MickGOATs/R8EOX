@@ -215,12 +215,11 @@ namespace R8EOX.Editor.Builders
             pivot.layer = layer;
 
             var wheel = pivot.AddComponent<R8EOX.Vehicle.Internal.RaycastWheel>();
-            wheel.IsSteer = isSteer;
-            wheel.IsMotor = isMotor;
-            wheel.SpringStrength = spec.FrontSpringStrength;
-            wheel.SpringDamping  = spec.FrontSpringDamping;
+            wheel.IsSteer = isSteer; wheel.IsMotor = isMotor;
+            bool front = localPos.z > 0f;
+            wheel.SpringStrength = front ? spec.FrontSpringStrength : spec.RearSpringStrength;
+            wheel.SpringDamping  = front ? spec.FrontSpringDamping  : spec.RearSpringDamping;
             wheel.RestDistance   = spec.RestDistance;
-
             var so = new SerializedObject(wheel);
             so.FindProperty("_wheelRadius").floatValue    = tireRadius;
             so.FindProperty("_overExtend").floatValue     = spec.OverExtend;

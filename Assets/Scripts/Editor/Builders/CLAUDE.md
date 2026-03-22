@@ -11,7 +11,12 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `AssetHelper.cs` | Utility methods for loading and creating assets in editor scripts |
 | `EnvironmentBuilder.cs` | Constructs environment elements (lighting, skybox, post-processing) |
 | `LayerData.cs` | Data struct for terrain layer configuration |
-| `RCBuggyBuilder.cs` | Builds the RCBuggy hierarchy: chassis, wheels, colliders, visuals, components |
+| `BuggySpec.cs` | Readonly data struct holding all per-variant vehicle parameters |
+| `BuggySpecCatalog.cs` | Static catalog with `Get2WD()` and `Get4WD()` spec factory methods |
+| `BuggyMotorKind.cs` | Builder-local enum mirroring `MotorPreset` (avoids cross-system import) |
+| `BuggyDriveLayout.cs` | Builder-local enum: RWD, AWD |
+| `BuggyDiffType.cs` | Builder-local enum: Open, BallDiff, Spool |
+| `RCBuggyBuilder.cs` | Builds buggy prefabs from BuggySpec; menu items for 2WD/4WD/All variants |
 | `TerrainBuilder.cs` | Creates and configures terrain objects with surface layers and height maps |
 | `TerrainLayerBuilder.cs` | Builds terrain layer assets (texture, normal map, tiling) |
 | `TerrainSplatmapBuilder.cs` | Composites splatmap blend masks onto terrain alphamap |

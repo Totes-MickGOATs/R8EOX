@@ -29,7 +29,7 @@ namespace R8EOX.Editor.Builders
             motor: BuggyMotorKind.Motor13_5T,
             layout: BuggyDriveLayout.AWD,
             rearDiff: BuggyDiffType.BallDiff, rearPreload: 50f,
-            frontDiff: BuggyDiffType.Open, frontPreload: 10f,
+            frontDiff: BuggyDiffType.Open, frontPreload: 0f,
             centerDiff: BuggyDiffType.Open, centerPreload: 20f, centerFrontBias: 0.35f,
             chassisWidth: 0.52f, chassisHeight: 0.032f, chassisLength: 1.36f,
             wheelbaseHalf: 0.68f, trackHalf: 0.52f,
