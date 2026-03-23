@@ -11,14 +11,14 @@ namespace R8EOX
     [CreateAssetMenu(fileName = "NewWheelInertiaConfig", menuName = "R8EOX/WheelInertiaConfig")]
     public class WheelInertiaConfig : ScriptableObject
     {
-        [Tooltip("Moment of inertia per wheel (kg*m^2). Typical 1/1 (10x RC): 0.120")]
-        [SerializeField] private float _wheelMoI = 0.120f;
+        [Tooltip("Moment of inertia per wheel (kg*m^2). Typical 1/10th RC: 0.006")]
+        [SerializeField] private float _wheelMoI = 0.006f;
 
         [Tooltip("Game-feel multiplier for gyroscopic effect. 1.0 = physically accurate.")]
-        [SerializeField] private float _gyroScale = 3.0f;
+        [SerializeField] private float _gyroScale = 1.5f;
 
         [Tooltip("Game-feel multiplier for reaction torque (pitch control). 1.0 = physically accurate.")]
-        [SerializeField] private float _reactionScale = 80.0f;
+        [SerializeField] private float _reactionScale = 30.0f;
 
         /// <summary>Moment of inertia per wheel in kg*m^2.</summary>
         public float WheelMoI => _wheelMoI;
