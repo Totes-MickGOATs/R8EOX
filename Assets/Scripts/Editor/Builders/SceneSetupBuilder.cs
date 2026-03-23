@@ -41,7 +41,8 @@ namespace R8EOX.Editor.Builders
 
             WireCameraMainRef(cameraManager);
 
-            var trackManager = Object.FindAnyObjectByType<R8EOX.Track.TrackManager>();
+            var trackManager = FindOrAdd<R8EOX.Track.TrackManager>(
+                managersParent, "TrackManager");
             WireTrackConfig(trackManager);
 
             var bootstrapper = FindOrCreateBootstrapper();
@@ -217,7 +218,7 @@ namespace R8EOX.Editor.Builders
             R8EOX.VFX.VFXManager       vfxManager,
             R8EOX.AI.AIManager         aiManager)
         {
-            string track = trackManager  != null ? "wired" : "NOT FOUND";
+            string track = trackManager  != null ? "placed" : "missing";
             string cam   = cameraManager != null ? "placed" : "missing";
             string race  = raceManager   != null ? "placed" : "missing";
             string ui    = uiManager     != null ? "placed" : "missing";
