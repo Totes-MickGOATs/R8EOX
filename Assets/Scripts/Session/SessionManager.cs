@@ -50,6 +50,7 @@ namespace R8EOX.Session
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
         }
 
+        public void SetSessionChannel(SessionChannel channel) { sessionChannel = channel; }
         public void BeginSession(SessionConfig config)
         {
             if (config == null)
