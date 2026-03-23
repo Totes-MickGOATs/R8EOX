@@ -44,7 +44,8 @@ namespace R8EOX.Tests.EditMode
         [Category("invariant")]
         public void ComputeGroundDrive_BrakeOnly_BrakeForcePositive()
         {
-            var result = Drive(brake: 1.0f);
+            // fwdSpeed=1.0 keeps us above reverse threshold so braking path is taken
+            var result = Drive(brake: 1.0f, fwdSpeed: 1.0f);
             Assert.That(result.BrakeForce, Is.EqualTo(15.3f).Within(0.001f));
         }
 
