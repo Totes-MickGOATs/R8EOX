@@ -86,7 +86,8 @@ namespace R8EOX.Session
             if (state.CurrentPhase != SessionPhase.Ready) return;
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
-            if (registry == null || registry.OverlayPrefab == null) return;
+            if (registry == null
+                || sessionChannel?.OverlayRegistry?.VehicleSelectOverlayPrefab == null) return;
             var (pos, rot) = vehicleSpawner.GetPlayerPositionAndRotation();
             swapPosition = pos;
             swapRotation = rot;
@@ -96,14 +97,12 @@ namespace R8EOX.Session
             ShowVehicleSelectOverlay(registry);
         }
 
-        // ----- Vehicle selection -----
-
         private void EnterVehicleSelectOrSpawn()
         {
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
             if (registry != null && registry.Count > 0
-                && registry.OverlayPrefab != null)
+                && sessionChannel?.OverlayRegistry?.VehicleSelectOverlayPrefab != null)
             {
                 state.BeginVehicleSelect();
                 ShowVehicleSelectOverlay(registry);
@@ -124,8 +123,9 @@ namespace R8EOX.Session
                 SetupSession();
                 return;
             }
+            var prefab = sessionChannel.OverlayRegistry.VehicleSelectOverlayPrefab;
             uiManager.ShowVehicleSelectOverlay(
-                registry, OnVehicleSelected, OnVehicleSelectCancelled);
+                prefab, registry, OnVehicleSelected, OnVehicleSelectCancelled);
         }
 
         private void OnVehicleSelected(VehicleDefinition definition)
@@ -170,8 +170,6 @@ namespace R8EOX.Session
         {
             if (uiManager != null) uiManager.CleanupVehicleSelectOverlay();
         }
-
-        // ----- Session setup -----
 
         private void Update()
         {
