@@ -23,6 +23,10 @@ namespace R8EOX.Session.Internal
                 overlay.AddError("Track",
                     "No spawn points found",
                     "Add SpawnGrid or SpawnPoint children to TrackManager");
+            if (trackManager.GetTrackConfig() == null)
+                overlay.AddError("Track",
+                    "TrackManager has no TrackConfig assigned",
+                    "Create a TrackConfig asset and assign it in the Inspector");
             if (raceManager == null)
                 overlay.AddWarning("Race",
                     "No RaceManager — degrading to Practice mode");

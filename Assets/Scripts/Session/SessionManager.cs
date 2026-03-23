@@ -214,7 +214,7 @@ namespace R8EOX.Session
                 errorOverlay = gameObject.AddComponent<SetupErrorOverlay>();
         }
 
-        private void InitializeTrack() => trackManager.Initialize(null);
+        private void InitializeTrack() => trackManager.Initialize();
 
         private void ValidateAndDegradeMode()
         {

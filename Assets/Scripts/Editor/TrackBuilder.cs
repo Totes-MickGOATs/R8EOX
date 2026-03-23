@@ -148,6 +148,25 @@ namespace R8EOX.Editor
             // 7. Place managers (convention — every track gets a complete scene)
             SceneSetupBuilder.PlaceManagers();
 
+            // 7b. Wire TrackConfig from scan data
+            if (scan.TrackConfigAsset != null)
+            {
+                var tm = Object.FindAnyObjectByType<R8EOX.Track.TrackManager>();
+                if (tm != null)
+                {
+                    var tmSO = new SerializedObject(tm);
+                    tmSO.FindProperty("config").objectReferenceValue =
+                        scan.TrackConfigAsset;
+                    tmSO.ApplyModifiedProperties();
+                }
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "[TrackBuilder] No TrackConfig found in " +
+                    $"{trackFolderPath}. Create one at the track root.");
+            }
+
             // 8. Save and finish
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(

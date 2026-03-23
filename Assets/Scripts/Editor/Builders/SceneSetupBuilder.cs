@@ -42,6 +42,7 @@ namespace R8EOX.Editor.Builders
             WireCameraMainRef(cameraManager);
 
             var trackManager = Object.FindAnyObjectByType<R8EOX.Track.TrackManager>();
+            WireTrackConfig(trackManager);
 
             var bootstrapper = FindOrCreateBootstrapper();
 
@@ -89,6 +90,32 @@ namespace R8EOX.Editor.Builders
                 prop.objectReferenceValue = mainCam;
                 so.ApplyModifiedProperties();
             }
+        }
+
+        private static void WireTrackConfig(R8EOX.Track.TrackManager trackManager)
+        {
+            if (trackManager == null)
+                return;
+
+            var so = new SerializedObject(trackManager);
+            var prop = so.FindProperty("config");
+            if (prop == null || prop.objectReferenceValue != null)
+                return;
+
+            // Global fallback: find any TrackConfig in the project
+            var guids = AssetDatabase.FindAssets("t:TrackConfig");
+            if (guids.Length == 0)
+            {
+                Debug.LogWarning(
+                    "[SceneSetupBuilder] No TrackConfig asset found. " +
+                    "Create one via Assets > Create > R8EOX > TrackConfig");
+                return;
+            }
+
+            prop.objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<ScriptableObject>(
+                    AssetDatabase.GUIDToAssetPath(guids[0]));
+            so.ApplyModifiedProperties();
         }
 
         // ---- Bootstrapper ----------------------------------------------------
