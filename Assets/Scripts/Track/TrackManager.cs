@@ -10,7 +10,7 @@ namespace R8EOX.Track
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (config == null && gameObject.scene.IsValid() && gameObject.scene.isLoaded)
+            if (config == null)
                 Debug.LogWarning("[TrackManager] TrackConfig is not assigned.", this);
         }
 #endif
