@@ -42,15 +42,17 @@ Scripts/
 - State machines owned by top-level class
 
 ## Contents
+- `App/` — Application lifecycle: persistent root (AppManager), scene loading, DontDestroyOnLoad management
+- `Menu/` — Menu system: screen navigation, splash, main menu, mode select, track select, loading
 - `Vehicle/` — RC car physics: suspension, drivetrain, grip, handling (complete)
 - `Input/` — Player input routing via new Input System, IVehicleInput interface (complete)
 - `Track/` — Track definition: spawn points, checkpoints, centerline, boundaries, surfaces
 - `Race/` — Race coordination: FSM, standings, timer (skeleton)
 - `Session/` — Session orchestration: editor-play detection, vehicle spawning, track validation, mode degradation
 - `Camera/` — Camera control: chase cam, cinematic views, screen effects (skeleton)
-- `UI/` — HUD, menus, user interface (skeleton)
+- `UI/` — HUD, menus, user interface, pause menu, vehicle select overlay
 - `Audio/` — Engine, tire, ambient, music (skeleton)
 - `AI/` — AI opponents: centerline-following drivers with difficulty scaling, wired via SessionManager
 - `VFX/` — Tire marks, exhaust, sparks, screen effects (skeleton)
-- `ScriptableObjects/` — Data containers: SessionConfig, TrackConfig, RaceConfig, motor/suspension/traction configs
-- `Editor/` — Builder tools: TrackBuilder, RCBuggyBuilder, material tools
+- `ScriptableObjects/` — Data containers: SessionConfig, TrackConfig, RaceConfig, TrackDefinition, TrackRegistry, MenuThemeConfig, motor/suspension/traction configs
+- `Editor/` — Builder tools: TrackBuilder, RCBuggyBuilder, MenuSceneBuilder, BootSceneBuilder, TrackRegistryBuilder
