@@ -12,20 +12,23 @@ namespace R8EOX.Menu.Internal
         [SerializeField] private Button quitButton;
 
         private Action onPlayPressed;
+        private Action onOptionsPressed;
         private Action onQuitPressed;
 
         // -------------------------------------------------------------------
         // Public API
         // -------------------------------------------------------------------
 
-        internal void Initialize(Action playCallback, Action quitCallback)
+        internal void Initialize(Action playCallback, Action optionsCallback, Action quitCallback)
         {
             onPlayPressed = playCallback;
+            onOptionsPressed = optionsCallback;
             onQuitPressed = quitCallback;
 
             playButton.onClick.AddListener(HandlePlay);
+            optionsButton.onClick.AddListener(HandleOptions);
+            optionsButton.interactable = true;
             quitButton.onClick.AddListener(HandleQuit);
-            optionsButton.interactable = false;
         }
 
         // -------------------------------------------------------------------
@@ -51,6 +54,9 @@ namespace R8EOX.Menu.Internal
             if (playButton != null)
                 playButton.onClick.RemoveListener(HandlePlay);
 
+            if (optionsButton != null)
+                optionsButton.onClick.RemoveListener(HandleOptions);
+
             if (quitButton != null)
                 quitButton.onClick.RemoveListener(HandleQuit);
         }
@@ -62,6 +68,11 @@ namespace R8EOX.Menu.Internal
         private void HandlePlay()
         {
             onPlayPressed?.Invoke();
+        }
+
+        private void HandleOptions()
+        {
+            onOptionsPressed?.Invoke();
         }
 
         private void HandleQuit()
