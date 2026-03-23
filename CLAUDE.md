@@ -142,11 +142,11 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 - The orchestrator pre-reads shared context (CLAUDE.md, folder CLAUDE.md, `.ai/knowledge/` docs) ONCE, then injects relevant content directly into each agent prompt — agents start immediately without re-reading files
 - Break tasks into the most granular pieces possible and launch maximum parallel agents
 
-### IMMEDIATE COMMITS — MANDATORY FOR ALL AGENTS AND SUBAGENTS
+### IMMEDIATE COMMITS — MANDATORY FOR EVERYONE: MAIN SESSION, AGENTS, AND SUBAGENTS
 
 > **BLOCKING RULE — DO NOT SKIP — DO NOT DEFER — DO NOT BATCH**
 >
-> Every agent and subagent MUST `git commit` **immediately after each file is written, modified, or updated.** This is the single most important workflow rule in this project. Violation = lost work.
+> **EVERYONE** who edits a file MUST `git commit` **immediately after each file is written, modified, or updated.** This includes the **main session / orchestrator** — not just subagents. If you are editing files, you are bound by this rule. No one is exempt. Violation = lost work.
 
 #### The Rule
 
