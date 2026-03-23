@@ -14,7 +14,7 @@ namespace R8EOX.Session.Internal
         internal bool HasVFXPoints;
 
         internal bool IsPlayable => HasRigidbody && HasWheels && HasInput;
-        internal bool IsRaceReady => IsPlayable && HasDrivetrain && HasColliders;
+        internal bool IsRaceReady => IsPlayable && HasDrivetrain && HasColliders && HasCameraTarget;
         internal bool IsFullyEquipped => IsRaceReady && HasCameraTarget && HasCollisionTracker && HasVFXPoints;
 
         internal string GetMissingReport()
