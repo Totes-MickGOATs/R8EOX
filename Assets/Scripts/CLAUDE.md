@@ -49,6 +49,7 @@ Scripts/
 - `Track/` — Track definition: spawn points, checkpoints, centerline, boundaries, surfaces
 - `Race/` — Race coordination: FSM, standings, timer (skeleton)
 - `Session/` — Session orchestration: editor-play detection, vehicle spawning, track validation, mode degradation
+- `Settings/` — User preferences: persistence, quality tiers, audio volumes, input calibration, profiles
 - `Camera/` — Camera control: chase cam, cinematic views, screen effects (skeleton)
 - `UI/` — HUD, menus, user interface, pause menu, vehicle select overlay
 - `Audio/` — Engine, tire, ambient, music (skeleton)
