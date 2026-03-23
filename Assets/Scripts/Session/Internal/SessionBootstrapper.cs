@@ -145,5 +145,23 @@ namespace R8EOX.Session.Internal
                 SessionMode.Practice,
                 defaultVehiclePrefab);
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (trackManager == null)
+                Debug.LogError(
+                    "[SessionBootstrapper] TrackManager is required " +
+                    "but not assigned!", this);
+            if (cameraManager == null)
+                Debug.LogError(
+                    "[SessionBootstrapper] CameraManager is required " +
+                    "but not assigned!", this);
+            if (sessionChannel == null)
+                Debug.LogWarning(
+                    "[SessionBootstrapper] SessionChannel not assigned " +
+                    "— editor-play will use defaults.", this);
+        }
+#endif
     }
 }
