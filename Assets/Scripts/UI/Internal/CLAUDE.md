@@ -7,11 +7,12 @@ Internal implementation for the UI system. Only `UIManager` should reference the
 - Namespace: `R8EOX.UI.Internal`
 - Access: `internal class` (enforced by pre-commit hook)
 - All are MonoBehaviours attached to UI GameObjects
+- TMPro text fields use `[SerializeField] private TextMeshProUGUI`
 
 ## Contents
-- `RaceHUD.cs` — Displays speed, position, lap counter, and current lap time during races
-- `Leaderboard.cs` — Shows/hides race standings list
-- `PauseMenu.cs` — Pause screen with resume/quit and "Change Vehicle" trigger; routes swap through UIManager
+- `RaceHUD.cs` — TMPro-based race HUD: speed (km/h), position (ordinal), lap counter, race time, current lap time, best lap time, countdown overlay; includes FormatTime and GetOrdinal helpers
+- `Leaderboard.cs` — Shows/hides race standings list (skeleton)
+- `PauseMenu.cs` — Pause screen with resume/quit and "Change Vehicle" trigger; routes swap through UIManager; controls Time.timeScale
 - `VehicleSelectOverlay.cs` — Full-screen vehicle selection overlay: wires VehicleListPanel + VehiclePreviewPanel, confirm/back buttons, persists last selection via PlayerPrefs
 - `VehicleListPanel.cs` — Scrollable vehicle list: spawns VehicleListEntry rows from VehicleDefinition[], reports selection changes
 - `VehiclePreviewPanel.cs` — Container for VehiclePreviewRenderer + VehicleStatsDisplay + vehicle name label

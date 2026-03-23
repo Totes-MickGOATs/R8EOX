@@ -1,19 +1,41 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using R8EOX.UI.Internal;
+using R8EOX.Race;
+using R8EOX.Vehicle;
 
 namespace R8EOX.UI
 {
     public class UIManager : MonoBehaviour
     {
+        [Header("UI References")]
+        [SerializeField] private RaceHUD raceHUD;
+        [SerializeField] private PauseMenu pauseMenu;
+        [SerializeField] private Leaderboard leaderboard;
+
         private R8EOX.Session.SessionManager sessionManager;
+        private RaceManager raceManager;
         private GameObject overlayInstance;
         private VehicleSelectOverlay activeOverlay;
+
+        private GameObject cachedPlayerVehicle;
+        private VehicleManager cachedVehicleManager;
+        private bool isPaused;
+        private bool countdownVisible;
 
         /// <summary>Set by SessionManager to enable swap routing.</summary>
         public void SetSessionManager(R8EOX.Session.SessionManager manager)
         {
             sessionManager = manager;
+        }
+
+        /// <summary>Set by SessionManager to enable HUD data polling.</summary>
+        public void SetRaceManager(RaceManager rm)
+        {
+            raceManager = rm;
+            if (raceManager != null)
+                raceManager.OnPhaseChanged += HandlePhaseChanged;
         }
 
         public void RequestVehicleSwap()
@@ -52,34 +74,132 @@ namespace R8EOX.UI
             overlayInstance = null;
         }
 
-        public void UpdateHUD(float speed, int position, int lap, int totalLaps)
+        public void UpdateHUD(
+            float speed, int position, int lap, int totalLaps)
         {
-            // TODO: Route data to RaceHUD
+            if (raceHUD == null) return;
+            raceHUD.UpdateSpeed(speed);
+            raceHUD.UpdatePosition(position);
+            raceHUD.UpdateLap(lap, totalLaps);
         }
 
         public void UpdateLeaderboard(string[] standings)
         {
-            // TODO: Route data to Leaderboard
+            if (leaderboard != null)
+                leaderboard.UpdateStandings(standings);
         }
 
         public void ShowPauseMenu()
         {
-            // TODO: Activate pause menu
+            isPaused = true;
+            if (pauseMenu != null) pauseMenu.Show();
         }
 
         public void HidePauseMenu()
         {
-            // TODO: Deactivate pause menu
+            isPaused = false;
+            if (pauseMenu != null) pauseMenu.Hide();
         }
 
         public void ShowCountdown(int seconds)
         {
-            // TODO: Display countdown overlay
+            if (raceHUD != null) raceHUD.ShowCountdown(seconds);
         }
 
         public void ShowRaceResults()
         {
             // TODO: Display final results screen
+        }
+
+        private void Update()
+        {
+            HandlePauseInput();
+            if (!isPaused && raceManager != null)
+                UpdateHUDFromRaceData();
+        }
+
+        private void HandlePauseInput()
+        {
+            if (Keyboard.current == null) return;
+            if (!Keyboard.current.escapeKey.wasPressedThisFrame) return;
+            TogglePause();
+        }
+
+        private void TogglePause()
+        {
+            if (isPaused)
+                HidePauseMenu();
+            else
+                ShowPauseMenu();
+        }
+
+        private void UpdateHUDFromRaceData()
+        {
+            if (raceHUD == null) return;
+
+            RacePhase phase = raceManager.GetCurrentPhase();
+            if (phase == RacePhase.PreRace) return;
+
+            UpdateCountdownDisplay(phase);
+            if (phase != RacePhase.Racing && phase != RacePhase.Finished)
+                return;
+
+            CachePlayerVehicle();
+            if (cachedVehicleManager == null) return;
+
+            GameObject player = cachedPlayerVehicle;
+            raceHUD.UpdateSpeed(cachedVehicleManager.GetSpeedKmh());
+            raceHUD.UpdatePosition(raceManager.GetVehiclePosition(player));
+            raceHUD.UpdateLap(
+                raceManager.GetLapCount(player),
+                raceManager.GetTotalLaps());
+            raceHUD.UpdateRaceTime(raceManager.GetRaceTime());
+            raceHUD.UpdateLapTime(raceManager.GetCurrentLapTime(player));
+            raceHUD.UpdateBestLapTime(raceManager.GetBestLapTime(player));
+        }
+
+        private void UpdateCountdownDisplay(RacePhase phase)
+        {
+            if (phase == RacePhase.Countdown)
+            {
+                float remaining = raceManager.GetCountdownRemaining();
+                raceHUD.ShowCountdown(remaining);
+                countdownVisible = true;
+            }
+            else if (countdownVisible)
+            {
+                raceHUD.HideCountdown();
+                countdownVisible = false;
+            }
+        }
+
+        private void CachePlayerVehicle()
+        {
+            if (sessionManager == null) return;
+            GameObject player = sessionManager.PlayerVehicle;
+            if (player == null) return;
+
+            if (player != cachedPlayerVehicle)
+            {
+                cachedPlayerVehicle = player;
+                cachedVehicleManager =
+                    player.GetComponent<VehicleManager>();
+            }
+        }
+
+        private void HandlePhaseChanged(RacePhase phase)
+        {
+            if (phase == RacePhase.Racing && raceHUD != null)
+                raceHUD.Show();
+
+            if (phase == RacePhase.Finished)
+                ShowRaceResults();
+        }
+
+        private void OnDestroy()
+        {
+            if (raceManager != null)
+                raceManager.OnPhaseChanged -= HandlePhaseChanged;
         }
     }
 }

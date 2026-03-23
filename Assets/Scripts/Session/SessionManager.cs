@@ -48,6 +48,7 @@ namespace R8EOX.Session
             cameraManager = cam;
             uiManager = ui;
             if (uiManager != null) uiManager.SetSessionManager(this);
+            if (uiManager != null && race != null) uiManager.SetRaceManager(race);
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
         }
 
