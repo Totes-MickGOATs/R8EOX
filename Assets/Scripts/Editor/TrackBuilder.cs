@@ -145,7 +145,10 @@ namespace R8EOX.Editor
                     scan.EnvironmentSettingsAsset);
             }
 
-            // 7. Save and finish
+            // 7. Place managers (convention — every track gets a complete scene)
+            SceneSetupBuilder.PlaceManagers();
+
+            // 8. Save and finish
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(
                 EditorSceneManager.GetActiveScene());
