@@ -93,9 +93,10 @@ lint_cs_file() {
     errors=$((errors + 1))
   fi
 
-  # BANNED: FindObjectOfType (exempt: editor builder scripts that scan scenes by design)
+  # BANNED: FindObjectOfType (exempt: editor builder scripts and test files that scan scenes by design)
   case "$file" in
     Assets/Scripts/Editor/*) : ;;  # Editor builders legitimately scan active scenes
+    Assets/Tests/*) : ;;           # Test helpers legitimately scan scenes for components
     *)
       local find_obj
       find_obj=$(echo "$content" | grep -nE 'FindObjectOfType|FindObjectsOfType|FindAnyObjectByType|FindFirstObjectByType' | grep -vE '^\s*[0-9]*:\s*//' || true)
