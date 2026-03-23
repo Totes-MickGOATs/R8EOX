@@ -59,9 +59,13 @@ namespace R8EOX.Tests.PlayMode
             foreach (var go in rootObjects)
             {
                 if (go != temp)
+                {
+                    go.SetActive(false);
                     Object.Destroy(go);
+                }
             }
 
+            temp.SetActive(false);
             Object.Destroy(temp);
         }
     }
