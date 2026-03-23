@@ -8,9 +8,13 @@ namespace R8EOX
         [Header("Vehicle Selection")]
         [SerializeField] private VehicleRegistry vehicleRegistry;
 
+        [Header("Track Selection")]
+        [SerializeField] private TrackRegistry trackRegistry;
+
         [System.NonSerialized] private SessionConfig activeConfig;
 
         public VehicleRegistry VehicleRegistry => vehicleRegistry;
+        public TrackRegistry TrackRegistry => trackRegistry;
 
         public bool HasActiveSession => activeConfig != null;
         public SessionConfig ActiveConfig => activeConfig;
