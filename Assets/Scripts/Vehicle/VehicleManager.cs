@@ -137,6 +137,7 @@ namespace R8EOX.Vehicle
 
         void FixedUpdate()
         {
+            if (_rb == null) return;
             var frame = new VehicleFrame { Dt = Time.fixedDeltaTime, ReverseEngaged = ReverseEngaged };
             if (_collision != null) _collision.ResetFrame();
             if (_flipRequested) { _flipRequested = false; DoFlip(); }
