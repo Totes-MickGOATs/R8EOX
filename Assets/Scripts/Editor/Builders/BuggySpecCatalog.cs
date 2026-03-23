@@ -25,7 +25,8 @@ namespace R8EOX.Editor.Builders
             rearSpringStrength: 300f, rearSpringDamping: 8.0f,
             gripCoeff: 0.75f, steeringMax: 0.55f,
             gearRatio: 7.5f,
-            bodyColor: new Color(0.85f, 0.2f, 0.15f, 0.85f)
+            bodyColor: new Color(0.85f, 0.2f, 0.15f, 0.85f),
+            isReference: true
         );
 
         internal static BuggySpec Get2WD() => new BuggySpec(
