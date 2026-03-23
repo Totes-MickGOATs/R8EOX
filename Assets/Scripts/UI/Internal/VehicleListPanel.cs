@@ -58,6 +58,7 @@ namespace R8EOX.UI.Internal
             for (int i = 0; i < allVehicles.Length; i++)
             {
                 var vehicle = allVehicles[i];
+                if (vehicle == null) continue;
 
                 if (!string.IsNullOrEmpty(searchText) &&
                     !vehicle.DisplayName.Contains(
@@ -82,7 +83,8 @@ namespace R8EOX.UI.Internal
             {
                 var instance = Instantiate(listEntryPrefab, listContent);
                 var entry = instance.GetComponent<VehicleListEntry>();
-                entry.Configure(i, filteredVehicles[i], OnEntryClicked);
+                bool isBroken = filteredVehicles[i].VehiclePrefab == null;
+                entry.Configure(i, filteredVehicles[i], OnEntryClicked, isBroken);
                 entryInstances.Add(entry);
             }
 

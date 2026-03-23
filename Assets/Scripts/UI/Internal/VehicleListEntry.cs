@@ -11,11 +11,12 @@ namespace R8EOX.UI.Internal
         [SerializeField] private UnityEngine.UI.Image highlightBackground;
         [SerializeField] private Color normalColor = new Color(0.15f, 0.15f, 0.15f, 1f);
         [SerializeField] private Color selectedColor = new Color(0.2f, 0.4f, 0.8f, 1f);
+        [SerializeField] private Color brokenColor = new Color(0.8f, 0.2f, 0.2f, 1f);
 
         private Action<int> onClicked;
         private int index;
 
-        internal void Configure(int entryIndex, VehicleDefinition definition, Action<int> clickCallback)
+        internal void Configure(int entryIndex, VehicleDefinition definition, Action<int> clickCallback, bool isBroken = false)
         {
             index = entryIndex;
             onClicked = clickCallback;
@@ -23,7 +24,12 @@ namespace R8EOX.UI.Internal
             if (definition == null) return;
 
             if (nameText != null)
-                nameText.text = definition.DisplayName;
+            {
+                nameText.text = isBroken
+                    ? $"{definition.DisplayName} [Missing Prefab]"
+                    : definition.DisplayName;
+                if (isBroken) nameText.color = brokenColor;
+            }
 
             if (categoryText != null)
                 categoryText.text = definition.Category.ToString();
