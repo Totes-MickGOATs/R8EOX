@@ -15,3 +15,4 @@ Editor-only scripts excluded from runtime builds by Unity's convention.
 - `AddBuggyMaterials.cs` — Menu item to create persistent URP Lit material assets and assign them to RCBuggy prefab meshes
 - `OutpostTrackSetup.cs` — Menu item to create/configure the OutpostTrack scene
 - `TrackBuilder.cs` — Assembles complete track scenes from terrain, environment, and vehicle
+- `BuildSettingsValidator.cs` — InitializeOnLoad + menu items: validates runtime scenes are in Build Settings, removes ghost entries, auto-fixes
