@@ -48,6 +48,14 @@ namespace R8EOX.Editor.Builders
             image.color = fillColor;
         }
 
+        // Ensures a GameObject has a RectTransform (replaces plain Transform)
+        internal static RectTransform EnsureRectTransform(GameObject go)
+        {
+            var rt = go.GetComponent<RectTransform>();
+            if (rt != null) return rt;
+            return go.AddComponent<RectTransform>();
+        }
+
         // Sets RectTransform to stretch-fill (anchor 0,0 -> 1,1, zero offsets)
         internal static void SetRectStretch(RectTransform rt)
         {
