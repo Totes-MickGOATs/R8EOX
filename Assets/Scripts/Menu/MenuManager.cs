@@ -40,6 +40,7 @@ namespace R8EOX.Menu
             if (appManager == null)
             {
                 Debug.LogError("[MenuManager] AppManager not found on [AppRoot]. Menu cannot initialize.");
+                enabled = false;
                 return;
             }
 
