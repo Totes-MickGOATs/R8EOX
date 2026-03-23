@@ -14,9 +14,9 @@ namespace R8EOX.Editor
     /// </summary>
     public static class TrackBuilder
     {
-        // Default terrain dimensions (used when no TerrainSettings SO)
-        const float k_DefaultTerrainWidth = 500f;
-        const float k_DefaultTerrainLength = 500f;
+        // Default terrain dimensions (must match TerrainSettings defaults)
+        const float k_DefaultTerrainWidth = 100f;
+        const float k_DefaultTerrainLength = 100f;
         const int k_DefaultHeightmapRes = 2049;
 
         [MenuItem("R8EOX/Tracks/Build Selected")]
