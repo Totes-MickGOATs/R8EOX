@@ -25,6 +25,7 @@ namespace R8EOX.Menu
         private MenuNavigator navigator;
         private R8EOX.App.AppManager appManager;
         private SessionMode selectedMode;
+        private GameObject optionsOverlayInstance;
 
         /// <summary>
         /// Persists across scene loads so the splash screen is only shown once per session.
@@ -79,7 +80,7 @@ namespace R8EOX.Menu
         private void InitializeScreens()
         {
             splashScreen.Initialize(OnSplashComplete);
-            mainMenuScreen.Initialize(OnPlayPressed, OnQuitPressed);
+            mainMenuScreen.Initialize(OnPlayPressed, OnOptionsPressed, OnQuitPressed);
             modeSelectScreen.Initialize(OnModeSelected, OnModeBackPressed);
             // trackSelectScreen is initialized in OnModeSelected once the mode is known
             loadingScreen.ResetProgress();
@@ -118,6 +119,37 @@ namespace R8EOX.Menu
         private void OnQuitPressed()
         {
             // MainMenuScreen handles the quit action internally (e.g. Application.Quit).
+        }
+
+        private void OnOptionsPressed()
+        {
+            var appRoot = GameObject.Find("[AppRoot]");
+            var settingsManager = appRoot?.GetComponent<R8EOX.Settings.SettingsManager>();
+            if (settingsManager == null)
+            {
+                Debug.LogWarning("[MenuManager] No SettingsManager found on [AppRoot].");
+                return;
+            }
+
+            var overlayRegistry = appManager.SessionChannel.OverlayRegistry;
+            if (overlayRegistry == null || overlayRegistry.OptionsOverlayPrefab == null)
+            {
+                optionsOverlayInstance = new GameObject("[OptionsOverlay]");
+                var overlay = optionsOverlayInstance.AddComponent<R8EOX.UI.Internal.OptionsOverlay>();
+                overlay.Show(settingsManager, OnOptionsBack);
+                return;
+            }
+
+            optionsOverlayInstance = Object.Instantiate(overlayRegistry.OptionsOverlayPrefab);
+            var overlayComp = optionsOverlayInstance.GetComponent<R8EOX.UI.Internal.OptionsOverlay>();
+            overlayComp.Show(settingsManager, OnOptionsBack);
+        }
+
+        private void OnOptionsBack()
+        {
+            if (optionsOverlayInstance != null)
+                Destroy(optionsOverlayInstance);
+            optionsOverlayInstance = null;
         }
 
         private void OnModeSelected(SessionMode mode)
