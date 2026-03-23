@@ -131,14 +131,16 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 | Code review | `unity-reviewer` | After writing code — catches null refs, performance issues, convention violations |
 | Research | `unity-researcher` | Before building — verify APIs, look up docs, check feasibility |
 | Testing | `unity-tester` | Writing or running NUnit tests |
+| Quality gate | `unity-e2e-tester` | After any wave of build agents completes — before reporting "done" to user |
 
 ### Execution Pattern
 
 1. **Research first** — if there are unknowns, dispatch `unity-researcher` before building
 2. **Build in parallel** — launch `unity-script-writer` and `unity-scene-builder` simultaneously when independent
 3. **Integrate after compilation** — wire new components into scenes only after scripts compile cleanly
-4. **Test and review** — dispatch `unity-tester` and `unity-reviewer` after code is written
-5. **Always consolidate** — check `read_console` and summarize results after all agents complete
+4. **E2E quality check** — dispatch `unity-e2e-tester` against test editor to catch issues early
+5. **Test and review** — dispatch `unity-tester` and `unity-reviewer` after code is written
+6. **Always consolidate** — check `read_console` and summarize results after all agents complete
 
 ### Key Rules
 
