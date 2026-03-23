@@ -131,6 +131,45 @@ namespace R8EOX.Tests.EditMode
 
             Assert.That(result, Is.EqualTo(240.964f).Within(0.01f));
         }
+
+        // --- ComputeSteeringPrecessionTorque ---
+
+        [Test, Category("invariant")]
+        public void ComputeSteeringPrecessionTorque_ZeroSteerRate_ZeroTorque()
+        {
+            // currentAxis == prevAxis → axisRate = zero → no steering precession torque
+            Vector3 result = GyroscopicMath.ComputeSteeringPrecessionTorque(
+                currentSpinAxis: new Vector3(1f, 0f, 0f),
+                prevSpinAxis: new Vector3(1f, 0f, 0f),
+                wheelMoI: 0.006f,
+                wheelAngularVelocity: 100f,
+                deltaTime: 0.02f);
+
+            Assert.That(result.x, Is.EqualTo(0f).Within(Tolerance));
+            Assert.That(result.y, Is.EqualTo(0f).Within(Tolerance));
+            Assert.That(result.z, Is.EqualTo(0f).Within(Tolerance));
+        }
+
+        [Test, Category("value")]
+        public void ComputeSteeringPrecessionTorque_NonzeroSteerRate_PerpendicularTorque()
+        {
+            // Axis rotated 10 degrees around Y from Vector3.right
+            // currentAxis ≈ (cos10°, 0, -sin10°), prevAxis = (1, 0, 0)
+            // axisRate = (currentAxis - prevAxis) / dt → has Z component
+            // torque = MoI * angVel * axisRate → non-zero with Z component
+            Vector3 currentAxis = Quaternion.Euler(0f, 10f, 0f) * Vector3.right;
+            Vector3 prevAxis = Vector3.right;
+
+            Vector3 result = GyroscopicMath.ComputeSteeringPrecessionTorque(
+                currentSpinAxis: currentAxis,
+                prevSpinAxis: prevAxis,
+                wheelMoI: 0.006f,
+                wheelAngularVelocity: 100f,
+                deltaTime: 0.02f);
+
+            Assert.That(result.magnitude, Is.GreaterThan(0f));
+            Assert.That(Mathf.Abs(result.z), Is.GreaterThan(0f));
+        }
     }
 }
 #endif
