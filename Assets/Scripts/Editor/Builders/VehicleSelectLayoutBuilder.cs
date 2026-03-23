@@ -66,9 +66,11 @@ namespace R8EOX.Editor.Builders
 
         private static void ApplyBackground(GameObject root)
         {
-            var img = root.GetComponent<Image>();
-            if (img == null) img = root.AddComponent<Image>();
-            img.color = LD.Background;
+            var t = root.transform.Find("Background");
+            if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] Background not found."); return; }
+            LD.SetRectStretch(t.GetComponent<RectTransform>());
+            var img = t.GetComponent<Image>();
+            if (img != null) img.color = LD.Background;
         }
 
         private static void ApplyTitle(GameObject root)
@@ -87,24 +89,20 @@ namespace R8EOX.Editor.Builders
 
         private static void ApplySearchField(GameObject root)
         {
-            var t = root.transform.Find("SearchField");
+            var t = root.transform.Find("ListPanel/SearchField");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] SearchField not found."); return; }
-            SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 1), new Vector2(0.32f, 1),
-                new Vector2(15, -125), new Vector2(-10, -85), new Vector2(0, 1));
+            SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 1), new Vector2(1, 1),
+                new Vector2(5, -40), new Vector2(-5, 0), new Vector2(0, 1));
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.PanelMedium;
-            var placeholder = t.Find("Text Area/Placeholder");
-            if (placeholder != null) { var ptmp = placeholder.GetComponent<TextMeshProUGUI>(); if (ptmp != null) ptmp.color = LD.TextGrey; }
-            var text = t.Find("Text Area/Text");
-            if (text != null) { var ttmp = text.GetComponent<TextMeshProUGUI>(); if (ttmp != null) ttmp.color = LD.TextWhite; }
         }
 
         private static void ApplyCategoryDropdown(GameObject root)
         {
-            var t = root.transform.Find("CategoryDropdown");
+            var t = root.transform.Find("ListPanel/CategoryDropdown");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] CategoryDropdown not found."); return; }
-            SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 1), new Vector2(0.32f, 1),
-                new Vector2(15, -170), new Vector2(-10, -130), new Vector2(0, 1));
+            SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 1), new Vector2(1, 1),
+                new Vector2(5, -80), new Vector2(-5, -42), new Vector2(0, 1));
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.PanelMedium;
         }
@@ -113,10 +111,12 @@ namespace R8EOX.Editor.Builders
         {
             var t = root.transform.Find("ListPanel");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] ListPanel not found."); return; }
-            SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 0), new Vector2(0.32f, 1),
-                new Vector2(15, 85), new Vector2(-10, -175), new Vector2(0, 0));
+            var rt = LD.EnsureRectTransform(t.gameObject);
+            SetRect(rt, new Vector2(0, 0), new Vector2(0.32f, 1),
+                new Vector2(15, 85), new Vector2(-10, -85), new Vector2(0, 0));
             var img = t.GetComponent<Image>();
-            if (img != null) img.color = LD.PanelDark;
+            if (img == null) img = t.gameObject.AddComponent<Image>();
+            img.color = LD.PanelDark;
             OverlayScrollViewBuilder.Apply(t);
         }
 
@@ -124,10 +124,12 @@ namespace R8EOX.Editor.Builders
         {
             var t = root.transform.Find("PreviewPanel");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] PreviewPanel not found."); return; }
-            SetRect(t.GetComponent<RectTransform>(), new Vector2(0.34f, 0), new Vector2(1, 1),
+            var rt = LD.EnsureRectTransform(t.gameObject);
+            SetRect(rt, new Vector2(0.34f, 0), new Vector2(1, 1),
                 new Vector2(10, 85), new Vector2(-15, -85), new Vector2(0, 0));
             var img = t.GetComponent<Image>();
-            if (img != null) img.color = LD.PanelDark;
+            if (img == null) img = t.gameObject.AddComponent<Image>();
+            img.color = LD.PanelDark;
             OverlayPreviewPanelBuilder.Apply(t);
         }
 
