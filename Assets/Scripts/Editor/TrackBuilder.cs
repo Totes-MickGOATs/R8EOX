@@ -77,6 +77,12 @@ namespace R8EOX.Editor
 
             TrackFolderData scan = TrackFolderScanner.Scan(trackFolderPath);
 
+            // Create a fresh scene for this track
+            string scenePath =
+                $"Assets/Scenes/{scan.TrackName}Track.unity";
+            EditorSceneManager.NewScene(
+                NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
             // Validate required assets
             if (string.IsNullOrEmpty(scan.HeightmapPath))
             {
@@ -184,10 +190,10 @@ namespace R8EOX.Editor
                     $"{trackFolderPath}. Create one at the track root.");
             }
 
-            // 8. Save and finish
+            // 8. Save scene and finish
             AssetDatabase.SaveAssets();
-            EditorSceneManager.MarkSceneDirty(
-                EditorSceneManager.GetActiveScene());
+            EditorSceneManager.SaveScene(
+                EditorSceneManager.GetActiveScene(), scenePath);
 
             Debug.Log(
                 $"[TrackBuilder] Track '{scan.TrackName}' built " +
