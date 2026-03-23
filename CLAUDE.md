@@ -142,15 +142,52 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 - The orchestrator pre-reads shared context (CLAUDE.md, folder CLAUDE.md, `.ai/knowledge/` docs) ONCE, then injects relevant content directly into each agent prompt — agents start immediately without re-reading files
 - Break tasks into the most granular pieces possible and launch maximum parallel agents
 
-### Subagent Commits (MANDATORY)
+### IMMEDIATE COMMITS — MANDATORY FOR ALL AGENTS AND SUBAGENTS
 
-**Every subagent MUST commit its own work before finishing.** This is not optional. Uncommitted work from subagents gets lost or causes conflicts.
+> **BLOCKING RULE — DO NOT SKIP — DO NOT DEFER — DO NOT BATCH**
+>
+> Every agent and subagent MUST `git commit` **immediately after each file is written, modified, or updated.** This is the single most important workflow rule in this project. Violation = lost work.
 
-- Stage ONLY the files you created or modified — list them explicitly by path
-- **NEVER** use `git add -A`, `git add .`, or `git add --all`
-- Commit with: `git commit -m "feat: {what you did}"`
-- If the commit fails, report the error — do not silently skip
-- The orchestrator must include this instruction in every agent prompt
+#### The Rule
+
+**One file changed = one immediate commit.** Not "commit when done." Not "commit at the end." IMMEDIATELY after EACH file change.
+
+```bash
+# After writing/modifying a file:
+git add path/to/ExactFile.cs
+git commit -m "feat: add ExactFile with purpose description"
+
+# Then continue to the next file. Repeat for EVERY file.
+```
+
+#### What This Means — COMMIT BEFORE PROCEEDING
+
+**You are BLOCKED from starting work on the next file until the current file is committed.** The workflow is strictly sequential per file:
+
+1. Write or edit `Foo.cs`
+2. `git add Foo.cs && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
+3. Only NOW may you proceed to `Bar.cs`
+4. `git add Bar.cs && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
+5. Only NOW may you proceed to the next file
+
+This applies to ALL file types: `.cs`, `.unity`, `.asset`, `.meta`, `CLAUDE.md`, everything.
+
+**If a commit fails, you MUST fix the issue and retry. You CANNOT skip the commit and move on.**
+
+#### Banned
+
+- `git add -A` / `git add .` / `git add --all` — **BANNED** (stages other agents' work)
+- Batching multiple files into one commit — **BANNED**
+- Deferring commits to "after all work is done" — **BANNED**
+- Silently skipping a failed commit — **BANNED** (report the error instead)
+- Using `--no-verify` — **BANNED** (pre-commit hook must validate every commit)
+
+#### Orchestrator Enforcement
+
+The orchestrator (main session or `/do` skill) MUST:
+1. Include this commit rule **verbatim** in every agent prompt
+2. After each agent completes, verify commits happened via `git log`
+3. If an agent returned without committing, flag it as a failure
 
 ### File Conflict Prevention
 
