@@ -145,6 +145,21 @@ namespace R8EOX.Editor
                     scan.EnvironmentSettingsAsset);
             }
 
+            // 6b. Post-processing
+            PostProcessBuilder.SetupPostProcessing(
+                scan.GeneratedFolder, scan.TrackName,
+                scan.EnvironmentSettingsAsset);
+
+            // 6c. Lighting probes
+            float probeWidth = ts != null
+                ? ts.TerrainWidth : k_DefaultTerrainWidth;
+            float probeLength = ts != null
+                ? ts.TerrainLength : k_DefaultTerrainLength;
+            float probeHeight = ts != null
+                ? ts.TerrainHeight : 10f;
+            LightingProbeBuilder.SetupLightingProbes(
+                probeWidth, probeLength, probeHeight);
+
             // 7. Place managers (convention — every track gets a complete scene)
             SceneSetupBuilder.PlaceManagers();
 
