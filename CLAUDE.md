@@ -122,6 +122,13 @@ Assets/
 - **EnvironmentBuilder auto-creates sun**: `SetupDirectionalLight` creates a Directional Light if none exists in the scene (rotation 50/-30/0). It also searches all `Light` components as a fallback before creating, so renamed lights are found too
 - **TrackFolderData optionals**: `EnvironmentSettingsAsset`, `TrackConfigAsset`, and `SkyboxHdrPath` can all be null. Downstream builder calls must null-guard these — `PostProcessBuilder` does not handle a null settings parameter
 - **Builders own their scenes**: Every builder (`BootSceneBuilder`, `MenuSceneBuilder`, `TrackBuilder`, `PhysicsTestTrackBuilder`) calls `EditorSceneManager.NewScene(EmptyScene)` at the start and `SaveScene()` at the end. They never modify the previously-active scene. If a new builder is added, it must follow this pattern — otherwise "Build All" will pollute whatever scene is open
+- **MCP multi-instance**: When E2E test editor is running, two editors connect to MCP. All agents MUST call `set_active_instance` before MCP calls or they'll error. Read `mcpforunity://instances` to discover connected editors
+- **Vehicle destroy order**: Always `SetActive(false)` before `Object.Destroy` on vehicles. AudioManager/VFXManager poll `GetTelemetry()` in LateUpdate and throw MissingReferenceException on destroyed Rigidbody
+- **FindAssets("t:CustomSO") unreliable**: Unity's `FindAssets` with `t:` filter can miss custom ScriptableObjects during domain reload. TrackFolderScanner has name-based and direct-path fallbacks
+- **Builder defaults must match SO defaults**: TrackBuilder/TerrainBuilder fallback constants must match TerrainSettings SO defaults (100x2x100). Drift between code defaults and SO values causes silent terrain size bugs
+- **OnValidate fires during AddComponent**: Builder code can't set serialized fields before OnValidate runs. Don't put warnings in OnValidate for fields that builders wire post-creation
+- **Test console = quality bar**: Treat ALL console warnings/errors during test runs as real bugs requiring root-cause fixes, not symptoms to suppress with LogAssert.ignoreFailingMessages
+- **TMP resources in git**: `Assets/TextMesh Pro/` must be committed — worktrees and fresh clones need it. The folder is exempt from project lint rules in `is_unity_generated()`
 
 ## Orchestration
 
