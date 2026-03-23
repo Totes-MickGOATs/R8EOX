@@ -9,6 +9,15 @@ namespace R8EOX.Tests.PlayMode
     [Category("smoke")]
     public class SmokeTests : E2ETestBase
     {
+        [UnitySetUp]
+        public IEnumerator SmokeSetUp()
+        {
+            // Suppress residual errors from previous test teardown (e.g. TrackValidator warnings)
+            LogAssert.ignoreFailingMessages = true;
+            yield return null;
+            LogAssert.ignoreFailingMessages = false;
+        }
+
         [UnityTest]
         public IEnumerator BootScene_Loads_WithoutErrors()
         {
