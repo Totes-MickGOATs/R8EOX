@@ -16,6 +16,7 @@ namespace R8EOX.Editor.Builders
         internal string SkyboxHdrPath { get; }
         internal EnvironmentSettings EnvironmentSettingsAsset { get; }
         internal string GeneratedFolder { get; }
+        internal TrackConfig TrackConfigAsset { get; }
 
         internal TrackFolderData(
             string trackName,
@@ -24,7 +25,8 @@ namespace R8EOX.Editor.Builders
             IReadOnlyList<LayerData> layers,
             string skyboxHdrPath,
             EnvironmentSettings environmentSettings,
-            string generatedFolder)
+            string generatedFolder,
+            TrackConfig trackConfig)
         {
             TrackName = trackName;
             HeightmapPath = heightmapPath;
@@ -33,6 +35,7 @@ namespace R8EOX.Editor.Builders
             SkyboxHdrPath = skyboxHdrPath;
             EnvironmentSettingsAsset = environmentSettings;
             GeneratedFolder = generatedFolder;
+            TrackConfigAsset = trackConfig;
         }
     }
 }

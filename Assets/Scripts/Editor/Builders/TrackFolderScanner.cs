@@ -25,6 +25,10 @@ namespace R8EOX.Editor.Builders
             EnvironmentSettings envSettings =
                 FindScriptableObject<EnvironmentSettings>(environmentFolder);
 
+            // TrackConfig (root of track folder)
+            TrackConfig trackConfig =
+                FindScriptableObject<TrackConfig>(trackFolderPath);
+
             // Terrain
             string terrainFolder = trackFolderPath + "/Terrain";
             string heightmapPath = FindHeightmap(terrainFolder);
@@ -40,7 +44,8 @@ namespace R8EOX.Editor.Builders
                 layers,
                 skyboxHdrPath,
                 envSettings,
-                generatedFolder);
+                generatedFolder,
+                trackConfig);
         }
 
         static string FindHdrInFolder(string folder)
