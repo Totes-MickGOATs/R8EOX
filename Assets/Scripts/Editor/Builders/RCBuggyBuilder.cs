@@ -29,6 +29,7 @@ namespace R8EOX.Editor.Builders
         {
             BuildAndSave(BuggySpecCatalog.Get2WD());
             BuildAndSave(BuggySpecCatalog.Get4WD());
+            BuggySpecExporter.Export();
         }
 
         // ---- Public API ----
