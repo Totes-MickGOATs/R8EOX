@@ -97,7 +97,7 @@ namespace R8EOX.UI.Internal
             _labelText.fontSize       = LabelFontSize;
             _labelText.alignment      = TextAlignmentOptions.MidlineLeft;
             _labelText.color          = Color.white;
-            _labelText.enableWordWrapping = false;
+            _labelText.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
         }
 
         private void BuildValueText()
@@ -114,7 +114,7 @@ namespace R8EOX.UI.Internal
             _valueText.fontSize       = LabelFontSize;
             _valueText.alignment      = TextAlignmentOptions.MidlineRight;
             _valueText.color          = Color.white;
-            _valueText.enableWordWrapping = false;
+            _valueText.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
         }
 
         // ── Utility ───────────────────────────────────────────────────────
