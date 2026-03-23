@@ -61,7 +61,7 @@ namespace R8EOX.Editor.Builders
             go.transform.SetPositionAndRotation(
                 new Vector3(0f, 3f, -8f),
                 Quaternion.LookRotation(new Vector3(0f, -0.35f, 1f).normalized));
-            go.AddComponent<Camera>();
+            go.AddComponent<UnityEngine.Camera>();
             go.AddComponent<AudioListener>();
         }
 

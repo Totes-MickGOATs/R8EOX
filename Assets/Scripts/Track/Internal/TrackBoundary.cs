@@ -8,7 +8,13 @@ namespace R8EOX.Track.Internal
 
         private void OnCollisionEnter(Collision collision)
         {
-            // TODO: Apply bounce/penalty when vehicle hits boundary
+            if (collision.contactCount == 0) return;
+
+            var rb = collision.rigidbody;
+            if (rb == null) return;
+
+            Vector3 normal = collision.GetContact(0).normal;
+            rb.AddForce(normal * bounceForce, ForceMode.VelocityChange);
         }
     }
 }

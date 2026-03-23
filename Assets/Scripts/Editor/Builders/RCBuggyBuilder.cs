@@ -18,17 +18,11 @@ namespace R8EOX.Editor.Builders
 
         // ---- Menu Items ----
 
-        [MenuItem("R8EOX/Build 2WD Buggy")]
-        static void Build2WD() => BuildAndSave(BuggySpecCatalog.Get2WD());
-
-        [MenuItem("R8EOX/Build 4WD Buggy")]
-        static void Build4WD() => BuildAndSave(BuggySpecCatalog.Get4WD());
-
         [MenuItem("R8EOX/Build All Buggies")]
         static void BuildAll()
         {
-            BuildAndSave(BuggySpecCatalog.Get2WD());
-            BuildAndSave(BuggySpecCatalog.Get4WD());
+            foreach (var spec in BuggySpecCatalog.GetAll())
+                BuildAndSave(spec);
             BuggySpecExporter.Export();
         }
 
@@ -231,7 +225,7 @@ namespace R8EOX.Editor.Builders
         // Deflects terrain seam edges instead of catching on them (legacy anti-snag fix).
         static void AddSkidPlates(GameObject root, int layer)
         {
-            var size = new Vector3(0.03f, 0.01f, 0.35f);
+            var size = new Vector3(0.03f, 0.01f, 0.34f);
             MakeSkidPlate(root, "SkidPlateL", new Vector3(-0.045f, -0.055f, 0f),  25f, size, layer);
             MakeSkidPlate(root, "SkidPlateR", new Vector3( 0.045f, -0.055f, 0f), -25f, size, layer);
         }

@@ -5,6 +5,9 @@ namespace R8EOX.Editor.Builders
 {
     internal static class BuggySpecCatalog
     {
+        /// <summary>All registered specs. Builder and exporter discover from here.</summary>
+        internal static BuggySpec[] GetAll() => new[] { Get2WD(), Get4WD() };
+
         internal static BuggySpec Get2WD() => new BuggySpec(
             name: "2WDBuggy",
             motor: BuggyMotorKind.Motor17_5T,
