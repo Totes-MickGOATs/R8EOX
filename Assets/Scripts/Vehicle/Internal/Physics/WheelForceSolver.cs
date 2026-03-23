@@ -69,6 +69,13 @@ namespace R8EOX.Vehicle.Internal
                 result.ForwardSpeed, effectiveZTraction, input.GripCoeff, result.GripLoad);
             result.LongitudinalForce = input.WheelForward * longForceMag;
 
+            // ---- Friction circle (combined slip) ----
+            float maxGripForce = input.GripCoeff * result.GripLoad;
+            var (latScale, lonScale) = FrictionCircleMath.ComputeCombinedSlipScale(
+                result.LateralForce.magnitude, result.LongitudinalForce.magnitude, maxGripForce);
+            result.LateralForce *= latScale;
+            result.LongitudinalForce *= lonScale;
+
             // Ramp sliding fix: cancel the spring's horizontal component when stopped.
             // Use proper vector subtraction so this works regardless of car rotation.
             if (Mathf.Abs(result.ForwardSpeed) < k_StaticFrictionSpeed)
