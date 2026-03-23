@@ -142,11 +142,13 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 - The orchestrator pre-reads shared context (CLAUDE.md, folder CLAUDE.md, `.ai/knowledge/` docs) ONCE, then injects relevant content directly into each agent prompt — agents start immediately without re-reading files
 - Break tasks into the most granular pieces possible and launch maximum parallel agents
 
-### IMMEDIATE COMMITS — MANDATORY FOR EVERYONE: MAIN SESSION, AGENTS, AND SUBAGENTS
+### IMMEDIATE COMMITS — MANDATORY FOR ALL CLAUDE ACTIVITY
 
 > **BLOCKING RULE — DO NOT SKIP — DO NOT DEFER — DO NOT BATCH**
 >
-> **EVERYONE** who edits a file MUST `git commit` **immediately after each file is written, modified, or updated.** This includes the **main session / orchestrator** — not just subagents. If you are editing files, you are bound by this rule. No one is exempt. Violation = lost work.
+> **"Agent" means ANY Claude activity: main session, orchestrator, subagent, dispatched agent — anything Claude does.** If Claude edited a file, Claude commits it immediately. No role is exempt. No distinction matters. If you changed a file, commit it now.
+>
+> Every agent MUST `git commit` **immediately after each file is written, modified, or updated.** Violation = lost work.
 
 #### The Rule
 
@@ -182,11 +184,11 @@ This applies to ALL file types: `.cs`, `.unity`, `.asset`, `.meta`, `CLAUDE.md`,
 - Silently skipping a failed commit — **BANNED** (report the error instead)
 - Using `--no-verify` — **BANNED** (pre-commit hook must validate every commit)
 
-#### Orchestrator / Main Session — YOU ARE NOT EXEMPT
+#### No Exemptions — This Means YOU
 
-The main session is **also bound by this rule** when it edits files directly. Do not mentally categorize your own edits as "just config" or "just docs" — if you used the Edit, Write, or Bash tool to change a file, you commit it immediately before touching another file.
+Do not mentally categorize your own edits as "just config" or "just docs." If you used Edit, Write, or Bash to change a file, you commit it before touching another file. There is no role, context, or rationale that exempts any Claude activity from this rule.
 
-The orchestrator (main session or `/do` skill) MUST ALSO:
+When dispatching agents, the orchestrator MUST ALSO:
 1. Include this commit rule **verbatim** in every agent prompt
 2. After each agent completes, verify commits happened via `git log`
 3. If an agent returned without committing, flag it as a failure
