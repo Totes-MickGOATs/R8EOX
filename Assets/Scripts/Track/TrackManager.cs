@@ -11,7 +11,7 @@ namespace R8EOX.Track
         private Centerline centerline;
         private Checkpoint[] checkpoints;
 
-        public System.Action<int, GameObject> OnCheckpointPassed;
+        public event System.Action<int, GameObject> OnCheckpointPassed;
 
         public void Initialize(TrackConfig trackConfig)
         {
