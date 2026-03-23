@@ -8,7 +8,6 @@ namespace R8EOX.Vehicle
     {
         const float k_DefaultMass = 1.5f, k_DefaultBounciness = 0.05f;
         const float k_FlipHeightOffset = 0.35f, k_MsToKmh = 3.6f;
-        const float k_ReverseSpeedThreshold = 0.25f, k_ForwardSpeedClearThreshold = 0.50f, k_ReverseBrakeMinThreshold = 0.1f;
 
         [Header("Motor")]
         [Tooltip("Motor preset selecting predefined engine parameters")]
@@ -153,45 +152,32 @@ namespace R8EOX.Vehicle
 
         void FixedUpdate()
         {
-            float dt = Time.fixedDeltaTime;
+            var frame = new VehicleFrame { Dt = Time.fixedDeltaTime, ReverseEngaged = ReverseEngaged };
             if (_collision != null) _collision.ResetFrame();
             if (_flipRequested) { _flipRequested = false; DoFlip(); }
 
-            IsAirborne = _airDetect.Update(!_wheels.AnyOnGround());
-            _tumble.Update(transform, IsAirborne, _tumbleEngageDeg, _tumbleFullDeg,
-                _tumbleHysteresisDeg, _enableDynamicPhysicsMaterial, _tumbleBounce, _tumbleFriction);
-            TumbleFactor = _tumble.TumbleFactor; TiltAngle = _tumble.TiltAngle;
+            InputStage.Execute(ref frame, _input, _rb, transform,
+                SmoothThrottle, _throttleRampUp, _throttleRampDown);
+            AirborneStage.Execute(ref frame, _wheels, _airDetect, _tumble, transform,
+                _tumbleEngageDeg, _tumbleFullDeg, _tumbleHysteresisDeg,
+                _enableDynamicPhysicsMaterial, _tumbleBounce, _tumbleFriction);
             _rb.centerOfMass = _comGround;
+            GroundDriveStage.Execute(ref frame, _rb, transform, _wheels,
+                _engineForceMax, _brakeForce, _reverseForce, _coastDrag, _maxSpeed);
+            DrivetrainStage.Execute(ref frame, _drivetrain, _wheels);
+            SteeringStage.Execute(ref frame, CurrentSteering,
+                _steeringMax, _steeringSpeed, _steeringSpeedLimit, _steeringHighSpeedFactor);
+            AirPhysicsStage.Execute(ref frame, _airPhysics);
+            WheelSolveStage.Execute(ref frame, _rb, _wheels);
 
-            float throttleRaw = _input != null ? _input.Throttle : 0f;
-            float brakeIn     = _input != null ? _input.Brake    : 0f; _brakeInput = brakeIn;
-            float steerIn     = _input != null ? _input.Steer    : 0f;
-            float rampRate    = throttleRaw > SmoothThrottle ? _throttleRampUp : _throttleRampDown;
-            SmoothThrottle = Mathf.MoveTowards(SmoothThrottle, throttleRaw, rampRate * dt);
-            ForwardSpeed   = Vector3.Dot(_rb.linearVelocity, transform.forward);
-
-            if (IsAirborne)
-            {
-                CurrentEngineForce = 0f; CurrentBrakeForce = 0f;
-                foreach (var w in _wheels.All) w.MotorForceShare = 0f;
-                if (_airPhysics != null) _airPhysics.Apply(dt, SmoothThrottle, brakeIn, steerIn);
-            }
-            else
-            {
-                ApplyGroundDrive(SmoothThrottle, brakeIn, ForwardSpeed);
-                if (_drivetrain != null) _drivetrain.Distribute(CurrentEngineForce, _wheels.Front, _wheels.Rear);
-                CurrentSteering = SteeringRamp.Step(CurrentSteering, dt, steerIn, ForwardSpeed,
-                    _steeringMax, _steeringSpeed, _steeringSpeedLimit, _steeringHighSpeedFactor);
-            }
-
-            foreach (var w in _wheels.All)
-            {
-                w.IsBraking = CurrentBrakeForce > 0f && w.IsMotor;
-                w.ApplyWheelPhysics(_rb, dt);
-                if (w.IsSteer) w.transform.localRotation = Quaternion.Euler(0f, CurrentSteering * Mathf.Rad2Deg, 0f);
-            }
+            // Sync frame → persistent state
+            SmoothThrottle = frame.SmoothThrottle; ForwardSpeed = frame.ForwardSpeed;
+            IsAirborne = frame.IsAirborne; TumbleFactor = frame.TumbleFactor; TiltAngle = frame.TiltAngle;
+            CurrentEngineForce = frame.EngineForce; CurrentBrakeForce = frame.BrakeForce;
+            ReverseEngaged = frame.ReverseEngaged; CurrentSteering = frame.CurrentSteering;
+            _brakeInput = frame.BrakeInput;
 #if UNITY_EDITOR || DEBUG
-            _debugLogTimer += dt;
+            _debugLogTimer += frame.Dt;
             if (_debugLogTimer >= 0.5f) { Debug.Log($"[esc] throttle={SmoothThrottle:F3} engineForce={CurrentEngineForce:F2}N brake={CurrentBrakeForce:F2}N reverse={ReverseEngaged} airborne={IsAirborne}"); _debugLogTimer = 0f; }
 #endif
         }
@@ -267,16 +253,6 @@ namespace R8EOX.Vehicle
             var d = p.Value;
             _engineForceMax = d.EngineForceMax; _brakeForce = d.BrakeForce; _reverseForce = d.ReverseForce;
             _coastDrag = d.CoastDrag; _maxSpeed = d.MaxSpeed; _throttleRampUp = d.ThrottleRampUp;
-        }
-
-        void ApplyGroundDrive(float throttleIn, float brakeIn, float fwdSpeed)
-        {
-            var r = ESCMath.ComputeGroundDrive(
-                throttleIn, brakeIn, fwdSpeed, ReverseEngaged,
-                _engineForceMax, _brakeForce, _reverseForce, _coastDrag, _maxSpeed,
-                _rb.linearVelocity.magnitude, k_ReverseSpeedThreshold, k_ForwardSpeedClearThreshold, k_ReverseBrakeMinThreshold);
-            CurrentEngineForce = r.EngineForce; CurrentBrakeForce = r.BrakeForce; ReverseEngaged = r.ReverseEngaged;
-            if (r.CoastDragForce > 0f) _rb.AddForce(-transform.forward * r.CoastDragForce, ForceMode.Force);
         }
 
         void DoFlip()
