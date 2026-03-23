@@ -21,11 +21,15 @@ namespace R8EOX.UI.Internal
         private CalibrationTabContent calibrationTab;
         private GameplayTabContent gameplayTab;
         private ProfileTabContent profileTab;
+        private R8EOX.UI.ToastManager toastRef;
 
-        internal void Show(Settings.SettingsManager settings, Action onClosedCallback)
+        internal void Show(
+            Settings.SettingsManager settings, Action onClosedCallback,
+            R8EOX.UI.ToastManager toast = null)
         {
             settingsManager = settings;
             onClosed = onClosedCallback;
+            toastRef = toast;
             BuildUI();
             InitializeTabs();
             gameObject.SetActive(true);
@@ -166,7 +170,7 @@ namespace R8EOX.UI.Internal
             controlsTab.Initialize(settingsManager);
             calibrationTab.Initialize(settingsManager);
             gameplayTab.Initialize(settingsManager);
-            profileTab.Initialize(settingsManager);
+            profileTab.Initialize(settingsManager, toastRef);
 
             tabBar.Initialize(OnTabChanged);
             OnTabChanged(OptionsTab.Video);
