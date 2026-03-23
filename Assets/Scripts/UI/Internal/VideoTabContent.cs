@@ -102,7 +102,7 @@ namespace R8EOX.UI.Internal
         {
             if (settingsManager == null) return;
             // Index maps directly to QualityTier: 0=Ultra, 1=High, 2=Balanced, 3=Performance
-            settingsManager.SetQualityTier(index);
+            settingsManager.SetQualityTier((R8EOX.Settings.Internal.QualityTier)index);
             // Re-sync render scale slider — tier preset may have changed it
             if (renderScaleSlider != null)
                 SetSliderSilent(renderScaleSlider, settingsManager.GetVideoSettings().RenderScale);
