@@ -12,9 +12,9 @@ namespace R8EOX.Menu.Internal
         [Tooltip("CanvasGroup on the 'PRESS ANY KEY' text object")]
         [SerializeField] private CanvasGroup promptGroup;
 
-        private Coroutine _pulseCoroutine;
-        private System.Action _onAnyKeyPressed;
-        private bool _inputEnabled;
+        private Coroutine pulseCoroutine;
+        private System.Action onAnyKeyPressed;
+        private bool inputEnabled;
 
         // ------------------------------------------------------------------ //
         // Public API
@@ -22,7 +22,7 @@ namespace R8EOX.Menu.Internal
 
         internal void Initialize(System.Action onKeyPressed)
         {
-            _onAnyKeyPressed = onKeyPressed;
+            onAnyKeyPressed = onKeyPressed;
         }
 
         // ------------------------------------------------------------------ //
@@ -32,7 +32,7 @@ namespace R8EOX.Menu.Internal
         internal override void OnEnter()
         {
             base.OnEnter();
-            _inputEnabled = false;
+            inputEnabled = false;
 
             if (titleTransform != null)
             {
@@ -40,24 +40,24 @@ namespace R8EOX.Menu.Internal
             }
             else
             {
-                _inputEnabled = true;
+                inputEnabled = true;
             }
 
             if (promptGroup != null)
             {
-                _pulseCoroutine = StartCoroutine(MenuAnimator.PulseAlpha(promptGroup, 0.3f, 1.0f));
+                pulseCoroutine = StartCoroutine(MenuAnimator.PulseAlpha(promptGroup, 0.3f, 1.0f));
             }
         }
 
         internal override void OnExit()
         {
             base.OnExit();
-            _inputEnabled = false;
+            inputEnabled = false;
 
-            if (_pulseCoroutine != null)
+            if (pulseCoroutine != null)
             {
-                StopCoroutine(_pulseCoroutine);
-                _pulseCoroutine = null;
+                StopCoroutine(pulseCoroutine);
+                pulseCoroutine = null;
             }
         }
 
@@ -67,7 +67,7 @@ namespace R8EOX.Menu.Internal
 
         private void Update()
         {
-            if (!_inputEnabled)
+            if (!inputEnabled)
             {
                 return;
             }
@@ -80,8 +80,8 @@ namespace R8EOX.Menu.Internal
 
             if (keyboardPressed || gamepadPressed)
             {
-                _inputEnabled = false;
-                _onAnyKeyPressed?.Invoke();
+                inputEnabled = false;
+                onAnyKeyPressed?.Invoke();
             }
         }
 
@@ -92,7 +92,7 @@ namespace R8EOX.Menu.Internal
         private IEnumerator DelayedEnableInput(IEnumerator scaleAnimation)
         {
             yield return StartCoroutine(scaleAnimation);
-            _inputEnabled = true;
+            inputEnabled = true;
         }
     }
 }
