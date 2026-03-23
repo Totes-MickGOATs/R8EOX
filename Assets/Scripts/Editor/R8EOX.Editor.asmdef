@@ -1,7 +1,7 @@
 {
     "name": "R8EOX.Editor",
     "rootNamespace": "R8EOX.Editor",
-    "references": ["R8EOX.Runtime"],
+    "references": ["R8EOX.Runtime", "Unity.TextMeshPro"],
     "includePlatforms": [
         "Editor"
     ],
