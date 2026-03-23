@@ -8,10 +8,10 @@ namespace R8EOX.Editor.Builders
     /// <summary>TerrainData, heightmap, GO creation, and material setup.</summary>
     internal static class TerrainBuilder
     {
-        // -- Default terrain settings used when no TerrainSettings asset is provided --
-        const float k_DefaultWidth = 500f;
-        const float k_DefaultHeight = 10f;
-        const float k_DefaultLength = 500f;
+        // -- Default terrain settings (must match TerrainSettings defaults) --
+        const float k_DefaultWidth = 100f;
+        const float k_DefaultHeight = 2f;
+        const float k_DefaultLength = 100f;
         const int k_DefaultHeightmapRes = 2049;
         const int k_DefaultAlphamapRes = 2048;
         const int k_DefaultDetailRes = 1024;
