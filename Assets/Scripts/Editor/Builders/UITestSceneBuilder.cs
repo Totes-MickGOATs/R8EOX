@@ -15,7 +15,7 @@ namespace R8EOX.Editor.Builders
 
             var camGO = new GameObject("Main Camera");
             camGO.tag = "MainCamera";
-            var cam = camGO.AddComponent<Camera>();
+            var cam = camGO.AddComponent<UnityEngine.Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.1f, 0.1f, 0.15f, 1f);
             cam.orthographic = false;
@@ -31,7 +31,7 @@ namespace R8EOX.Editor.Builders
             var bootstrapGO = new GameObject("UITestBootstrapper");
             var bootstrapper = bootstrapGO.AddComponent<R8EOX.UI.Internal.UITestBootstrapper>();
 
-            var registryAsset = AssetDatabase.LoadAssetAtPath<R8EOX.UI.Internal.VehicleRegistry>(
+            var registryAsset = AssetDatabase.LoadAssetAtPath<R8EOX.VehicleRegistry>(
                 "Assets/Settings/VehicleRegistry.asset");
             if (registryAsset != null)
             {
