@@ -187,6 +187,50 @@ namespace R8EOX.Tests.EditMode
             Assert.That(r.LateralForce.x, Is.LessThan(0f),
                 "Lateral grip must oppose sideways (+X) sliding velocity");
         }
+
+        // ------------------------------------------------------------------ //
+        //  Friction circle integration tests                                  //
+        // ------------------------------------------------------------------ //
+
+        [Test, Category("invariant")]
+        public void Solve_ThrottleReducesCornering_LateralForceLower()
+        {
+            // With motor force (longitudinal demand), lateral grip should be
+            // reduced by the friction circle compared to no motor force.
+            var noMotor = MakeInput(
+                tireVelocity: new Vector3(1.5f, 0f, 2.0f),
+                wheelRight: Vector3.right, wheelForward: Vector3.forward,
+                motorForceShare: 0f, isMotor: true);
+            var withMotor = MakeInput(
+                tireVelocity: new Vector3(1.5f, 0f, 2.0f),
+                wheelRight: Vector3.right, wheelForward: Vector3.forward,
+                motorForceShare: 8.0f, isMotor: true);
+
+            var rNoMotor = WheelForceSolver.Solve(in noMotor);
+            var rWithMotor = WheelForceSolver.Solve(in withMotor);
+
+            Assert.That(Mathf.Abs(rWithMotor.LateralForce.x),
+                Is.LessThanOrEqualTo(Mathf.Abs(rNoMotor.LateralForce.x)),
+                "Motor force should saturate friction circle, reducing lateral grip");
+        }
+
+        [Test, Category("invariant")]
+        public void Solve_FrictionCircle_TotalForceStillSumsComponents()
+        {
+            // Even after friction circle scaling, TotalForce must equal the sum.
+            var input = MakeInput(
+                tireVelocity: new Vector3(2.0f, 0f, 3.0f),
+                motorForceShare: 6.0f, isMotor: true,
+                currentEngineForce: 5f);
+
+            WheelForceResult r = WheelForceSolver.Solve(in input);
+
+            Vector3 expected = r.SuspensionForce + r.LateralForce
+                             + r.LongitudinalForce + r.MotorForce;
+            Assert.That(r.TotalForce.x, Is.EqualTo(expected.x).Within(1e-4f));
+            Assert.That(r.TotalForce.y, Is.EqualTo(expected.y).Within(1e-4f));
+            Assert.That(r.TotalForce.z, Is.EqualTo(expected.z).Within(1e-4f));
+        }
     }
 }
 #endif
