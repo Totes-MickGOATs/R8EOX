@@ -7,9 +7,7 @@ namespace R8EOX
     public class VehicleRegistry : ScriptableObject
     {
         [SerializeField] private VehicleDefinition[] vehicles;
-        [SerializeField] private GameObject overlayPrefab;
 
-        public GameObject OverlayPrefab => overlayPrefab;
         public int Count => vehicles?.Length ?? 0;
 
         public VehicleDefinition[] GetAll()
