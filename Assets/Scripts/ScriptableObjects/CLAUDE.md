@@ -20,7 +20,7 @@ ScriptableObject class definitions. Asset instances created from these go in app
 - `SessionConfig.cs` — Session parameters (mode, track, vehicle, laps, AI, countdown, time limit)
 - `SessionChannel.cs` — Runtime data channel for sharing active SessionConfig and VehicleRegistry between systems
 - `RaceConfig.cs` — Race configuration
-- `EnvironmentSettings.cs` — Skybox, fog, ambient light, and sun settings
+- `EnvironmentSettings.cs` — Skybox, fog, ambient light, sun, and post-processing settings (bloom, color adjustments, vignette, white balance)
 - `TerrainSettings.cs` — Terrain dimensions and resolution settings
 - `LayerSettings.cs` — Terrain layer tile size and surface properties
 - `VehicleCategory.cs` — Enum: Buggy, Truck, Stadium, Custom
