@@ -25,6 +25,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `TrackFolderScanner.cs` | Scans track asset folders by naming convention |
 | `PhysicsTestTrackBuilder.cs` | Builds the PhysicsTestTrack scene: ground, obstacles, waypoints, lighting, camera, PhysicsTestManager |
 | `BuggySpecExporter.cs` | Exports buggy specs, motor presets, and builder geometry to JSON for the viewer playground |
+| `SceneSetupBuilder.cs` | Places all manager GameObjects into the active track scene and wires SessionBootstrapper refs; available as menu item and called by TrackBuilder |
 
 ## Conventions
 

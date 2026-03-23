@@ -83,14 +83,19 @@ lint_cs_file() {
     errors=$((errors + 1))
   fi
 
-  # BANNED: FindObjectOfType
-  local find_obj
-  find_obj=$(echo "$content" | grep -nE 'FindObjectOfType|FindObjectsOfType|FindAnyObjectByType|FindFirstObjectByType' | grep -vE '^\s*[0-9]*:\s*//' || true)
-  if [ -n "$find_obj" ]; then
-    echo "FAIL [banned-pattern] ${file}: FindObjectOfType banned — pass references through parent"
-    echo "$find_obj" | head -1 | sed 's/^/  /'
-    errors=$((errors + 1))
-  fi
+  # BANNED: FindObjectOfType (exempt: editor builder scripts that scan scenes by design)
+  case "$file" in
+    Assets/Scripts/Editor/*) : ;;  # Editor builders legitimately scan active scenes
+    *)
+      local find_obj
+      find_obj=$(echo "$content" | grep -nE 'FindObjectOfType|FindObjectsOfType|FindAnyObjectByType|FindFirstObjectByType' | grep -vE '^\s*[0-9]*:\s*//' || true)
+      if [ -n "$find_obj" ]; then
+        echo "FAIL [banned-pattern] ${file}: FindObjectOfType banned — pass references through parent"
+        echo "$find_obj" | head -1 | sed 's/^/  /'
+        errors=$((errors + 1))
+      fi
+      ;;
+  esac
 
   # BANNED: Singleton .Instance
   local singleton

@@ -13,7 +13,7 @@ All rules are enforced by the pre-commit hook. ALL violations block the commit.
 | One type per file | `one-type-per-file` | Max 1 distinct class/struct/enum/interface | Keeps files focused and findable |
 | Top-down | `top-down` | Blocks cross-system `.Internal` imports | Enforces system boundary isolation |
 | SendMessage | `banned-pattern` | Blocks `SendMessage`/`BroadcastMessage` | Untraceable string-based messaging |
-| FindObjectOfType | `banned-pattern` | Blocks all `FindObject*` variants | Global reach bypasses parent hierarchy |
+| FindObjectOfType | `banned-pattern` | Blocks all `FindObject*` variants in runtime code | Global reach bypasses parent hierarchy; exempt: `Assets/Scripts/Editor/` (scene builders legitimately scan active scenes) |
 | Singleton | `singleton` | Blocks `.Instance` accessor | Bypasses dependency injection |
 
 ## Documentation Rules
