@@ -49,12 +49,12 @@ namespace R8EOX.Editor.Builders
             Color bodyTransp = new Color(spec.BodyColor.r, spec.BodyColor.g, spec.BodyColor.b, 0.85f);
             Color bodySolid  = new Color(spec.BodyColor.r, spec.BodyColor.g, spec.BodyColor.b, 1f);
 
-            Material darkGrey = CreateMaterial("DarkGrey",   new Color(0.2f, 0.2f, 0.2f));
-            Material medGrey  = CreateMaterial("MediumGrey", new Color(0.5f, 0.5f, 0.5f));
-            Material bodySemi = CreateMaterial("BodySemi",   bodyTransp, transparent: true);
-            Material bodyWing = CreateMaterial("BodyWing",   bodySolid);
-            Material tireMat  = CreateMaterial("BlackTire",  new Color(0.05f, 0.05f, 0.05f));
-            Material hubMat   = CreateMaterial("WhiteHub",   new Color(0.9f, 0.9f, 0.9f));
+            Material darkGrey = GetOrCreateMaterial("DarkGrey",               new Color(0.2f, 0.2f, 0.2f));
+            Material medGrey  = GetOrCreateMaterial("MediumGrey",             new Color(0.5f, 0.5f, 0.5f));
+            Material bodySemi = GetOrCreateMaterial($"{spec.Name}_BodySemi",  bodyTransp, transparent: true);
+            Material bodyWing = GetOrCreateMaterial($"{spec.Name}_BodyWing",  bodySolid);
+            Material tireMat  = GetOrCreateMaterial("BlackTire",              new Color(0.05f, 0.05f, 0.05f));
+            Material hubMat   = GetOrCreateMaterial("WhiteHub",               new Color(0.9f, 0.9f, 0.9f));
 
             AddBodyMeshes(root, darkGrey, medGrey, bodySemi, bodyWing);
             AddControlArms(root, darkGrey, spec);
@@ -92,6 +92,7 @@ namespace R8EOX.Editor.Builders
             string path = $"Assets/Prefabs/{spec.Name}.prefab";
             PrefabUtility.SaveAsPrefabAsset(go, path);
             Object.DestroyImmediate(go);
+            AssetDatabase.SaveAssets();
             Debug.Log($"[RCBuggyBuilder] Saved {path}");
         }
 
@@ -247,26 +248,27 @@ namespace R8EOX.Editor.Builders
             return go;
         }
 
-        static Material CreateMaterial(string name, Color color, bool transparent = false)
+        static Material GetOrCreateMaterial(string name, Color color, bool transparent = false)
         {
-            var mat = new Material(Shader.Find(k_UrpLitShader));
-            mat.name = name;
+            const string matDir = "Assets/Materials/Vehicle";
+            string path = $"{matDir}/{name}.mat";
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+            { existing.SetColor("_BaseColor", color); EditorUtility.SetDirty(existing); return existing; }
+            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Application.dataPath, "..", matDir));
+            var mat = new Material(Shader.Find(k_UrpLitShader)) { name = name };
             mat.SetColor("_BaseColor", color);
             if (transparent)
             {
-                mat.SetFloat("_Surface", 1f);
-                mat.SetFloat("_Blend", 0f);
-                mat.SetFloat("_AlphaClip", 0f);
+                mat.SetFloat("_Surface", 1f); mat.SetFloat("_Blend", 0f); mat.SetFloat("_AlphaClip", 0f);
                 mat.SetOverrideTag("RenderType", "Transparent");
-                mat.SetInt("_SrcBlend",
-                    (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                mat.SetInt("_DstBlend",
-                    (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                 mat.SetInt("_ZWrite", 0);
-                mat.DisableKeyword("_ALPHATEST_ON");
-                mat.EnableKeyword("_ALPHABLEND_ON");
+                mat.DisableKeyword("_ALPHATEST_ON"); mat.EnableKeyword("_ALPHABLEND_ON");
                 mat.renderQueue = 3000;
             }
+            AssetDatabase.CreateAsset(mat, path);
             return mat;
         }
 
