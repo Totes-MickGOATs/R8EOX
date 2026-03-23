@@ -11,10 +11,14 @@ namespace R8EOX
         [Header("Track Selection")]
         [SerializeField] private TrackRegistry trackRegistry;
 
+        [Header("Overlay Registry")]
+        [SerializeField] private OverlayRegistry overlayRegistry;
+
         [System.NonSerialized] private SessionConfig activeConfig;
 
         public VehicleRegistry VehicleRegistry => vehicleRegistry;
         public TrackRegistry TrackRegistry => trackRegistry;
+        public OverlayRegistry OverlayRegistry => overlayRegistry;
 
         public bool HasActiveSession => activeConfig != null;
         public SessionConfig ActiveConfig => activeConfig;
