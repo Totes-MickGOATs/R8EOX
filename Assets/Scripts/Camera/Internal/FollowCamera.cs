@@ -29,6 +29,11 @@ namespace R8EOX.Camera.Internal
             offset = newOffset;
         }
 
+        internal void ResetVelocity()
+        {
+            currentVelocity = Vector3.zero;
+        }
+
         internal void Configure(Vector3 offset, float smoothSpeed, float lookAheadFactor)
         {
             this.offset = offset;

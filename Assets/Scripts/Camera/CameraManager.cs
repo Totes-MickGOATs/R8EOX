@@ -37,6 +37,7 @@ namespace R8EOX.Camera
         {
             currentTarget = target;
             followCamera.Configure(followOffset, followSmoothSpeed, followLookAhead);
+            followCamera.ResetVelocity();
         }
 
         public void SwitchToFollowMode()
