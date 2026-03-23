@@ -19,7 +19,13 @@ RC car vehicle physics — suspension, drivetrain, grip, and handling. This is t
 - `WheelTelemetry.cs` — Public readonly struct: per-wheel data snapshot (contact, slip, grip, RPM, suspension)
 - `VehicleTelemetry.cs` — Public readonly struct: full vehicle state snapshot (speed, RPM, inputs, airborne, wheels)
 - `Internal/` — Internal MonoBehaviours and helper classes
-- `Internal/Physics/` — Pure static math classes (suspension, grip, drivetrain, tumble)
+- `Internal/Physics/` — Pure static math classes (suspension, grip, drivetrain, tumble, friction circle)
+- `Internal/Pipeline/` — Sequential physics pipeline stages (see Pipeline/CLAUDE.md)
+
+## Physics Pipeline
+VehicleManager.FixedUpdate delegates to sequential stages in `Internal/Pipeline/`:
+`InputStage → AirborneStage → GroundDriveStage → DrivetrainStage → SteeringStage → AirPhysicsStage → WheelSolveStage`
+Each stage is a static class with `Execute(ref VehicleFrame, ...)`. VehicleFrame is a mutable struct created fresh each FixedUpdate. Adding a feature = create one stage file + add one line to FixedUpdate.
 
 ## Telemetry Contracts
 `WheelTelemetry` and `VehicleTelemetry` are public DTOs in `R8EOX.Vehicle` — other systems (Audio, VFX, UI) read them without touching Vehicle internals. `VehicleTelemetry` is returned by `VehicleManager.GetTelemetry()`.
