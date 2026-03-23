@@ -150,6 +150,16 @@ namespace R8EOX.Session.Internal
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            // Defer validation so builder can finish wiring refs —
+            // AddComponent triggers OnValidate before fields are set
+            UnityEditor.EditorApplication.delayCall -= ValidateRefs;
+            UnityEditor.EditorApplication.delayCall += ValidateRefs;
+        }
+
+        private void ValidateRefs()
+        {
+            if (this == null) return;
+
             if (trackManager == null)
                 Debug.LogError(
                     "[SessionBootstrapper] TrackManager is required " +
