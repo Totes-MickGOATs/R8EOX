@@ -79,6 +79,14 @@ namespace R8EOX.Editor.Builders
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
                 return AssetDatabase.LoadAssetAtPath<T>(path);
             }
+
+            // Fallback: FindAssets with t: filter can miss custom SOs after
+            // domain reload. Search by filename convention instead.
+            string fallbackPath = $"{folder}/{typeName}.asset";
+            var fallback = AssetDatabase.LoadAssetAtPath<T>(fallbackPath);
+            if (fallback != null)
+                return fallback;
+
             return null;
         }
 
