@@ -155,9 +155,13 @@ namespace R8EOX.Editor
                 if (tm != null)
                 {
                     var tmSO = new SerializedObject(tm);
-                    tmSO.FindProperty("config").objectReferenceValue =
-                        scan.TrackConfigAsset;
-                    tmSO.ApplyModifiedProperties();
+                    var configProp = tmSO.FindProperty("config");
+                    if (configProp != null)
+                    {
+                        configProp.objectReferenceValue =
+                            scan.TrackConfigAsset;
+                        tmSO.ApplyModifiedProperties();
+                    }
                 }
             }
             else

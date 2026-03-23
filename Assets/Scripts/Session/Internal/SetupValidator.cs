@@ -19,6 +19,13 @@ namespace R8EOX.Session.Internal
                 overlay.AddError("Camera",
                     "No CameraManager in scene",
                     "Add CameraManager component and assign in SessionBootstrapper");
+            if (trackManager == null)
+            {
+                overlay.AddError("Track",
+                    "TrackManager is null",
+                    "Assign TrackManager in scene");
+                return;
+            }
             if (trackManager.GetSpawnPointCount() <= 0)
                 overlay.AddError("Track",
                     "No spawn points found",
