@@ -1,5 +1,4 @@
 using UnityEngine;
-using R8EOX.UI.Internal;
 
 namespace R8EOX.UI.Internal
 {
