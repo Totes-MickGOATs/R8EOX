@@ -111,26 +111,28 @@ namespace R8EOX.Editor.Builders
         {
             var t = root.transform.Find("ListPanel");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] ListPanel not found."); return; }
-            var rt = LD.EnsureRectTransform(t.gameObject);
+            var go = t.gameObject;
+            var rt = LD.EnsureRectTransform(go);
             SetRect(rt, new Vector2(0, 0), new Vector2(0.32f, 1),
                 new Vector2(15, 85), new Vector2(-10, -85), new Vector2(0, 0));
-            var img = t.GetComponent<Image>();
-            if (img == null) img = t.gameObject.AddComponent<Image>();
+            var img = go.GetComponent<Image>();
+            if (img == null) img = go.AddComponent<Image>();
             img.color = LD.PanelDark;
-            OverlayScrollViewBuilder.Apply(t);
+            OverlayScrollViewBuilder.Apply(rt.transform);
         }
 
         private static void ApplyPreviewPanel(GameObject root)
         {
             var t = root.transform.Find("PreviewPanel");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] PreviewPanel not found."); return; }
-            var rt = LD.EnsureRectTransform(t.gameObject);
+            var go = t.gameObject;
+            var rt = LD.EnsureRectTransform(go);
             SetRect(rt, new Vector2(0.34f, 0), new Vector2(1, 1),
                 new Vector2(10, 85), new Vector2(-15, -85), new Vector2(0, 0));
-            var img = t.GetComponent<Image>();
-            if (img == null) img = t.gameObject.AddComponent<Image>();
+            var img = go.GetComponent<Image>();
+            if (img == null) img = go.AddComponent<Image>();
             img.color = LD.PanelDark;
-            OverlayPreviewPanelBuilder.Apply(t);
+            OverlayPreviewPanelBuilder.Apply(rt.transform);
         }
 
         private static void ApplyConfirmButton(GameObject root)
