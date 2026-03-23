@@ -35,6 +35,8 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `FontAssetBuilder.cs` | `R8EOX > Build Font Assets` menu item: creates SDFAA TMP_FontAsset files from the four TTF imports (Rajdhani Bold/SemiBold/Regular, SourceCodePro Regular) and wires titleFont/bodyFont/monoFont into the MenuThemeConfig asset |
 | `OptionsLayoutData.cs` | Shared layout constants (panel size, padding, tab bar, content spacing, header, back button, colors) used by Options overlay builders |
 | `OptionsOverlayBuilder.cs` | `R8EOX > Build Options Overlay` menu item: creates OptionsOverlay prefab at `Assets/Prefabs/UI/OptionsOverlay.prefab` and wires it into OverlayRegistry if one exists |
+| `PostProcessBuilder.cs` | Creates per-track URP VolumeProfile with Bloom, ColorAdjustments, Vignette, WhiteBalance, Tonemapping overrides from EnvironmentSettings SO; places Global Volume in scene |
+| `LightingProbeBuilder.cs` | Places a box-projected ReflectionProbe and a 2-layer LightProbeGroup grid sized to terrain dimensions |
 
 ## Conventions
 
