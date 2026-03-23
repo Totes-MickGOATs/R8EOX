@@ -18,6 +18,8 @@ namespace R8EOX.Session
         private Race.RaceManager raceManager;
         private Camera.CameraManager cameraManager;
         private UI.UIManager uiManager;
+        private Audio.AudioManager audioManager;
+        private VFX.VFXManager vfxManager;
 
         private readonly SessionState state = new SessionState();
         private readonly VehicleSpawner vehicleSpawner = new VehicleSpawner();
@@ -41,12 +43,15 @@ namespace R8EOX.Session
         /// <summary>Provide scene-resident manager references.</summary>
         public void OnSceneReady(
             TrackManager track, Race.RaceManager race,
-            Camera.CameraManager cam, UI.UIManager ui = null)
+            Camera.CameraManager cam, UI.UIManager ui = null,
+            Audio.AudioManager audio = null, VFX.VFXManager vfx = null)
         {
             trackManager = track;
             raceManager = race;
             cameraManager = cam;
             uiManager = ui;
+            audioManager = audio;
+            vfxManager = vfx;
             if (uiManager != null) uiManager.SetSessionManager(this);
             if (uiManager != null && race != null) uiManager.SetRaceManager(race);
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
@@ -63,9 +68,7 @@ namespace R8EOX.Session
             activeConfig = config;
             if (sessionChannel != null) sessionChannel.SetSession(config);
             state.BeginLoading();
-            Debug.Log(
-                $"[SessionManager] Session starting: mode={config.SessionMode}, "
-                + $"vehicle={config.VehiclePrefab?.name ?? "null"}");
+            Debug.Log($"[SessionManager] Session starting: mode={config.SessionMode}, vehicle={config.VehiclePrefab?.name ?? "null"}");
             if (trackManager != null) EnterVehicleSelectOrSpawn();
         }
 
@@ -80,12 +83,10 @@ namespace R8EOX.Session
             vehicleSpawner.DestroyAllSpawned();
             if (sessionChannel != null) sessionChannel.Clear();
             activeConfig = null;
-            trackManager = null;
-            raceManager = null;
-            cameraManager = null;
-            uiManager = null;
+            trackManager = null; raceManager = null;
+            cameraManager = null; uiManager = null;
+            audioManager = null; vfxManager = null;
             state.Reset();
-            Debug.Log("[SessionManager] Session ended.");
         }
 
         /// <summary>Swap vehicle mid-session (called by UIManager).</summary>
@@ -134,7 +135,6 @@ namespace R8EOX.Session
             }
             uiManager.ShowVehicleSelectOverlay(
                 registry, OnVehicleSelected, OnVehicleSelectCancelled);
-            Debug.Log("[SessionManager] Vehicle selection overlay shown.");
         }
 
         private void OnVehicleSelected(VehicleDefinition definition)
@@ -147,9 +147,8 @@ namespace R8EOX.Session
                 isSwapping = false;
                 vehicleSpawner.SpawnPlayerVehicleAt(
                     definition.VehiclePrefab, swapPosition, swapRotation);
-                WireCamera();
+                WirePlayerVehicle();
                 state.MarkReady();
-                Debug.Log($"[SessionManager] Vehicle swapped to {definition.DisplayName}.");
             }
             else
             {
@@ -165,16 +164,14 @@ namespace R8EOX.Session
                 isSwapping = false;
                 vehicleSpawner.SpawnPlayerVehicleAt(
                     activeConfig.VehiclePrefab, swapPosition, swapRotation);
-                WireCamera();
+                WirePlayerVehicle();
                 state.EndVehicleSelect();
                 state.MarkReady();
-                Debug.Log("[SessionManager] Vehicle swap cancelled — respawned previous vehicle.");
             }
             else
             {
                 state.BeginSpawning();
                 SetupSession();
-                Debug.Log("[SessionManager] Vehicle selection cancelled — using default.");
             }
         }
 
@@ -209,7 +206,7 @@ namespace R8EOX.Session
             SpawnPlayer();
             ValidateVehicle();
             SpawnAIOpponents();
-            WireCamera();
+            WirePlayerVehicle();
             StartRaceIfApplicable();
             state.MarkReady();
             Debug.Log(
@@ -278,10 +275,13 @@ namespace R8EOX.Session
             }
         }
 
-        private void WireCamera()
+        private void WirePlayerVehicle()
         {
-            if (cameraManager == null || vehicleSpawner.PlayerVehicle == null) return;
-            cameraManager.SetTarget(vehicleSpawner.PlayerVehicle.transform);
+            var player = vehicleSpawner.PlayerVehicle;
+            if (player == null) return;
+            if (cameraManager != null) cameraManager.SetTarget(player.transform);
+            if (audioManager != null) audioManager.SetTarget(player);
+            if (vfxManager != null) vfxManager.SetTarget(player);
         }
 
         private void StartRaceIfApplicable()
