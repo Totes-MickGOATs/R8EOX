@@ -95,7 +95,6 @@ namespace R8EOX.Editor.Builders
             var vmSO = new SerializedObject(vmComp);
             var dtSO = new SerializedObject(dt);
 
-            float flipHeight = ReadConst(vmSO, "_tumbleEngageDeg") > 0 ? 0.35f : 0.35f;
             // Read actual serialized defaults
             float steeringSpeed = vmSO.FindProperty("_steeringSpeed")?.floatValue ?? 7f;
             float steeringSpeedLimit = vmSO.FindProperty("_steeringSpeedLimit")?.floatValue ?? 8f;
@@ -112,6 +111,8 @@ namespace R8EOX.Editor.Builders
             float scr = R8EOX.Vehicle.Internal.RaycastWheel.SphereCastRadius;
 
             return "  \"shared\": {\n" +
+                F("    \"diffStiffness\": {0}", R8EOX.Vehicle.Internal.Drivetrain.DiffStiffnessConst) + ",\n" +
+                F("    \"flipHeight\": {0}", R8EOX.Vehicle.VehicleManager.FlipHeightOffset) + ",\n" +
                 F("    \"sphereCastRadius\": {0}", scr) + ",\n" +
                 F("    \"steeringSpeed\": {0}", steeringSpeed) + ",\n" +
                 F("    \"steeringSpeedLimit\": {0}", steeringSpeedLimit) + ",\n" +
