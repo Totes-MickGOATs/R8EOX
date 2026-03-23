@@ -6,7 +6,7 @@ namespace R8EOX.Vehicle
     [RequireComponent(typeof(Rigidbody))]
     public class VehicleManager : MonoBehaviour
     {
-        const float k_DefaultMass = 1.5f, k_DefaultAngularDrag = 0.05f, k_DefaultBounciness = 0.05f;
+        const float k_DefaultMass = 1.5f, k_DefaultBounciness = 0.05f;
         const float k_FlipHeightOffset = 0.35f, k_MsToKmh = 3.6f;
         const float k_ReverseSpeedThreshold = 0.25f, k_ForwardSpeedClearThreshold = 0.50f, k_ReverseBrakeMinThreshold = 0.1f;
 
@@ -60,6 +60,10 @@ namespace R8EOX.Vehicle
         [Tooltip("Grip coefficient multiplier applied to all wheels (0=no grip, 1=full grip)")]
         [SerializeField] private float _gripCoeff = 0.7f;
 
+        [Header("Drivetrain")]
+        [Tooltip("Final drive gear ratio (motor RPM to wheel RPM)")]
+        [SerializeField] private float _gearRatio = 7.5f;
+
         [Header("CoM")]
         [Tooltip("Centre of mass offset from the Rigidbody origin (world-space Y is most critical)")]
         [SerializeField] private Vector3 _comGround = new Vector3(0f, -0.05f, 0f);
@@ -103,12 +107,13 @@ namespace R8EOX.Vehicle
         public float TumbleBounce    => _tumbleBounce;    public float TumbleFriction => _tumbleFriction;
         internal RCAirPhysics AirPhysics => _airPhysics; internal Drivetrain DrivetrainRef => _drivetrain;
         public float Mass => _rb != null ? _rb.mass : k_DefaultMass;
+        public static float FlipHeightOffset => k_FlipHeightOffset;
 
         // Private fields
         Rigidbody _rb; R8EOX.Input.IVehicleInput _input; RCAirPhysics _airPhysics; Drivetrain _drivetrain;
         WheelManager _wheels = new WheelManager(); TumbleController _tumble;
         AirborneDetector _airDetect = new AirborneDetector(5); bool _flipRequested;
-        CollisionTracker _collision; float _gearRatio = 7.5f; float _brakeInput;
+        CollisionTracker _collision; float _brakeInput;
 #if UNITY_EDITOR || DEBUG
         float _debugLogTimer;
 #endif
@@ -122,9 +127,7 @@ namespace R8EOX.Vehicle
         void Start()
         {
             ApplyMotorPreset();
-            _rb.mass = k_DefaultMass; _rb.centerOfMass = _comGround; _rb.linearDamping = 0f;
-            _rb.angularDamping = k_DefaultAngularDrag; _rb.interpolation = RigidbodyInterpolation.Interpolate;
-            _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            _rb.centerOfMass = _comGround;
 
             var physMat = new PhysicsMaterial("CarBody") {
                 dynamicFriction = 0f, staticFriction = 0f, bounciness = k_DefaultBounciness,
