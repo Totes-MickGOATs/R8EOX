@@ -184,10 +184,21 @@ namespace R8EOX.Session
 
         // ----- Session setup -----
 
+        private void Update()
+        {
+            if (effectiveMode == SessionMode.Race
+                && raceManager != null
+                && state.CurrentPhase == SessionPhase.Ready)
+            {
+                raceManager.Tick(Time.deltaTime);
+            }
+        }
+
         private void SetupSession()
         {
             if (activeConfig == null || trackManager == null) return;
             InitializeTrack();
+            if (raceManager != null) raceManager.Initialize(trackManager);
             ValidateAndDegradeMode();
             if (activeConfig.VehiclePrefab == null)
             {
@@ -195,6 +206,7 @@ namespace R8EOX.Session
                 return;
             }
             SpawnPlayer();
+            ValidateVehicle();
             SpawnAIOpponents();
             WireCamera();
             StartRaceIfApplicable();
@@ -233,6 +245,16 @@ namespace R8EOX.Session
                 };
             }
             vehicleSpawner.SpawnPlayerVehicle(activeConfig.VehiclePrefab, playerSpawn);
+            if (raceManager != null && vehicleSpawner.PlayerVehicle != null)
+                raceManager.RegisterVehicle(vehicleSpawner.PlayerVehicle);
+        }
+
+        private void ValidateVehicle()
+        {
+            var vehicle = vehicleSpawner.PlayerVehicle;
+            if (vehicle == null) return;
+            var readiness = VehicleValidator.Validate(vehicle);
+            VehicleValidator.LogReadiness(readiness, vehicle.name);
         }
 
         private void SpawnAIOpponents()
@@ -245,9 +267,14 @@ namespace R8EOX.Session
             {
                 if (!sp.IsPlayerSpawn) aiSpawns.Add(sp);
             }
-            vehicleSpawner.SpawnAIVehicles(
+            var aiVehicles = vehicleSpawner.SpawnAIVehicles(
                 activeConfig.VehiclePrefab, aiSpawns.ToArray(),
                 activeConfig.AiOpponentCount);
+            if (raceManager != null)
+            {
+                foreach (var vehicle in aiVehicles)
+                    raceManager.RegisterVehicle(vehicle);
+            }
         }
 
         private void WireCamera()

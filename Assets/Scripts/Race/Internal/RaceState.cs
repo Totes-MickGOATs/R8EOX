@@ -1,19 +1,12 @@
 namespace R8EOX.Race.Internal
 {
-    internal enum RacePhase
-    {
-        PreRace,
-        Countdown,
-        Racing,
-        Finished
-    }
-
     internal class RaceState
     {
         private RacePhase currentPhase = RacePhase.PreRace;
         private float countdownTimer;
 
         internal RacePhase CurrentPhase => currentPhase;
+        internal float CountdownRemaining => countdownTimer;
 
         internal void BeginCountdown(float duration)
         {
@@ -28,6 +21,7 @@ namespace R8EOX.Race.Internal
                 countdownTimer -= deltaTime;
                 if (countdownTimer <= 0f)
                 {
+                    countdownTimer = 0f;
                     currentPhase = RacePhase.Racing;
                 }
             }
@@ -41,6 +35,7 @@ namespace R8EOX.Race.Internal
         internal void Reset()
         {
             currentPhase = RacePhase.PreRace;
+            countdownTimer = 0f;
         }
     }
 }
