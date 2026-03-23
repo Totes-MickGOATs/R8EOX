@@ -13,7 +13,8 @@ Pure static math classes extracted from MonoBehaviours for testability. No Unity
 - `SuspensionMath.cs` — Spring force, damping, compression calculations
 - `GripMath.cs` — Lateral and longitudinal grip from curve-sampled model
 - `DrivetrainMath.cs` — Differential force distribution math
-- `WheelForceSolver.cs` — Combines suspension + grip + drive into net wheel force
+- `FrictionCircleMath.cs` — Friction ellipse for combined lateral/longitudinal slip scaling
+- `WheelForceSolver.cs` — Combines suspension + grip + friction circle + drive into net wheel force
 - `WheelForceInput.cs` — Input struct for WheelForceSolver
 - `WheelForceResult.cs` — Result struct from WheelForceSolver
 - `AirPhysicsMath.cs` — Airborne torque and gyroscopic precession
