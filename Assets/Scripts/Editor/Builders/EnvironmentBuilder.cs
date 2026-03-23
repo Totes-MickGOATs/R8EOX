@@ -142,19 +142,40 @@ namespace R8EOX.Editor.Builders
 
         static void SetupDirectionalLight(Color color, float intensity)
         {
+            Light sun = FindDirectionalLight();
+
+            if (sun == null)
+            {
+                var go = new GameObject("Directional Light");
+                sun = go.AddComponent<Light>();
+                sun.type = LightType.Directional;
+                go.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+                Debug.Log("[EnvironmentBuilder] Created Directional Light.");
+            }
+
+            sun.color = color;
+            sun.intensity = intensity;
+            Debug.Log("[EnvironmentBuilder] Sun color/intensity applied.");
+        }
+
+        static Light FindDirectionalLight()
+        {
             GameObject sunGO = GameObject.Find("Directional Light");
-            Light sun = sunGO != null ? sunGO.GetComponent<Light>() : null;
-            if (sun != null && sun.type == LightType.Directional)
+            if (sunGO != null)
             {
-                sun.color = color;
-                sun.intensity = intensity;
-                Debug.Log("[TrackBuilder] Sun color/intensity applied.");
+                Light light = sunGO.GetComponent<Light>();
+                if (light != null && light.type == LightType.Directional)
+                    return light;
             }
-            else
+
+            // Fallback: search all lights in case named differently
+            foreach (Light light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
             {
-                Debug.LogWarning(
-                    "[TrackBuilder] No directional light found in scene.");
+                if (light.type == LightType.Directional)
+                    return light;
             }
+
+            return null;
         }
     }
 }
