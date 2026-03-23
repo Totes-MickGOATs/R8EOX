@@ -107,7 +107,7 @@ namespace R8EOX.Editor.Builders
             descTMP.fontSize = 14;
             descTMP.color = LD.TextGrey;
             descTMP.alignment = TextAlignmentOptions.TopLeft;
-            descTMP.enableWordWrapping = true;
+            descTMP.textWrappingMode = TextWrappingModes.Normal;
         }
     }
 }
