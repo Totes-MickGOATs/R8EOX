@@ -32,13 +32,13 @@ namespace R8EOX.App
         // ----- Events -----
 
         /// <summary>Invoked with progress 0-1 while a track scene is loading.</summary>
-        public Action<float> OnLoadProgress;
+        public event Action<float> OnLoadProgress;
 
         /// <summary>Invoked once the track scene has finished loading.</summary>
-        public Action OnLoadComplete;
+        public event Action OnLoadComplete;
 
         /// <summary>Invoked if scene loading fails, with an error message.</summary>
-        public Action<string> OnLoadError;
+        public event Action<string> OnLoadError;
 
         // ----- Lifecycle -----
 
