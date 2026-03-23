@@ -44,6 +44,7 @@ namespace R8EOX.Editor.Builders
             var trackManager = FindOrAdd<R8EOX.Track.TrackManager>(
                 managersParent, "TrackManager");
             WireTrackConfig(trackManager);
+            EnsureSpawnGrid(trackManager);
 
             var bootstrapper = FindOrCreateBootstrapper();
 
@@ -117,6 +118,22 @@ namespace R8EOX.Editor.Builders
                 AssetDatabase.LoadAssetAtPath<ScriptableObject>(
                     AssetDatabase.GUIDToAssetPath(guids[0]));
             so.ApplyModifiedProperties();
+        }
+
+        private static void EnsureSpawnGrid(R8EOX.Track.TrackManager trackManager)
+        {
+            if (trackManager == null)
+                return;
+
+            var existing =
+                trackManager.GetComponentInChildren<R8EOX.Track.Internal.SpawnGrid>();
+            if (existing != null)
+                return;
+
+            var go = new GameObject("SpawnGrid");
+            go.transform.SetParent(trackManager.transform, false);
+            go.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            go.AddComponent<R8EOX.Track.Internal.SpawnGrid>();
         }
 
         // ---- Bootstrapper ----------------------------------------------------
