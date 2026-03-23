@@ -32,7 +32,9 @@ namespace R8EOX.UI.Internal
 
         internal void OnQuitPressed()
         {
-            // TODO: Return to main menu
+            Hide();
+            if (uiManager != null)
+                uiManager.RequestQuitToMenu();
         }
     }
 }
