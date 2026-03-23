@@ -51,7 +51,7 @@ namespace R8EOX.UI.Internal
             float min, float max, float step, float value, Action<float> onChange)
         {
             var row = MakeHRow("SliderRow_" + label, parent);
-            AddLabel(row.transform, label, LABEL_WIDTH, 20f, FontStyles.SemiBold, Color.white);
+            AddLabel(row.transform, label, LABEL_WIDTH, 20f, FontStyles.Bold, Color.white);
 
             var sliderGO = NewGO("Slider", row.transform);
             sliderGO.AddComponent<LayoutElement>().flexibleWidth = 1f;
@@ -80,7 +80,7 @@ namespace R8EOX.UI.Internal
             string[] options, int selectedIndex, Action<int> onChange)
         {
             var row = MakeHRow("DropdownRow_" + label, parent);
-            AddLabel(row.transform, label, LABEL_WIDTH, 20f, FontStyles.SemiBold, Color.white);
+            AddLabel(row.transform, label, LABEL_WIDTH, 20f, FontStyles.Bold, Color.white);
 
             var ddGO = NewGO("Dropdown", row.transform);
             ddGO.AddComponent<LayoutElement>().flexibleWidth = 1f;
@@ -105,7 +105,7 @@ namespace R8EOX.UI.Internal
             Transform parent, string label, bool isChecked, Action<bool> onChange)
         {
             var row = MakeHRow("CheckboxRow_" + label, parent);
-            var lbl = AddLabel(row.transform, label, 0f, 20f, FontStyles.SemiBold, Color.white);
+            var lbl = AddLabel(row.transform, label, 0f, 20f, FontStyles.Bold, Color.white);
             lbl.GetComponent<LayoutElement>().flexibleWidth = 1f;
 
             var tGO = NewGO("Toggle", row.transform);
