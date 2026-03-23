@@ -27,9 +27,9 @@ namespace R8EOX.Vehicle.Internal
 
         // ---- Fallback Defaults (used when no config asset assigned) ----
 
-        const float k_DefaultWheelMoI = 0.120f;
-        const float k_DefaultGyroScale = 3.0f;
-        const float k_DefaultReactionScale = 80.0f;
+        const float k_DefaultWheelMoI = 0.006f;
+        const float k_DefaultGyroScale = 1.5f;
+        const float k_DefaultReactionScale = 30.0f;
 
 
         // ---- Private Fields ----
@@ -37,6 +37,7 @@ namespace R8EOX.Vehicle.Internal
         private Rigidbody _rb;
         private RaycastWheel[] _wheels;
         private float[] _prevWheelSpinRates;
+        private Vector3[] _prevWheelSpinAxes;
 
 
         // ---- Properties ----
@@ -61,6 +62,9 @@ namespace R8EOX.Vehicle.Internal
                 _wheels = transform.parent.GetComponentsInChildren<RaycastWheel>();
 
             _prevWheelSpinRates = new float[_wheels.Length];
+            _prevWheelSpinAxes = new Vector3[_wheels.Length];
+            for (int i = 0; i < _wheels.Length; i++)
+                _prevWheelSpinAxes[i] = _wheels[i].transform.right;
         }
 
 
@@ -97,6 +101,11 @@ namespace R8EOX.Vehicle.Internal
                         spinAxis, wheelMoI, currentSpinRate, _prevWheelSpinRates[i], dt);
                 }
 
+                // Steering precession: axis change from steering produces yaw torque
+                totalGyroTorque += GyroscopicMath.ComputeSteeringPrecessionTorque(
+                    spinAxis, _prevWheelSpinAxes[i], wheelMoI, currentSpinRate, dt);
+
+                _prevWheelSpinAxes[i] = spinAxis;
                 _prevWheelSpinRates[i] = currentSpinRate;
             }
 
