@@ -78,7 +78,7 @@ namespace R8EOX.Editor.Builders
 
         private static void WireCameraMainRef(R8EOX.Camera.CameraManager cameraManager)
         {
-            var mainCam = Camera.main;
+            var mainCam = UnityEngine.Camera.main;
             if (mainCam == null)
                 return;
 
