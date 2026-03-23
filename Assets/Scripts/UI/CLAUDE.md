@@ -12,10 +12,10 @@ HUD, menus, and all user interface elements.
 - Uses new InputSystem for pause toggle (Escape key)
 
 ## Contents
-- `UIManager.cs` — Top-level API: show/hide UI, update displays, vehicle select overlay lifecycle, route vehicle swap requests, Escape-key pause toggle, pull-based HUD update from RaceManager
+- `UIManager.cs` — Top-level API: show/hide UI, update displays, vehicle select overlay lifecycle, route vehicle swap requests, quit-to-menu callback, Escape-key pause toggle, pull-based HUD update from RaceManager
 - `Internal/RaceHUD.cs` — TMPro-based HUD: speed (km/h), position (ordinal), lap counter, race time, lap time, best lap time, countdown display
 - `Internal/Leaderboard.cs` — Race standings display (skeleton)
-- `Internal/PauseMenu.cs` — Pause screen with resume/quit and "Change Vehicle" swap trigger; Time.timeScale pause
+- `Internal/PauseMenu.cs` — Pause screen with resume/quit-to-menu and "Change Vehicle" swap trigger; Time.timeScale pause; routes quit through UIManager callback
 - `Internal/VehicleSelectOverlay.cs` — Full-screen vehicle selection overlay with list, preview, and confirm/back
 - `Internal/VehicleListPanel.cs` — Scrollable vehicle list that spawns VehicleListEntry rows
 - `Internal/VehiclePreviewPanel.cs` — Container for VehiclePreviewRenderer, VehicleStatsDisplay, and vehicle name
