@@ -8,11 +8,22 @@ namespace R8EOX.Track
         [SerializeField] private TrackConfig config;
 
         private SpawnPointData[] cachedSpawnData;
+        private Centerline centerline;
+        private Checkpoint[] checkpoints;
+
+        public System.Action<int, GameObject> OnCheckpointPassed;
 
         public void Initialize(TrackConfig trackConfig)
         {
             config = trackConfig;
 
+            DiscoverSpawnPoints();
+            DiscoverCenterline();
+            DiscoverCheckpoints();
+        }
+
+        private void DiscoverSpawnPoints()
+        {
             var grid = GetComponentInChildren<SpawnGrid>();
             if (grid != null)
             {
@@ -28,22 +39,64 @@ namespace R8EOX.Track
             }
         }
 
+        private void DiscoverCenterline()
+        {
+            centerline = GetComponentInChildren<Centerline>();
+            if (centerline != null)
+                centerline.Initialize();
+        }
+
+        private void DiscoverCheckpoints()
+        {
+            checkpoints = GetComponentsInChildren<Checkpoint>();
+            if (checkpoints == null || checkpoints.Length == 0)
+            {
+                checkpoints = System.Array.Empty<Checkpoint>();
+                return;
+            }
+
+            System.Array.Sort(checkpoints, (a, b) => a.Index.CompareTo(b.Index));
+
+            for (int i = 0; i < checkpoints.Length; i++)
+                checkpoints[i].OnVehiclePassed += HandleCheckpointPassed;
+        }
+
+        private void HandleCheckpointPassed(int index, GameObject vehicle)
+        {
+            OnCheckpointPassed?.Invoke(index, vehicle);
+        }
+
+        private void OnDestroy()
+        {
+            if (checkpoints != null)
+            {
+                for (int i = 0; i < checkpoints.Length; i++)
+                {
+                    if (checkpoints[i] != null)
+                        checkpoints[i].OnVehiclePassed -= HandleCheckpointPassed;
+                }
+            }
+        }
+
         public int GetCheckpointCount()
         {
-            // TODO: Return total checkpoints on track
-            return 0;
+            return checkpoints?.Length ?? 0;
         }
 
         public Vector3 GetCheckpointPosition(int index)
         {
-            // TODO: Return world position of checkpoint by index
-            return Vector3.zero;
+            if (checkpoints == null || index < 0 || index >= checkpoints.Length)
+                return Vector3.zero;
+
+            return checkpoints[index].transform.position;
         }
 
         public float GetTrackLength()
         {
-            // TODO: Return total track length from centerline
-            return 0f;
+            if (centerline == null || !centerline.IsValid)
+                return 0f;
+
+            return centerline.GetTotalLength();
         }
 
         public float GetSurfaceGripAt(Vector3 position)
@@ -54,8 +107,34 @@ namespace R8EOX.Track
 
         public Vector3 GetNearestCenterlinePoint(Vector3 position)
         {
-            // TODO: Project position onto centerline spline
-            return Vector3.zero;
+            if (centerline == null || !centerline.IsValid)
+                return position;
+
+            return centerline.GetNearestPoint(position);
+        }
+
+        public float GetDistanceAlongTrack(Vector3 position)
+        {
+            if (centerline == null || !centerline.IsValid)
+                return 0f;
+
+            return centerline.GetDistanceAtPoint(position);
+        }
+
+        public Vector3 GetDirectionAtDistance(float distance)
+        {
+            if (centerline == null || !centerline.IsValid)
+                return Vector3.forward;
+
+            return centerline.GetDirectionAtDistance(distance);
+        }
+
+        public float GetCurvatureAtDistance(float distance)
+        {
+            if (centerline == null || !centerline.IsValid)
+                return 0f;
+
+            return centerline.GetCurvatureAtDistance(distance);
         }
 
         public int GetSpawnPointCount()
@@ -87,8 +166,7 @@ namespace R8EOX.Track
 
         public bool HasCenterline()
         {
-            // TODO: Check if centerline component exists and has points
-            return false;
+            return centerline != null && centerline.IsValid;
         }
     }
 }
