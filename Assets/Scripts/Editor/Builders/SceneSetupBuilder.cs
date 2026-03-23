@@ -162,9 +162,18 @@ namespace R8EOX.Editor.Builders
             if (existing != null)
                 return;
 
+            // Sample terrain height at origin for spawn Y position
+            float spawnY = 0.5f;
+            var terrain = Terrain.activeTerrain;
+            if (terrain != null)
+            {
+                spawnY = terrain.SampleHeight(Vector3.zero)
+                    + terrain.transform.position.y + 0.3f;
+            }
+
             var go = new GameObject("SpawnGrid");
             go.transform.SetParent(trackManager.transform, false);
-            go.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            go.transform.localPosition = new Vector3(0f, spawnY, 0f);
             go.AddComponent<R8EOX.Track.Internal.SpawnGrid>();
         }
 
