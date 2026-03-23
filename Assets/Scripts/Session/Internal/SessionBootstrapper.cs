@@ -150,12 +150,6 @@ namespace R8EOX.Session.Internal
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            // Skip validation on freshly-added component — builder
-            // wires all refs after AddComponent via ApplyModifiedProperties
-            if (trackManager == null && cameraManager == null
-                && raceManager == null)
-                return;
-
             if (trackManager == null)
                 Debug.LogError(
                     "[SessionBootstrapper] TrackManager is required " +
