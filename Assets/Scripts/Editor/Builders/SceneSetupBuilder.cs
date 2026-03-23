@@ -41,12 +41,7 @@ namespace R8EOX.Editor.Builders
 
             WireCameraMainRef(cameraManager);
 
-            // Suppress OnValidate warning — TrackConfig is wired immediately after
-            Debug.unityLogger.logEnabled = false;
-            var trackManager = FindOrAdd<R8EOX.Track.TrackManager>(
-                managersParent, "TrackManager");
-            Debug.unityLogger.logEnabled = true;
-            WireTrackConfig(trackManager);
+            var trackManager = FindOrAddTrackManager(managersParent);
             EnsureSpawnGrid(trackManager);
 
             var bootstrapper = FindOrCreateBootstrapper();
@@ -97,30 +92,64 @@ namespace R8EOX.Editor.Builders
             }
         }
 
-        private static void WireTrackConfig(R8EOX.Track.TrackManager trackManager)
+        private static R8EOX.Track.TrackManager FindOrAddTrackManager(
+            GameObject parent)
         {
-            if (trackManager == null)
-                return;
+            var existing =
+                Object.FindAnyObjectByType<R8EOX.Track.TrackManager>();
+            if (existing != null)
+            {
+                WireTrackConfigIfNeeded(existing);
+                return existing;
+            }
 
+            // Pre-find the config so we can assign it via SerializedObject
+            // immediately after AddComponent — before OnValidate fires a warning.
+            var configAsset = FindAnyTrackConfig();
+
+            var go = new GameObject("TrackManager");
+            go.transform.SetParent(parent.transform, false);
+            var tm = go.AddComponent<R8EOX.Track.TrackManager>();
+
+            if (configAsset != null)
+            {
+                var so = new SerializedObject(tm);
+                var prop = so.FindProperty("config");
+                if (prop != null)
+                {
+                    prop.objectReferenceValue = configAsset;
+                    so.ApplyModifiedProperties();
+                }
+            }
+
+            return tm;
+        }
+
+        private static void WireTrackConfigIfNeeded(
+            R8EOX.Track.TrackManager trackManager)
+        {
             var so = new SerializedObject(trackManager);
             var prop = so.FindProperty("config");
             if (prop == null || prop.objectReferenceValue != null)
                 return;
 
-            // Global fallback: find any TrackConfig in the project
-            var guids = AssetDatabase.FindAssets("t:TrackConfig");
-            if (guids.Length == 0)
-            {
-                Debug.LogWarning(
-                    "[SceneSetupBuilder] No TrackConfig asset found. " +
-                    "Create one via Assets > Create > R8EOX > TrackConfig");
+            var configAsset = FindAnyTrackConfig();
+            if (configAsset == null)
                 return;
-            }
 
-            prop.objectReferenceValue =
-                AssetDatabase.LoadAssetAtPath<ScriptableObject>(
-                    AssetDatabase.GUIDToAssetPath(guids[0]));
+            prop.objectReferenceValue = configAsset;
             so.ApplyModifiedProperties();
+        }
+
+        private static ScriptableObject FindAnyTrackConfig()
+        {
+            var guids = AssetDatabase.FindAssets("t:TrackConfig");
+            if (guids.Length > 0)
+            {
+                return AssetDatabase.LoadAssetAtPath<ScriptableObject>(
+                    AssetDatabase.GUIDToAssetPath(guids[0]));
+            }
+            return null;
         }
 
         private static void EnsureSpawnGrid(R8EOX.Track.TrackManager trackManager)

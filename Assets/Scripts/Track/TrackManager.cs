@@ -7,13 +7,6 @@ namespace R8EOX.Track
     {
         [SerializeField] private TrackConfig config;
 
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (config == null)
-                Debug.LogWarning("[TrackManager] TrackConfig is not assigned.", this);
-        }
-#endif
 
         private SpawnPointData[] cachedSpawnData;
         private Centerline centerline;
