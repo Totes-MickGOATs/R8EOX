@@ -28,5 +28,12 @@ namespace R8EOX.Camera.Internal
         {
             offset = newOffset;
         }
+
+        internal void Configure(Vector3 offset, float smoothSpeed, float lookAheadFactor)
+        {
+            this.offset = offset;
+            this.smoothSpeed = smoothSpeed;
+            this.lookAheadFactor = lookAheadFactor;
+        }
     }
 }

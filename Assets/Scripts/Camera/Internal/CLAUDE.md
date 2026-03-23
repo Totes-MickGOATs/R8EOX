@@ -8,6 +8,6 @@ Internal implementation for the Camera system. Only `CameraManager` should refer
 - Access: `internal class` (enforced by pre-commit hook)
 
 ## Contents
-- `FollowCamera.cs` — Chase cam with configurable offset, smooth damping, and look-ahead
-- `CinematicCamera.cs` — Scripted camera positions with smooth transitions, always looks at target
+- `FollowCamera.cs` — Chase cam with configurable offset, smooth damping, and look-ahead. Supports `Configure()` for bulk parameter updates from CameraManager.
+- `CinematicCamera.cs` — Scripted camera positions with smooth transitions, always looks at target (skeleton — lerp-based)
 - `CameraShake.cs` — Intensity/duration-based shake: returns random offset with decay over time
