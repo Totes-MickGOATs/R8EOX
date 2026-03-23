@@ -130,7 +130,7 @@ namespace R8EOX.UI.Internal
             }
 
             int idx = System.Array.IndexOf(names, settingsManager.ActiveProfileName);
-            profileDropdown.value = Mathf.Max(0, idx);
+            profileDropdown.SetValueWithoutNotify(Mathf.Max(0, idx));
             profileDropdown.RefreshShownValue();
         }
 
