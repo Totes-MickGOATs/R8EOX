@@ -86,6 +86,7 @@ namespace R8EOX.Editor.Builders
                 if (mr == null) continue;
                 if (child.GetComponent<R8EOX.Vehicle.Internal.RaycastWheel>() != null) continue;
                 if (child.parent != root.transform) continue;
+                if (child.name.Contains("Arm")) continue;
 
                 if (!first) result += ",\n";
                 first = false;
