@@ -67,5 +67,28 @@ namespace R8EOX.Vehicle.Internal
 
             return forwardSpeed / wheelRadius;
         }
+
+        /// <summary>
+        /// Compute torque from steering-induced axis change on a spinning wheel.
+        /// When the driver steers mid-air, the spin axis rotates, producing a
+        /// real gyroscopic torque: tau = I_wheel * omega_spin * d(axis)/dt.
+        /// This is how RC drivers yaw-correct in the air.
+        /// </summary>
+        /// <param name="currentSpinAxis">Current wheel spin axis in world space (unit vector)</param>
+        /// <param name="prevSpinAxis">Previous frame wheel spin axis in world space</param>
+        /// <param name="wheelMoI">Wheel moment of inertia (kg*m^2)</param>
+        /// <param name="wheelAngularVelocity">Wheel spin rate (rad/s)</param>
+        /// <param name="deltaTime">Time step (seconds)</param>
+        /// <returns>Steering precession torque in world space (N*m)</returns>
+        public static Vector3 ComputeSteeringPrecessionTorque(
+            Vector3 currentSpinAxis, Vector3 prevSpinAxis,
+            float wheelMoI, float wheelAngularVelocity, float deltaTime)
+        {
+            if (deltaTime <= 0f)
+                return Vector3.zero;
+
+            Vector3 axisRate = (currentSpinAxis - prevSpinAxis) / deltaTime;
+            return wheelMoI * wheelAngularVelocity * axisRate;
+        }
     }
 }
