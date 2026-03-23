@@ -45,12 +45,16 @@ lint_cs_file() {
   fi
 
   # PUBLIC FIELD CHECK (skip properties, static, const, readonly, event)
-  local public_fields
-  public_fields=$(echo "$content" | grep -nE '^\s*public\s+(int|float|double|string|bool|Vector[234]|Quaternion|Transform|GameObject|Rigidbody|Collider|Renderer|Color|Sprite|Texture|AudioClip|AnimationCurve|LayerMask)\s+' | grep -vE '(static|const|readonly|event|\{.*get|=>|\()' || true)
-  if [ -n "$public_fields" ]; then
-    echo "FAIL [public-field] ${file}: prefer [SerializeField] private"
-    echo "$public_fields" | head -3 | sed 's/^/  /'
-    errors=$((errors + 1))
+  # Exempt: internal struct types — these are pure data containers (pipeline frames,
+  # force results, etc.) where public fields are intentional and [SerializeField] is meaningless.
+  if ! echo "$content" | grep -qE '^\s*internal\s+struct\s+'; then
+    local public_fields
+    public_fields=$(echo "$content" | grep -nE '^\s*public\s+(int|float|double|string|bool|Vector[234]|Quaternion|Transform|GameObject|Rigidbody|Collider|Renderer|Color|Sprite|Texture|AudioClip|AnimationCurve|LayerMask)\s+' | grep -vE '(static|const|readonly|event|\{.*get|=>|\()' || true)
+    if [ -n "$public_fields" ]; then
+      echo "FAIL [public-field] ${file}: prefer [SerializeField] private"
+      echo "$public_fields" | head -3 | sed 's/^/  /'
+      errors=$((errors + 1))
+    fi
   fi
 
   # ONE CLASS PER FILE (sort -u handles partial classes)
