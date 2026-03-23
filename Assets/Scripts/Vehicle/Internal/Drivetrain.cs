@@ -58,6 +58,8 @@ namespace R8EOX.Vehicle.Internal
         public DiffType FrontDiff { get => _frontDiffType; set => _frontDiffType = value; }
         /// <summary>Rear differential preload in Newtons.</summary>
         public float RearPreload { get => _rearPreload; set => _rearPreload = value; }
+        /// <summary>Diff stiffness coupling constant used in differential calculations. Exposed for export.</summary>
+        public static float DiffStiffnessConst => k_DiffStiffness;
 
 
         // ---- Public API ----
