@@ -7,11 +7,26 @@ namespace R8EOX.Track
     {
         [SerializeField] private TrackConfig config;
 
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (config == null)
+                Debug.LogWarning("[TrackManager] TrackConfig is not assigned.", this);
+        }
+#endif
+
         private SpawnPointData[] cachedSpawnData;
         private Centerline centerline;
         private Checkpoint[] checkpoints;
 
         public event System.Action<int, GameObject> OnCheckpointPassed;
+
+        public void Initialize()
+        {
+            DiscoverSpawnPoints();
+            DiscoverCenterline();
+            DiscoverCheckpoints();
+        }
 
         public void Initialize(TrackConfig trackConfig)
         {
@@ -181,5 +196,7 @@ namespace R8EOX.Track
         {
             return config != null ? config.TrackType : TrackType.Circuit;
         }
+
+        public TrackConfig GetTrackConfig() => config;
     }
 }
