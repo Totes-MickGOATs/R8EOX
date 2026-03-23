@@ -74,7 +74,6 @@ namespace R8EOX.Menu.Internal
         {
             CanvasGroup.interactable = false;
             CanvasGroup.blocksRaycasts = false;
-            OnExit();
             float elapsed = 0f;
             float startAlpha = CanvasGroup.alpha;
             while (elapsed < duration)
@@ -84,6 +83,7 @@ namespace R8EOX.Menu.Internal
                 yield return null;
             }
             CanvasGroup.alpha = 0f;
+            OnExit();
             gameObject.SetActive(false);
         }
     }
