@@ -29,6 +29,9 @@ namespace R8EOX.Track.Internal
         [Header("Row Grouping")]
         [SerializeField] private GridGrouping rowGrouping;
 
+        private const float k_WarnThreshold = 0.5f;
+        private const float k_ErrorThreshold = 2.0f;
+
         internal SpawnPointData[] ComputeSpawnPoints()
         {
             return SpawnGridMath.ComputeSpawnPoints(
@@ -75,6 +78,8 @@ namespace R8EOX.Track.Internal
             SpawnPointData[] points = ComputeSpawnPoints();
             if (points == null || points.Length == 0) return;
 
+            Terrain terrain = Terrain.activeTerrain;
+
 #if UNITY_EDITOR
             var labelStyle = new GUIStyle
             {
@@ -92,11 +97,33 @@ namespace R8EOX.Track.Internal
             for (int i = 0; i < points.Length; i++)
             {
                 SpawnPointData point = points[i];
-                Gizmos.color = point.Index == 0 ? Color.green : Color.yellow;
+
+                Color pointColor = point.Index == 0 ? Color.green : Color.yellow;
+                float delta = 0f;
+                float terrainY = 0f;
+                if (terrain != null)
+                {
+                    terrainY = terrain.SampleHeight(point.Position)
+                        + terrain.transform.position.y;
+                    delta = terrainY - point.Position.y;
+                    if (delta > k_ErrorThreshold)
+                        pointColor = Color.red;
+                    else if (delta > k_WarnThreshold)
+                        pointColor = new Color(1f, 0.5f, 0f);
+                }
+
+                Gizmos.color = pointColor;
                 Gizmos.DrawWireSphere(point.Position, 0.4f);
 
                 Vector3 forward = point.Rotation * Vector3.forward;
                 Gizmos.DrawRay(point.Position, forward * 1.5f);
+
+                if (delta > k_WarnThreshold)
+                {
+                    Vector3 terrainPos = new Vector3(
+                        point.Position.x, terrainY, point.Position.z);
+                    Gizmos.DrawLine(point.Position, terrainPos);
+                }
 
 #if UNITY_EDITOR
                 Handles.Label(

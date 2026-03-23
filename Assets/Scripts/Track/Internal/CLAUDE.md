@@ -12,8 +12,8 @@ Internal implementation classes for the Track system. Only `TrackManager` should
 - `Centerline.cs` — MonoBehaviour [RequireComponent(SplineContainer)]: wraps com.unity.splines for centerline queries — position at distance, nearest point projection, distance along track, direction, curvature. Discovered by TrackManager via GetComponentInChildren
 - `Checkpoint.cs` — MonoBehaviour with trigger collider: detects vehicle passage, notifies TrackManager via Action
 - `TrackBoundary.cs` — MonoBehaviour with collision: applies bounce force when vehicles hit walls
-- `SpawnPoint.cs` — MonoBehaviour marking vehicle spawn locations: serializes index, isPlayerSpawn flag; provides SpawnPointData DTO via ToData(); draws Gizmo in editor (fallback when no SpawnGrid)
-- `SpawnGrid.cs` — MonoBehaviour: configurable grid-based spawn layout with live editor gizmos; single draggable object generates all spawn points from grid dimensions, spacing, fill order, stagger, and column/row grouping
+- `SpawnPoint.cs` — MonoBehaviour marking vehicle spawn locations: serializes index, isPlayerSpawn flag; provides SpawnPointData DTO via ToData(); terrain-aware gizmos (red >2m below, orange >0.5m below terrain, with displacement line)
+- `SpawnGrid.cs` — MonoBehaviour: configurable grid-based spawn layout with live editor gizmos; terrain-aware per-point coloring (red >2m, orange >0.5m below terrain) with displacement lines; single draggable object generates all spawn points from grid dimensions, spacing, fill order, stagger, and column/row grouping
 - `SpawnGridMath.cs` — Pure static class: computes SpawnPointData[] from grid parameters; validates grouping sums; no MonoBehaviour dependencies (testable)
 - `FillDirection.cs` — Enum: LeftToRight, RightToLeft (lateral fill order within grid rows)
 - `RowOrder.cs` — Enum: FrontToBack, BackToFront (whether row 0 is front or back of grid)
