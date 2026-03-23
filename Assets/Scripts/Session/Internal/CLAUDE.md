@@ -13,9 +13,9 @@ Internal implementation classes for the Session system. Only `SessionManager` sh
 - `SessionState.cs` — FSM with validated phase transitions; supports VehicleSelect phase (Loading→VehicleSelect→Spawning) and mid-session car swap (Ready→VehicleSelect)
 - `SessionBootstrapper.cs` — Scene-resident MonoBehaviour: detects editor-play vs menu flow via SessionChannel; creates default Practice session in editor-play mode
 - `VehicleSpawner.cs` — Instantiates vehicle prefabs at SpawnPointData positions with terrain safety
-- `SpawnSafety.cs` — Pure static class: raycast terrain height, compute safe spawn Y
+- `SpawnSafety.cs` — Pure static class: raycast terrain height, compute safe spawn Y; warns when correction exceeds 0.5m
 - `TrackValidator.cs` — Validates track components against mode requirements (TODO)
 - `VehicleReadiness.cs` — Struct: flags for rigidbody, input, wheels, drivetrain, colliders, attachment points; readiness tiers (IsPlayable, IsRaceReady, IsFullyEquipped); missing-component report
 - `VehicleValidator.cs` — Static: inspects a vehicle GameObject for required components/transforms; populates VehicleReadiness; logs per-tier warnings/errors
 - `SetupErrorOverlay.cs` — IMGUI overlay: shows validation errors (red) and warnings (yellow) at runtime; auto-destroys after 30s if warnings-only; no Canvas/UIManager dependency
-- `SetupValidator.cs` — Static: validates all scene manager refs (camera=error, race/ui/audio/vfx/ai=warning) and TrackConfig assignment; called by SessionManager during SetupSession
+- `SetupValidator.cs` — Static: validates all scene manager refs (camera=error, race/ui/audio/vfx/ai=warning), TrackConfig assignment, and spawn point heights vs terrain (>0.5m=warning, >2.0m=error); called by SessionManager during SetupSession

@@ -8,6 +8,7 @@ namespace R8EOX.Session.Internal
         private const float k_ProbeHeight = 100f;
         private const float k_ClearanceBuffer = 0.15f;
         private const float k_FallbackY = 5f;
+        private const float k_CorrectionWarnThreshold = 0.5f;
 
         internal static Vector3 GetSafeSpawnPosition(
             SpawnPointData spawnPoint,
@@ -27,6 +28,14 @@ namespace R8EOX.Session.Internal
 
             float lowestBound = GetLowestColliderBound(vehiclePrefab);
             float safeY = terrainY - lowestBound + k_ClearanceBuffer;
+
+            float correction = Mathf.Abs(safeY - spawnPos.y);
+            if (correction > k_CorrectionWarnThreshold)
+            {
+                Debug.LogWarning(
+                    $"[SpawnSafety] Spawn index {spawnPoint.Index} corrected " +
+                    $"by {correction:F2}m (from Y={spawnPos.y:F2} to Y={safeY:F2}).");
+            }
 
             return new Vector3(spawnPos.x, safeY, spawnPos.z);
         }
