@@ -72,42 +72,27 @@ namespace R8EOX.Editor.Builders
         static T FindScriptableObject<T>(string folder) where T : ScriptableObject
         {
             string typeName = typeof(T).Name;
-            Debug.LogWarning($"[Scanner] FindScriptableObject<{typeName}> in '{folder}'");
-
-            // Attempt 1: type filter
             string[] guids = AssetDatabase.FindAssets(
                 $"t:{typeName}", new[] { folder });
-            Debug.LogWarning($"[Scanner]   t:{typeName} → {guids.Length} result(s)");
             if (guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
-                Debug.LogWarning($"[Scanner]   LoadAssetAtPath<{typeName}>('{path}') → {(asset != null ? "OK" : "NULL")}");
-                if (asset != null) return asset;
+                return AssetDatabase.LoadAssetAtPath<T>(path);
             }
 
-            // Attempt 2: name search without type filter
+            // Fallback: name search without type filter, then direct path
             string[] nameGuids = AssetDatabase.FindAssets(
                 typeName, new[] { folder });
-            Debug.LogWarning($"[Scanner]   name search '{typeName}' → {nameGuids.Length} result(s)");
             foreach (string guid in nameGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                Debug.LogWarning($"[Scanner]     candidate: '{path}'");
                 if (!path.EndsWith(".asset")) continue;
                 var asset = AssetDatabase.LoadAssetAtPath<T>(path);
-                Debug.LogWarning($"[Scanner]     LoadAssetAtPath<{typeName}>('{path}') → {(asset != null ? "OK" : "NULL")}");
                 if (asset != null) return asset;
             }
 
-            // Attempt 3: direct path convention
-            string directPath = $"{folder}/{typeName}.asset";
-            var direct = AssetDatabase.LoadAssetAtPath<T>(directPath);
-            Debug.LogWarning($"[Scanner]   direct path '{directPath}' → {(direct != null ? "OK" : "NULL")}");
-            if (direct != null) return direct;
-
-            Debug.LogWarning($"[Scanner] {typeName} NOT FOUND in '{folder}' after all attempts");
-            return null;
+            return AssetDatabase.LoadAssetAtPath<T>(
+                $"{folder}/{typeName}.asset");
         }
 
         static List<LayerData> ScanLayers(string trackFolderPath)
