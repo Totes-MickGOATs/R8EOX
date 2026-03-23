@@ -18,8 +18,9 @@ Internal implementation classes for the Vehicle system. Only `VehicleManager` re
 - `WheelManager.cs` — Coordinates the wheel array for VehicleManager
 - `WheelVisuals.cs` — Rotates visual wheel meshes based on angular velocity
 - `SteeringRamp.cs` — Speed-dependent steering angle interpolation
-- `TumbleController.cs` — Crash/tumble detection and recovery
+- `TumbleController.cs` — Tilt detection and tumble factor for telemetry (no material blending)
 - `AirborneDetector.cs` — Tracks whether vehicle is airborne
 - `MotorPresetRegistry.cs` — Predefined motor tuning presets (21.5T through 1.5T)
 - `MotorPreset.cs` — Motor preset enum (extracted from VehicleManager for one-type-per-file)
 - `Physics/` — Pure static math classes (see Physics/CLAUDE.md)
+- `Pipeline/` — Sequential physics pipeline stages (see Pipeline/CLAUDE.md)
