@@ -45,3 +45,6 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 - `BuggySpecSerializer.BuildBodyMeshes()` excludes control arms (name contains "Arm") — the viewer builds arms separately from `armY`/`armThickness`/`armDepth` fields
 - `BuggySpecExporter` writes inline into `rc-buggy-viewer.html` between SPEC_DATA markers — there is no standalone JSON file
 - When adding new constants to the shared JSON, add static accessors on the owning runtime class (e.g., `Drivetrain.DiffStiffnessConst`) rather than hardcoding values in the exporter
+- `GetOrCreatePhysicsMaterial()` creates `.asset` files in `Assets/Materials/Physics/` — one per collider region (ChassiBottom, BodyShell, Bumper, SkidPlate)
+- `BuggySpec.InertiaTensor` is applied by `AddRigidbody` when non-zero; `Vector3.zero` means use Unity default
+- Solver iterations (12 velocity, 4 position) are set per-Rigidbody in `AddRigidbody`, not globally
