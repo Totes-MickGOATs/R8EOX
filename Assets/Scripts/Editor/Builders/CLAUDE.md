@@ -33,6 +33,8 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `VehicleListEntryBuilder.cs` | Configures VehicleListEntry prefab: LayoutElement height, Highlight/Thumbnail/NameText/CategoryText layout and styles |
 | `MenuSceneBuilder.cs` | `R8EOX > Build Menu Scene` menu item: creates MainMenu.unity scene with Camera, Canvas, MenuManager, and all five screen panels (Splash, MainMenu, ModeSelect, TrackSelect, Loading) fully wired |
 | `FontAssetBuilder.cs` | `R8EOX > Build Font Assets` menu item: creates SDFAA TMP_FontAsset files from the four TTF imports (Rajdhani Bold/SemiBold/Regular, SourceCodePro Regular) and wires titleFont/bodyFont/monoFont into the MenuThemeConfig asset |
+| `OptionsLayoutData.cs` | Shared layout constants (panel size, padding, tab bar, content spacing, header, back button, colors) used by Options overlay builders |
+| `OptionsOverlayBuilder.cs` | `R8EOX > Build Options Overlay` menu item: creates OptionsOverlay prefab at `Assets/Prefabs/UI/OptionsOverlay.prefab` and wires it into OverlayRegistry if one exists |
 
 ## Conventions
 
