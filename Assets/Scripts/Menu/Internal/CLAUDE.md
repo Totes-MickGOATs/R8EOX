@@ -19,6 +19,7 @@ with `internal` access modifiers — never exposed outside the Menu system.
 | `MenuButtonStyle.cs` | `internal enum` | Button style variants: Primary, Secondary, Danger, Locked, Ghost |
 | `MenuScreen.cs` | `internal abstract class : MonoBehaviour` | Base class for all menu screens — owns CanvasGroup fade in/out, Show/Hide/ShowImmediate/HideImmediate lifecycle |
 | `ModeSelectScreen.cs` | `internal class : MenuScreen` | Mode selection screen — Testing Session (Practice), Race (locked), Multiplayer (locked); initialized with mode and back callbacks |
+| `TrackSelectScreen.cs` | `internal class : MenuScreen` | Track selection screen — coordinates TrackListPanel (left) and TrackPreviewPanel (right) with START/BACK buttons; initialized with TrackRegistry, SessionMode, and confirm/back callbacks |
 
 ## Usage Pattern
 
