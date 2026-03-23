@@ -26,6 +26,7 @@ namespace R8EOX.Editor.Builders
 
             return $"    \"{key}\": {{\n" +
                 $"      \"name\": \"{spec.Name}\",\n" +
+                (spec.IsReference ? "      \"reference\": true,\n" : "") +
                 $"      \"motor\": \"{motorName}\", \"motorIndex\": {motorIdx},\n" +
                 $"      \"layout\": \"{layout}\",\n" +
                 $"      \"rearDiff\": \"{diffNames[(int)spec.RearDiff]}\", " + F("\"rearPreload\": {0}", spec.RearPreload) + ",\n" +
