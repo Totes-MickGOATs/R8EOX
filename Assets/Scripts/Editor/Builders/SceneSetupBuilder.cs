@@ -41,8 +41,11 @@ namespace R8EOX.Editor.Builders
 
             WireCameraMainRef(cameraManager);
 
+            // Suppress OnValidate warning — TrackConfig is wired immediately after
+            Debug.unityLogger.logEnabled = false;
             var trackManager = FindOrAdd<R8EOX.Track.TrackManager>(
                 managersParent, "TrackManager");
+            Debug.unityLogger.logEnabled = true;
             WireTrackConfig(trackManager);
             EnsureSpawnGrid(trackManager);
 
