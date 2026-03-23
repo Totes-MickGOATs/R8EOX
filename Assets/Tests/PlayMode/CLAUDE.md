@@ -29,3 +29,15 @@ Integration and end-to-end tests that run in Play Mode with full Unity lifecycle
 - `SessionFlowTests.cs` — Editor-play flow: SessionManager creation, vehicle spawn, camera wiring, HUD, cleanup
 - `VehicleSpawnTests.cs` — Vehicle correctness: Rigidbody, input, terrain height, spawn point position
 - `Regressions/` — Regression tests for bugs found by E2E agent
+
+## E2E Test Editor Isolation
+- PlayMode tests run on an isolated Unity editor opened from a git worktree at `.claude-worktrees/e2e-test`
+- The test editor connects to MCP as a separate instance (e.g., `e2e-test@hash`)
+- Pin to it via `set_active_instance` before any MCP calls
+- Update worktree to main HEAD before each run: `git -C <worktree> checkout --detach <main_HEAD>`
+
+## Console Cleanliness
+- Zero warnings/errors in console after test runs is the target
+- MissingReferenceException = real bug (stale reference in a manager), not Unity noise
+- SpawnSafety corrections = spawn height misconfiguration, fix in scene/builder
+- LogAssert.ignoreFailingMessages should only be used for cross-test bleed during scene transitions, not to mask real issues
