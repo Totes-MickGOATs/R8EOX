@@ -90,6 +90,11 @@ namespace R8EOX.Editor.Builders
         public readonly Color BodyColor;
 
 
+        // ---- Metadata ----
+
+        public readonly bool IsReference;
+
+
         // ---- Constructor ----
 
         public BuggySpec(
@@ -108,7 +113,8 @@ namespace R8EOX.Editor.Builders
             float rearSpringStrength, float rearSpringDamping,
             float gripCoeff, float steeringMax,
             float gearRatio,
-            Color bodyColor)
+            Color bodyColor,
+            bool isReference = false)
         {
             Name = name; Motor = motor;
             Layout = layout;
@@ -127,6 +133,7 @@ namespace R8EOX.Editor.Builders
             GripCoeff = gripCoeff; SteeringMax = steeringMax;
             GearRatio = gearRatio;
             BodyColor = bodyColor;
+            IsReference = isReference;
         }
     }
 }
