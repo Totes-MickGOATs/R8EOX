@@ -61,43 +61,43 @@ namespace R8EOX.Settings
 
         // ── Getters ────────────────────────────────────────────────────────
 
-        public VideoSettings GetVideoSettings() => currentData.video.Clone();
-        public AudioSettingsData GetAudioSettings() => currentData.audio.Clone();
-        public ControlsSettings GetControlsSettings() => currentData.controls.Clone();
-        public CalibrationSettings GetCalibrationSettings() => currentData.calibration.Clone();
-        public GameplaySettings GetGameplaySettings() => currentData.gameplay.Clone();
+        internal VideoSettings GetVideoSettings() => currentData.video.Clone();
+        internal AudioSettingsData GetAudioSettings() => currentData.audio.Clone();
+        internal ControlsSettings GetControlsSettings() => currentData.controls.Clone();
+        internal CalibrationSettings GetCalibrationSettings() => currentData.calibration.Clone();
+        internal GameplaySettings GetGameplaySettings() => currentData.gameplay.Clone();
 
         // ── Setters ────────────────────────────────────────────────────────
 
-        public void SetVideoSettings(Action<VideoSettings> modifier)
+        internal void SetVideoSettings(Action<VideoSettings> modifier)
         {
             if (modifier == null) return;
             modifier(currentData.video);
             Save(); ApplyVideo(); OnSettingsChanged?.Invoke();
         }
 
-        public void SetAudioSettings(Action<AudioSettingsData> modifier)
+        internal void SetAudioSettings(Action<AudioSettingsData> modifier)
         {
             if (modifier == null) return;
             modifier(currentData.audio);
             Save(); ApplyAudio(); OnSettingsChanged?.Invoke();
         }
 
-        public void SetControlsSettings(Action<ControlsSettings> modifier)
+        internal void SetControlsSettings(Action<ControlsSettings> modifier)
         {
             if (modifier == null) return;
             modifier(currentData.controls);
             Save(); OnSettingsChanged?.Invoke();
         }
 
-        public void SetCalibrationSettings(Action<CalibrationSettings> modifier)
+        internal void SetCalibrationSettings(Action<CalibrationSettings> modifier)
         {
             if (modifier == null) return;
             modifier(currentData.calibration);
             Save(); OnSettingsChanged?.Invoke();
         }
 
-        public void SetGameplaySettings(Action<GameplaySettings> modifier)
+        internal void SetGameplaySettings(Action<GameplaySettings> modifier)
         {
             if (modifier == null) return;
             modifier(currentData.gameplay);
@@ -197,7 +197,7 @@ namespace R8EOX.Settings
         // ── Quality Tier ───────────────────────────────────────────────────
 
         /// <summary>Applies a preset video config for the given tier.</summary>
-        public void SetQualityTier(QualityTier tier)
+        internal void SetQualityTier(QualityTier tier)
         {
             SetVideoSettings(v =>
             {
@@ -220,12 +220,12 @@ namespace R8EOX.Settings
 
         private void ApplyVideo()
         {
-            // VideoApplier.Apply(currentData.video); — wired once VideoApplier is created
+            VideoApplier.Apply(currentData.video);
         }
 
         private void ApplyAudio()
         {
-            // AudioApplier.Apply(currentData.audio); — wired once AudioApplier is created
+            AudioApplier.Apply(currentData.audio);
         }
     }
 }
