@@ -161,40 +161,40 @@ namespace R8EOX.Editor.Builders
 
         static void AddColliders(GameObject root)
         {
-            AddBoxCollider(root, new Vector3(0.56f, 0.12f, 1.56f), new Vector3(0f, -0.17f,  0f));
-            AddBoxCollider(root, new Vector3(0.48f, 0.28f, 1.0f),  new Vector3(0f,  0.03f,  0f));
-            AddBoxCollider(root, new Vector3(0.44f, 0.14f, 0.16f), new Vector3(0f, -0.10f,  0.86f));
-            AddBoxCollider(root, new Vector3(0.36f, 0.18f, 0.18f), new Vector3(0f, -0.08f, -0.86f));
+            AddBoxCollider(root, new Vector3(0.14f, 0.03f, 0.39f), new Vector3(0f, -0.0425f,  0f));
+            AddBoxCollider(root, new Vector3(0.12f, 0.07f, 0.25f),  new Vector3(0f,  0.0075f,  0f));
+            AddBoxCollider(root, new Vector3(0.11f, 0.035f, 0.04f), new Vector3(0f, -0.025f,  0.215f));
+            AddBoxCollider(root, new Vector3(0.09f, 0.045f, 0.045f), new Vector3(0f, -0.02f, -0.215f));
         }
 
         static void AddBodyMeshes(GameObject root, Material darkGrey, Material medGrey,
                                    Material bodySemi, Material bodyWing)
         {
-            AddBoxMesh(root, "ChassisPlate",    new Vector3(0.52f, 0.032f, 1.36f),
-                new Vector3(0f, -0.233f,  0f),    darkGrey);
-            AddBoxMesh(root, "FrontBumperMesh", new Vector3(0.48f, 0.12f,  0.1f),
-                new Vector3(0f, -0.153f,  0.78f), darkGrey);
-            AddBoxMesh(root, "RearBumperMesh",  new Vector3(0.4f,  0.16f,  0.16f),
-                new Vector3(0f, -0.153f, -0.72f), darkGrey);
-            AddBoxMesh(root, "FrontShockTower", new Vector3(0.4f,  0.24f,  0.02f),
-                new Vector3(0f, -0.073f,  0.48f), medGrey);
-            AddBoxMesh(root, "RearShockTower",  new Vector3(0.32f, 0.24f,  0.02f),
-                new Vector3(0f, -0.073f, -0.48f), medGrey);
-            AddBoxMesh(root, "BodyShell",       new Vector3(0.48f, 0.16f,  1.12f),
-                new Vector3(0f, -0.05f,   0.08f), bodySemi);
+            AddBoxMesh(root, "ChassisPlate",    new Vector3(0.13f, 0.008f, 0.34f),
+                new Vector3(0f, -0.058f,  0f),    darkGrey);
+            AddBoxMesh(root, "FrontBumperMesh", new Vector3(0.12f, 0.03f,  0.025f),
+                new Vector3(0f, -0.038f,  0.195f), darkGrey);
+            AddBoxMesh(root, "RearBumperMesh",  new Vector3(0.10f,  0.04f,  0.04f),
+                new Vector3(0f, -0.038f, -0.18f), darkGrey);
+            AddBoxMesh(root, "FrontShockTower", new Vector3(0.10f,  0.06f,  0.005f),
+                new Vector3(0f, -0.018f,  0.12f), medGrey);
+            AddBoxMesh(root, "RearShockTower",  new Vector3(0.08f, 0.06f,  0.005f),
+                new Vector3(0f, -0.018f, -0.12f), medGrey);
+            AddBoxMesh(root, "BodyShell",       new Vector3(0.12f, 0.04f,  0.28f),
+                new Vector3(0f, -0.0125f,   0.02f), bodySemi);
             AddBoxMesh(root, "RearWing",
-                new Vector3(0.48f, 0.008f, 0.16f), new Vector3(0f, 0.167f, -0.6f), bodyWing)
+                new Vector3(0.12f, 0.002f, 0.04f), new Vector3(0f, 0.042f, -0.15f), bodyWing)
                 .transform.localRotation = Quaternion.Euler(22.5f, 0f, 0f);
         }
 
         static void AddControlArms(GameObject root, Material darkGrey, BuggySpec spec)
         {
             float armX = spec.TrackHalf * 0.52f; float wh = spec.WheelbaseHalf;
-            var armSize = new Vector3(armX, 0.02f, 0.08f);
-            AddBoxMesh(root, "FrontArmL", armSize, new Vector3(-armX, -0.213f,  wh), darkGrey);
-            AddBoxMesh(root, "FrontArmR", armSize, new Vector3( armX, -0.213f,  wh), darkGrey);
-            AddBoxMesh(root, "RearArmL",  armSize, new Vector3(-armX, -0.213f, -wh), darkGrey);
-            AddBoxMesh(root, "RearArmR",  armSize, new Vector3( armX, -0.213f, -wh), darkGrey);
+            var armSize = new Vector3(armX, 0.005f, 0.02f);
+            AddBoxMesh(root, "FrontArmL", armSize, new Vector3(-armX, -0.053f,  wh), darkGrey);
+            AddBoxMesh(root, "FrontArmR", armSize, new Vector3( armX, -0.053f,  wh), darkGrey);
+            AddBoxMesh(root, "RearArmL",  armSize, new Vector3(-armX, -0.053f, -wh), darkGrey);
+            AddBoxMesh(root, "RearArmR",  armSize, new Vector3( armX, -0.053f, -wh), darkGrey);
         }
 
         static void BuildWheel(GameObject parent, string name, Vector3 localPos,
@@ -229,7 +229,7 @@ namespace R8EOX.Editor.Builders
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             go.name = name; go.transform.SetParent(pivot.transform, false);
-            go.transform.localPosition = new Vector3(0f, -0.2f, 0f);
+            go.transform.localPosition = new Vector3(0f, -0.05f, 0f);
             go.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             go.transform.localScale    = new Vector3(radius * 2f, height * 0.5f, radius * 2f);
             go.GetComponent<Renderer>().material = mat;
@@ -277,8 +277,8 @@ namespace R8EOX.Editor.Builders
 
         static void AddAttachmentPoints(GameObject root, BuggySpec spec)
         {
-            AddEmptyChild(root, "CameraTarget",    new Vector3(0f,  0.15f,  0.3f));
-            AddEmptyChild(root, "CameraMountPoint",new Vector3(0f,  3f,    -8f));
+            AddEmptyChild(root, "CameraTarget",    new Vector3(0f,  0.0375f,  0.075f));
+            AddEmptyChild(root, "CameraMountPoint",new Vector3(0f,  0.75f,   -2f));
             AddEmptyChild(root, "ExhaustPoint",    new Vector3(0f, -0.15f, -spec.ChassisLength * 0.5f));
             foreach (Transform child in root.transform)
                 if (child.GetComponent<R8EOX.Vehicle.Internal.RaycastWheel>() != null)
