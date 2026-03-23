@@ -19,3 +19,4 @@ Internal implementation for the UI system. Only `UIManager` should reference the
 - `VehiclePreviewRenderer.cs` — RenderTexture-based 3D vehicle preview with turntable, 3-point lighting, drag-to-rotate
 - `VehicleStatsDisplay.cs` — Fill-bar display for vehicle stats (speed, acceleration, handling, weight) + description
 - `VehicleListEntry.cs` — Single row in vehicle list: thumbnail, name, category badge, selection highlight
+- `ConfirmDialog.cs` — Self-contained reusable modal for destructive confirmations. Static `Show()` creates its own Canvas (sortOrder=200, ScreenSpaceOverlay) so it renders above all other overlays. Supports danger (red border) and primary (cyan border) styling, full-screen backdrop that blocks clicks, Escape-to-cancel, and a 0.15s CanvasGroup fade-in via unscaledDeltaTime. Entirely code-built — no prefab required.
