@@ -115,7 +115,7 @@ namespace R8EOX.UI.Internal
             _instructionText = instrGo.AddComponent<TextMeshProUGUI>();
             _instructionText.fontSize = 16f; _instructionText.color = Color.white;
             _instructionText.alignment = TextAlignmentOptions.Center;
-            _instructionText.enableWordWrapping = true;
+            _instructionText.textWrappingMode = TMPro.TextWrappingModes.Normal;
 
             // Progress
             var progGo = Child("Progress", panel.transform);
@@ -123,7 +123,7 @@ namespace R8EOX.UI.Internal
             _progressText = progGo.AddComponent<TextMeshProUGUI>();
             _progressText.fontSize = 13f; _progressText.color = MutedText;
             _progressText.alignment = TextAlignmentOptions.Center;
-            _progressText.enableWordWrapping = true;
+            _progressText.textWrappingMode = TMPro.TextWrappingModes.Normal;
 
             // Buttons
             var row = Child("Buttons", panel.transform);
