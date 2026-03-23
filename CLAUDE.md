@@ -142,6 +142,15 @@ For any non-trivial task, use the specialized subagents in `.claude/agents/` ins
 5. **Test and review** — dispatch `unity-tester` and `unity-reviewer` after code is written
 6. **Always consolidate** — check `read_console` and summarize results after all agents complete
 
+### MCP Instance Routing
+
+When the E2E test editor is running, **two Unity editors are connected to MCP**. All agents MUST pin to the correct instance or MCP calls will error.
+
+- **Before dispatching any MCP-using agent**, read `mcpforunity://instances` to get the current dev editor's instance ID
+- **Include the instance ID in every agent prompt**: `Pin to instance R8EOX@{hash} before any MCP calls`
+- The `unity-e2e-tester` handles its own instance pinning (it pins to the test editor, not the dev editor)
+- If only one instance is connected, pinning is optional but harmless
+
 ### Key Rules
 
 - Launch independent agents in **parallel** (multiple Agent calls in one message)
