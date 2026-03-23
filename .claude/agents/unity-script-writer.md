@@ -25,6 +25,20 @@ git commit -m "feat: description of change"
 - If commit fails, fix and retry — never skip
 - This is NOT optional. This is the #1 rule in this project.
 
+## MCP Instance Pinning (REQUIRED when multiple editors are open)
+
+Before making ANY MCP calls, check if multiple Unity editors are connected:
+
+```
+ReadMcpResourceTool(server="UnityMCP", uri="mcpforunity://instances")
+```
+
+- **1 instance** → no pinning needed, proceed normally
+- **Multiple instances** → you MUST pin to the correct one before any MCP call:
+  - If the orchestrator included an instance ID in your prompt, use it: `mcp__UnityMCP__set_active_instance(instance="R8EOX@{hash}")`
+  - Otherwise, pin to the instance that is NOT in `.claude-worktrees/` (that's the E2E test editor — avoid it)
+  - **If you skip pinning with multiple instances, MCP will error on every call**
+
 ## Your Tools
 
 - `mcp__UnityMCP__create_script` — create new C# scripts
