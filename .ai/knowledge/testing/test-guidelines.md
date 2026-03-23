@@ -14,9 +14,15 @@ NUnit via `com.unity.test-framework` 1.6.0
 
 ### PlayMode Tests
 - Location: `Assets/Tests/PlayMode/`
-- Namespace: `R8EOX.Tests`
+- Namespace: `R8EOX.Tests.PlayMode`
+- Assembly: `R8EOX.Tests.PlayMode` (separate asmdef, `includePlatforms` empty for player loop)
 - Run in Play Mode with full Unity lifecycle
 - Good for: MonoBehaviour integration, physics, coroutines, scene loading
+- Base class: extend `E2ETestBase` for tests that load scenes (handles DDOL cleanup)
+- Utilities: `E2ETestUtils` (scene loading, waits), `TestInputHelper` (input simulation)
+- Categories: `smoke`, `integrity`, `flow`, `integration`, `regression`
+- Use `[UnityTest]` returning `IEnumerator` (not `[Test]`) for async operations
+- Use `[UnitySetUp]` / `[UnityTearDown]` for setup needing yield
 
 ## Test Structure
 
@@ -79,6 +85,37 @@ namespace R8EOX.Tests
 - MCP: `mcp__UnityMCP__run_tests` — runs all or filtered tests
 - Unity: Window > General > Test Runner
 - Filter by: EditMode, PlayMode, test name, category
+
+## PlayMode Test Infrastructure
+
+### E2ETestBase (abstract base)
+- `[UnitySetUp]` — destroys all DontDestroyOnLoad objects (`[AppRoot]`, `[SessionManager]`, etc.)
+- `[UnityTearDown]` — resets `Time.timeScale`, loads empty scene, cleans DDOL again
+- DDOL cleanup trick: create temp GO → `DontDestroyOnLoad(temp)` → enumerate root objects in DDOL scene → destroy all → destroy temp
+
+### E2ETestUtils (static helpers)
+- `LoadSceneAndWait(sceneName, timeout)` — async scene load + wait for activation
+- `WaitUntil(condition, timeout, message)` — generic predicate wait with timeout
+- `WaitForGameObject(name, timeout)` — poll `GameObject.Find` each frame
+- `WaitForComponent<T>(timeout)` — poll `FindAnyObjectByType<T>()`
+- `WaitForNoErrors(settleFrames)` — subscribe to `Application.logMessageReceived`
+- `WaitForFrames(count)` — simple frame skip
+
+### TestInputHelper
+- `SwapToScriptedInput(vehicle)` — remove `RCInput`, add `ScriptedInput`, return it
+- `CreateTestDevices()` — add `Keyboard` + `Gamepad` via `InputSystem.AddDevice<T>()`
+- Vehicle tests: use `ScriptedInput` (same path AI uses, bypasses Input System)
+- Menu tests: use `InputTestFixture` + device simulation
+
+## E2E Quality Workflow
+
+The `unity-e2e-tester` agent runs against an isolated Unity editor (git worktree):
+1. Sets up worktree + launches test editor
+2. Pins to test editor via `set_active_instance`
+3. Runs: Console → EditMode → Scene Integrity → Play Mode → PlayMode Tests → UX Review
+4. Produces structured quality report (Technical + Experience sections)
+5. Auto-dispatches fixes for blocking issues
+6. Invoke with `/e2e` (full), `/e2e smoke`, `/e2e regression`, `/e2e ux`
 
 ## File Limits
 
