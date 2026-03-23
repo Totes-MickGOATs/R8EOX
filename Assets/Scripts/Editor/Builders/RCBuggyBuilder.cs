@@ -50,6 +50,7 @@ namespace R8EOX.Editor.Builders
             root.AddComponent<R8EOX.Input.RCInput>();
             var vehicleManager = root.AddComponent<VehicleManager>();
             AddColliders(root);
+            AddSkidPlates(root, carLayer);
 
             Color bodyTransp = new Color(spec.BodyColor.r, spec.BodyColor.g, spec.BodyColor.b, 0.85f);
             Color bodySolid  = new Color(spec.BodyColor.r, spec.BodyColor.g, spec.BodyColor.b, 1f);
@@ -67,22 +68,14 @@ namespace R8EOX.Editor.Builders
             bool frontIsMotor = spec.Layout == BuggyDriveLayout.AWD;
             float th = spec.TrackHalf, wh = spec.WheelbaseHalf;
 
-            BuildWheel(root, "WheelFL", new Vector3(-th, 0f,  wh),
-                isSteer: true,  isMotor: frontIsMotor,
-                spec.TireRadius, spec.FrontTireWidth, spec.HubRadius, spec.FrontHubWidth,
-                spec, tireMat, hubMat, carLayer);
-            BuildWheel(root, "WheelFR", new Vector3( th, 0f,  wh),
-                isSteer: true,  isMotor: frontIsMotor,
-                spec.TireRadius, spec.FrontTireWidth, spec.HubRadius, spec.FrontHubWidth,
-                spec, tireMat, hubMat, carLayer);
-            BuildWheel(root, "WheelRL", new Vector3(-th, 0f, -wh),
-                isSteer: false, isMotor: true,
-                spec.TireRadius, spec.RearTireWidth, spec.HubRadius, spec.RearHubWidth,
-                spec, tireMat, hubMat, carLayer);
-            BuildWheel(root, "WheelRR", new Vector3( th, 0f, -wh),
-                isSteer: false, isMotor: true,
-                spec.TireRadius, spec.RearTireWidth, spec.HubRadius, spec.RearHubWidth,
-                spec, tireMat, hubMat, carLayer);
+            BuildWheel(root, "WheelFL", new Vector3(-th, 0f,  wh), isSteer: true,  isMotor: frontIsMotor,
+                spec.TireRadius, spec.FrontTireWidth, spec.HubRadius, spec.FrontHubWidth, spec, tireMat, hubMat, carLayer);
+            BuildWheel(root, "WheelFR", new Vector3( th, 0f,  wh), isSteer: true,  isMotor: frontIsMotor,
+                spec.TireRadius, spec.FrontTireWidth, spec.HubRadius, spec.FrontHubWidth, spec, tireMat, hubMat, carLayer);
+            BuildWheel(root, "WheelRL", new Vector3(-th, 0f, -wh), isSteer: false, isMotor: true,
+                spec.TireRadius, spec.RearTireWidth,  spec.HubRadius, spec.RearHubWidth,  spec, tireMat, hubMat, carLayer);
+            BuildWheel(root, "WheelRR", new Vector3( th, 0f, -wh), isSteer: false, isMotor: true,
+                spec.TireRadius, spec.RearTireWidth,  spec.HubRadius, spec.RearHubWidth,  spec, tireMat, hubMat, carLayer);
 
             var airGO = new GameObject("AirPhysics"); airGO.transform.SetParent(root.transform, false);
             airGO.AddComponent<R8EOX.Vehicle.Internal.RCAirPhysics>();
@@ -171,18 +164,12 @@ namespace R8EOX.Editor.Builders
         static void AddBodyMeshes(GameObject root, Material darkGrey, Material medGrey,
                                    Material bodySemi, Material bodyWing)
         {
-            AddBoxMesh(root, "ChassisPlate",    new Vector3(0.13f, 0.008f, 0.34f),
-                new Vector3(0f, -0.058f,  0f),    darkGrey);
-            AddBoxMesh(root, "FrontBumperMesh", new Vector3(0.12f, 0.03f,  0.025f),
-                new Vector3(0f, -0.038f,  0.195f), darkGrey);
-            AddBoxMesh(root, "RearBumperMesh",  new Vector3(0.10f,  0.04f,  0.04f),
-                new Vector3(0f, -0.038f, -0.18f), darkGrey);
-            AddBoxMesh(root, "FrontShockTower", new Vector3(0.10f,  0.06f,  0.005f),
-                new Vector3(0f, -0.018f,  0.12f), medGrey);
-            AddBoxMesh(root, "RearShockTower",  new Vector3(0.08f, 0.06f,  0.005f),
-                new Vector3(0f, -0.018f, -0.12f), medGrey);
-            AddBoxMesh(root, "BodyShell",       new Vector3(0.12f, 0.04f,  0.28f),
-                new Vector3(0f, -0.0125f,   0.02f), bodySemi);
+            AddBoxMesh(root, "ChassisPlate",    new Vector3(0.13f, 0.008f, 0.34f),  new Vector3(0f, -0.058f,   0f),    darkGrey);
+            AddBoxMesh(root, "FrontBumperMesh", new Vector3(0.12f, 0.03f,  0.025f), new Vector3(0f, -0.038f,  0.195f), darkGrey);
+            AddBoxMesh(root, "RearBumperMesh",  new Vector3(0.10f, 0.04f,  0.04f),  new Vector3(0f, -0.038f, -0.18f),  darkGrey);
+            AddBoxMesh(root, "FrontShockTower", new Vector3(0.10f, 0.06f,  0.005f), new Vector3(0f, -0.018f,  0.12f),  medGrey);
+            AddBoxMesh(root, "RearShockTower",  new Vector3(0.08f, 0.06f,  0.005f), new Vector3(0f, -0.018f, -0.12f),  medGrey);
+            AddBoxMesh(root, "BodyShell",       new Vector3(0.12f, 0.04f,  0.28f),  new Vector3(0f, -0.0125f,  0.02f), bodySemi);
             AddBoxMesh(root, "RearWing",
                 new Vector3(0.12f, 0.002f, 0.04f), new Vector3(0f, 0.042f, -0.15f), bodyWing)
                 .transform.localRotation = Quaternion.Euler(22.5f, 0f, 0f);
@@ -239,6 +226,18 @@ namespace R8EOX.Editor.Builders
 
         static void AddBoxCollider(GameObject parent, Vector3 size, Vector3 center)
         { var col = parent.AddComponent<BoxCollider>(); col.size = size; col.center = center; }
+
+        // Beveled skid plates — angled box colliders forming a V-shaped keel under the chassis.
+        // Deflects terrain seam edges instead of catching on them (legacy anti-snag fix).
+        static void AddSkidPlates(GameObject root, int layer)
+        {
+            var size = new Vector3(0.03f, 0.01f, 0.35f);
+            MakeSkidPlate(root, "SkidPlateL", new Vector3(-0.045f, -0.055f, 0f),  25f, size, layer);
+            MakeSkidPlate(root, "SkidPlateR", new Vector3( 0.045f, -0.055f, 0f), -25f, size, layer);
+        }
+
+        static void MakeSkidPlate(GameObject root, string name, Vector3 pos, float rotZ, Vector3 size, int layer)
+        { var go = new GameObject(name); go.transform.SetParent(root.transform, false); go.transform.localPosition = pos; go.transform.localRotation = Quaternion.Euler(0f, 0f, rotZ); go.layer = layer; go.AddComponent<BoxCollider>().size = size; }
 
         static GameObject AddBoxMesh(GameObject parent, string name,
             Vector3 size, Vector3 localPos, Material mat)
