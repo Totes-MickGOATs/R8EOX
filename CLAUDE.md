@@ -31,7 +31,10 @@ This project includes the `com.coplaydev.unity-mcp` package. Use the UnityMCP to
 - `com.coplaydev.unity-mcp` — MCP for Unity integration
 
 ### Scenes
-- None yet — create scenes as needed in `Assets/Scenes/`
+- **Boot.unity** (build index 0) — App entry point. Creates persistent `[AppRoot]` with `AppManager`, loads MainMenu
+- **MainMenu.unity** (build index 1) — All menu screens on one Canvas. `MenuManager` drives navigation
+- **OutpostTrack.unity** / **PhysicsTestTrack.unity** — Track scenes loaded async via `AppManager.LoadTrack()`
+- Editor-play still works: open any track scene, press Play — `SessionBootstrapper` creates a default Practice session
 
 ## Conventions
 
