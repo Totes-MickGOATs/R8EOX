@@ -193,7 +193,7 @@ namespace R8EOX.UI.Internal
             if (_sampleCount >= NeutralFrames)
             {
                 for (int i = 0; i < AxisCount; i++) _neutralAccum[i] /= NeutralFrames;
-                EnterState(WizardState.MoveExtremes);
+                EnterState(StateMoveExtremes);
             }
         }
 
@@ -210,7 +210,7 @@ namespace R8EOX.UI.Internal
             }
             _extremesTimer -= Time.unscaledDeltaTime;
             _progressText.text = $"Time: {Mathf.CeilToInt(Mathf.Max(0f, _extremesTimer))}s";
-            if (_extremesTimer <= 0f) EnterState(WizardState.Results);
+            if (_extremesTimer <= 0f) EnterState(StateResults);
         }
 
         // ── Callbacks ─────────────────────────────────────────────────────
