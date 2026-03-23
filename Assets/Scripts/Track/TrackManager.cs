@@ -176,5 +176,10 @@ namespace R8EOX.Track
         {
             return centerline != null && centerline.IsValid;
         }
+
+        public TrackType GetTrackType()
+        {
+            return config != null ? config.TrackType : TrackType.Circuit;
+        }
     }
 }

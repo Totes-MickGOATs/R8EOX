@@ -5,10 +5,6 @@ using R8EOX.Track;
 
 namespace R8EOX.Session
 {
-    /// <summary>
-    /// Top-level session orchestrator. Manages lifecycle from begin
-    /// through vehicle selection, spawning, wiring, and teardown.
-    /// </summary>
     public class SessionManager : MonoBehaviour
     {
         [Header("Channel")]
@@ -31,17 +27,13 @@ namespace R8EOX.Session
         private Vector3 swapPosition;
         private Quaternion swapRotation;
         private bool isSwapping;
+        private SetupErrorOverlay errorOverlay;
 
-        /// <summary>True when vehicles are spawned and systems wired.</summary>
         public bool IsReady => state.CurrentPhase == SessionPhase.Ready;
-        /// <summary>True when session is active (not Idle).</summary>
         public bool IsActive => state.CurrentPhase != SessionPhase.Idle;
-        /// <summary>Player vehicle spawned this session.</summary>
         public GameObject PlayerVehicle => vehicleSpawner.PlayerVehicle;
-        /// <summary>Effective mode after track-readiness degradation.</summary>
         public SessionMode EffectiveMode => effectiveMode;
 
-        /// <summary>Provide scene-resident manager references.</summary>
         public void OnSceneReady(
             TrackManager track, Race.RaceManager race,
             Camera.CameraManager cam, UI.UIManager ui = null,
@@ -58,7 +50,6 @@ namespace R8EOX.Session
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
         }
 
-        /// <summary>Begin a new play session with the given config.</summary>
         public void BeginSession(SessionConfig config)
         {
             if (config == null)
@@ -72,11 +63,11 @@ namespace R8EOX.Session
             if (trackManager != null) EnterVehicleSelectOrSpawn();
         }
 
-        /// <summary>End the current session and clean up.</summary>
         public void EndSession()
         {
             if (state.CurrentPhase == SessionPhase.Idle) return;
             state.BeginTeardown();
+            if (errorOverlay != null) { Destroy(errorOverlay); errorOverlay = null; }
             CleanupOverlay();
             isSwapping = false;
             if (aiManager != null) aiManager.RemoveAllDrivers();
@@ -89,7 +80,6 @@ namespace R8EOX.Session
             state.Reset();
         }
 
-        /// <summary>Swap vehicle mid-session (called by UIManager).</summary>
         public void RequestVehicleSwap()
         {
             if (state.CurrentPhase != SessionPhase.Ready) return;
@@ -193,13 +183,19 @@ namespace R8EOX.Session
         private void SetupSession()
         {
             if (activeConfig == null || trackManager == null) return;
+            CreateErrorOverlay();
             InitializeTrack();
             if (raceManager != null) raceManager.Initialize(trackManager);
             if (aiManager != null) aiManager.Initialize(trackManager);
             ValidateAndDegradeMode();
+            SetupValidator.Validate(errorOverlay, trackManager,
+                cameraManager, raceManager, uiManager,
+                audioManager, vfxManager, aiManager, effectiveMode);
             if (activeConfig.VehiclePrefab == null)
             {
-                Debug.LogError("[SessionManager] No vehicle prefab in SessionConfig!");
+                errorOverlay.AddError("Vehicle",
+                    "No vehicle prefab in SessionConfig",
+                    "Assign a vehicle prefab to SessionConfig or VehicleDefinition");
                 return;
             }
             SpawnPlayer();
@@ -208,9 +204,14 @@ namespace R8EOX.Session
             WirePlayerVehicle();
             StartRaceIfApplicable();
             state.MarkReady();
-            Debug.Log(
-                $"[SessionManager] Session ready: mode={effectiveMode}, "
-                + $"vehicles={vehicleSpawner.SpawnedCount}");
+            Debug.Log($"[SessionManager] Session ready: mode={effectiveMode}, vehicles={vehicleSpawner.SpawnedCount}");
+        }
+
+        private void CreateErrorOverlay()
+        {
+            errorOverlay = gameObject.GetComponent<SetupErrorOverlay>();
+            if (errorOverlay == null)
+                errorOverlay = gameObject.AddComponent<SetupErrorOverlay>();
         }
 
         private void InitializeTrack() => trackManager.Initialize(null);
@@ -218,7 +219,7 @@ namespace R8EOX.Session
         private void ValidateAndDegradeMode()
         {
             var readiness = TrackValidator.Validate(trackManager);
-            var trackType = TrackType.Circuit; // TODO: read from TrackManager
+            var trackType = trackManager.GetTrackType();
             effectiveMode = TrackValidator.DegradeMode(
                 activeConfig.SessionMode, readiness, trackType);
             if (effectiveMode != activeConfig.SessionMode)
@@ -237,7 +238,7 @@ namespace R8EOX.Session
                 Debug.LogWarning("[SessionManager] No spawn points! Spawning at origin.");
                 playerSpawn = new SpawnPointData
                 {
-                    Index = 0, Position = Vector3.zero,
+                    Index = 0, Position = Vector3.up * 5f,
                     Rotation = Quaternion.identity, IsPlayerSpawn = true
                 };
             }
