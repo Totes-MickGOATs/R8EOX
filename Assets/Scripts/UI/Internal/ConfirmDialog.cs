@@ -149,7 +149,7 @@ namespace R8EOX.UI.Internal
             tmp.fontSize = 16f;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.enableWordWrapping = true;
+            tmp.textWrappingMode = TMPro.TextWrappingModes.Normal;
 
             var rt = go.GetComponent<RectTransform>();
             rt.anchorMin = new Vector2(0f, 0.5f);
