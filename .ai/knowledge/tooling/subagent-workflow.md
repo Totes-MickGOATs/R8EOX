@@ -2,24 +2,34 @@
 
 Every subagent must follow this process. The orchestrator injects this into your prompt.
 
-## CRITICAL: You MUST Commit Your Work
+## ⛔ RULE #1: COMMIT EVERY FILE IMMEDIATELY — YOU ARE BLOCKED UNTIL YOU DO
 
-**Every subagent MUST git commit before finishing. No exceptions.** Uncommitted work is invisible to other agents and the orchestrator — it WILL be lost or cause conflicts.
+> **This is the most important rule in the entire project. It overrides everything else.**
+
+**You MUST `git commit` IMMEDIATELY after writing or modifying EACH file.** You are **BLOCKED from starting work on the next file** until the commit for the current file succeeds. No batching. No deferring. No exceptions.
+
+### The Workflow (repeat for EVERY file you touch)
 
 ```bash
-# Stage ONLY your files — list every file explicitly by path
-git add path/to/File1.cs path/to/File2.cs path/to/CLAUDE.md
+# 1. Write or modify ONE file
+# 2. Stage ONLY that file by exact path
+git add path/to/ExactFile.cs
 
-# NEVER use these — they stage OTHER agents' uncommitted work:
-# git add -A    ← BANNED
-# git add .     ← BANNED
-# git add --all ← BANNED
+# 3. Commit it NOW
+git commit -m "feat: description of this specific file change"
 
-# Commit (pre-commit hook validates linting)
-git commit -m "feat: {what you did}"
+# 4. STOP — verify commit succeeded
+# 5. Only NOW may you proceed to the next file
 ```
 
-If the commit fails, **report the error** — do not silently skip.
+### BANNED — Violations Will Cause Lost Work
+
+- `git add -A` / `git add .` / `git add --all` — **BANNED** (stages other agents' work)
+- Batching multiple files into one commit — **BANNED**
+- Deferring commits to "after all work is done" — **BANNED**
+- Silently skipping a failed commit — **BANNED** (report the error)
+- `--no-verify` — **BANNED** (pre-commit hook must validate)
+- Proceeding to the next file before the current commit succeeds — **BANNED**
 
 ---
 
@@ -39,11 +49,14 @@ If the commit fails, **report the error** — do not silently skip.
 - [ ] No banned patterns: `SendMessage`, `FindObjectOfType`, `.Instance`, legacy `Input.GetKey/GetAxis`
 - [ ] After creating/modifying C# files, check `read_console` for compilation errors
 
-## After All Work Is Done
+## After All Files Are Written and Committed
+
+By this point, you should have already committed each file individually as you created/modified it. If somehow you have uncommitted files, commit them NOW one at a time before proceeding.
 
 ### 1. Update Documentation
 - [ ] If you created files in a folder with a CLAUDE.md, update its Contents section
-- [ ] If you created files in a folder WITHOUT a CLAUDE.md, create one:
+- [ ] **COMMIT the CLAUDE.md update immediately**: `git add path/to/CLAUDE.md && git commit -m "docs: update CLAUDE.md"`
+- [ ] If you created files in a folder WITHOUT a CLAUDE.md, create one and **commit it immediately**:
   ```markdown
   # {Folder Name}
 
@@ -56,17 +69,15 @@ If the commit fails, **report the error** — do not silently skip.
   ## Contents
   - `File.cs` — {What it does}
   ```
-- [ ] If you created a NEW directory, it needs a CLAUDE.md
+- [ ] If you created a NEW directory, it needs a CLAUDE.md — **commit it immediately**
 
-### 2. Commit Your Work (MANDATORY)
-- [ ] Stage ONLY the files you created or modified — list them explicitly by path: `git add path/to/File1.cs path/to/File2.cs`
-- [ ] **NEVER** use `git add -A`, `git add .`, or `git add --all` — this will stage other agents' uncommitted work and cause conflicts
-- [ ] Commit with a descriptive message: `git commit -m "feat: {what you did}"`
-- [ ] If the commit fails, report the error — do not silently skip
-- [ ] **DO NOT FINISH without committing** — this is the most important step
+### 2. Verify All Commits Happened
+- [ ] Run `git status` — there should be NO uncommitted changes from your work
+- [ ] If anything is uncommitted, commit it NOW (one file at a time)
+- [ ] Run `git log --oneline -5` to verify your commit history
 
 ### 3. Report Results
 - [ ] List every file you created or modified (full paths)
-- [ ] Confirm your commit hash (run `git log --oneline -1`)
+- [ ] List every commit hash (run `git log --oneline -N` where N = number of files you touched)
 - [ ] Note any compilation errors from read_console
 - [ ] Flag anything that needs follow-up by another agent or the orchestrator
