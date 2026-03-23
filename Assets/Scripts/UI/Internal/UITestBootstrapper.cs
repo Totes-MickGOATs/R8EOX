@@ -6,6 +6,7 @@ namespace R8EOX.UI.Internal
     internal class UITestBootstrapper : MonoBehaviour
     {
         [SerializeField] private VehicleRegistry registry;
+        [SerializeField] private OverlayRegistry overlayRegistry;
 
         private VehicleSelectOverlay activeOverlay;
 
@@ -17,13 +18,14 @@ namespace R8EOX.UI.Internal
                 return;
             }
 
-            if (registry.OverlayPrefab == null)
+            if (overlayRegistry == null
+                || overlayRegistry.VehicleSelectOverlayPrefab == null)
             {
-                Debug.LogError("[UITestBootstrapper] OverlayPrefab not set on registry.");
+                Debug.LogError("[UITestBootstrapper] OverlayRegistry or prefab not set.");
                 return;
             }
 
-            var go = Instantiate(registry.OverlayPrefab);
+            var go = Instantiate(overlayRegistry.VehicleSelectOverlayPrefab);
             activeOverlay = go.GetComponent<VehicleSelectOverlay>();
             if (activeOverlay == null)
             {
