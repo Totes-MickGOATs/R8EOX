@@ -128,7 +128,11 @@ namespace R8EOX.Session.Internal
             foreach (var vehicle in spawnedVehicles)
             {
                 if (vehicle != null)
+                {
+                    var rb = vehicle.GetComponent<Rigidbody>();
+                    if (rb != null) rb.isKinematic = true;
                     Object.Destroy(vehicle);
+                }
             }
 
             spawnedVehicles.Clear();
