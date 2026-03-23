@@ -20,6 +20,7 @@ with `internal` access modifiers — never exposed outside the Menu system.
 | `MenuScreen.cs` | `internal abstract class : MonoBehaviour` | Base class for all menu screens — owns CanvasGroup fade in/out, Show/Hide/ShowImmediate/HideImmediate lifecycle |
 | `ModeSelectScreen.cs` | `internal class : MenuScreen` | Mode selection screen — Testing Session (Practice), Race (locked), Multiplayer (locked); initialized with mode and back callbacks |
 | `TrackSelectScreen.cs` | `internal class : MenuScreen` | Track selection screen — coordinates TrackListPanel (left) and TrackPreviewPanel (right) with START/BACK buttons; initialized with TrackRegistry, SessionMode, and confirm/back callbacks |
+| `TrackLoadingScreen.cs` | `internal class : MenuScreen` | Loading screen displayed during async track scene load — progress bar (fillAmount), percentage label, and rotating racing tips every 4 s |
 
 ## Usage Pattern
 
