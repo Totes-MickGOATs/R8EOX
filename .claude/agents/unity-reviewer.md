@@ -63,8 +63,10 @@ If the code looks clean, say so briefly.
 ## Subagent Workflow
 Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
 - After reviewing, verify folder CLAUDE.md files are up to date
+- If you update ANY file (e.g., CLAUDE.md), **commit it IMMEDIATELY** before proceeding
+- You are BLOCKED from starting the next file until the current commit succeeds
 - Flag missing or stale documentation in your review output
-- Report all files reviewed and issues found
+- Report all files reviewed, any commits made, and issues found
 
 ## Pre-loaded Context
 If the orchestrator has included project conventions and reference docs in your prompt,
