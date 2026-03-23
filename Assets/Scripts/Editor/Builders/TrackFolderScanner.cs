@@ -72,26 +72,41 @@ namespace R8EOX.Editor.Builders
         static T FindScriptableObject<T>(string folder) where T : ScriptableObject
         {
             string typeName = typeof(T).Name;
+            Debug.Log($"[Scanner] FindScriptableObject<{typeName}> in '{folder}'");
+
+            // Attempt 1: type filter
             string[] guids = AssetDatabase.FindAssets(
                 $"t:{typeName}", new[] { folder });
+            Debug.Log($"[Scanner]   t:{typeName} → {guids.Length} result(s)");
             if (guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                return AssetDatabase.LoadAssetAtPath<T>(path);
-            }
-
-            // Fallback: FindAssets with t: filter can miss custom SOs after
-            // domain reload. Search by filename pattern without type filter.
-            string[] nameGuids = AssetDatabase.FindAssets(
-                typeName, new[] { folder });
-            foreach (string guid in nameGuids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                if (!path.EndsWith(".asset")) continue;
                 var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                Debug.Log($"[Scanner]   LoadAssetAtPath<{typeName}>('{path}') → {(asset != null ? "OK" : "NULL")}");
                 if (asset != null) return asset;
             }
 
+            // Attempt 2: name search without type filter
+            string[] nameGuids = AssetDatabase.FindAssets(
+                typeName, new[] { folder });
+            Debug.Log($"[Scanner]   name search '{typeName}' → {nameGuids.Length} result(s)");
+            foreach (string guid in nameGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Debug.Log($"[Scanner]     candidate: '{path}'");
+                if (!path.EndsWith(".asset")) continue;
+                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                Debug.Log($"[Scanner]     LoadAssetAtPath<{typeName}>('{path}') → {(asset != null ? "OK" : "NULL")}");
+                if (asset != null) return asset;
+            }
+
+            // Attempt 3: direct path convention
+            string directPath = $"{folder}/{typeName}.asset";
+            var direct = AssetDatabase.LoadAssetAtPath<T>(directPath);
+            Debug.Log($"[Scanner]   direct path '{directPath}' → {(direct != null ? "OK" : "NULL")}");
+            if (direct != null) return direct;
+
+            Debug.LogWarning($"[Scanner] {typeName} NOT FOUND in '{folder}' after all attempts");
             return null;
         }
 
