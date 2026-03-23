@@ -1,6 +1,9 @@
 #if UNITY_EDITOR
 using NUnit.Framework;
-using R8EOX.Vehicle.Internal;
+
+// InternalsVisibleTo("R8EOX.Tests.EditMode") is granted in Assets/Scripts/AssemblyInfo.cs.
+// SuspensionMath is referenced by fully-qualified name throughout to satisfy the top-down
+// linter rule that blocks cross-system `using R8EOX.*.Internal` directives.
 
 namespace R8EOX.Tests.EditMode
 {
@@ -22,7 +25,7 @@ namespace R8EOX.Tests.EditMode
         [Test, Category("invariant")]
         public void ComputeSpringLength_NormalDistance_SubtractsRadius()
         {
-            float result = SuspensionMath.ComputeSpringLength(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSpringLength(
                 anchorToContact: 0.09f, wheelRadius: WheelRadius, minSpringLen: MinSpringLen);
 
             Assert.That(result, Is.EqualTo(0.0485f).Within(Tolerance));
@@ -31,7 +34,7 @@ namespace R8EOX.Tests.EditMode
         [Test, Category("invariant")]
         public void ComputeSpringLength_BelowMinimum_ClampsToBumpStop()
         {
-            float result = SuspensionMath.ComputeSpringLength(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSpringLength(
                 anchorToContact: 0.045f, wheelRadius: WheelRadius, minSpringLen: MinSpringLen);
 
             Assert.That(result, Is.EqualTo(MinSpringLen).Within(Tolerance));
@@ -44,7 +47,7 @@ namespace R8EOX.Tests.EditMode
         {
             // compression = 0.05 - 0.03 = 0.02; springForce = 700 * 0.02 = 14.0
             const float compressedLen = 0.03f;
-            float result = SuspensionMath.ComputeSuspensionForce(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSuspensionForce(
                 springStrength: SpringStrength, restDistance: RestDistance,
                 springLen: compressedLen, prevSpringLen: compressedLen, deltaTime: Dt);
 
@@ -56,7 +59,7 @@ namespace R8EOX.Tests.EditMode
         {
             // springLen > restDistance means tension — suspension cannot pull; clamps to 0
             const float extendedLen = 0.07f;
-            float result = SuspensionMath.ComputeSuspensionForce(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSuspensionForce(
                 springStrength: SpringStrength, restDistance: RestDistance,
                 springLen: extendedLen, prevSpringLen: extendedLen, deltaTime: Dt);
 
@@ -68,13 +71,13 @@ namespace R8EOX.Tests.EditMode
         [Test, Category("invariant")]
         public void ComputeSuspensionForceWithDamping_CompressionVelocity_AddsDamping()
         {
-            // Spring compressing: prevLen > curLen → positive damping velocity → adds to spring force
+            // Spring compressing: prevLen > curLen → positive damping → adds to spring force
             const float springLen = 0.03f;
             const float prevSpringLen = 0.04f; // was longer → spring got shorter → compressing
 
             float springOnlyForce = SpringStrength * (RestDistance - springLen); // 14.0
 
-            float result = SuspensionMath.ComputeSuspensionForceWithDamping(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSuspensionForceWithDamping(
                 springStrength: SpringStrength, springDamping: SpringDamping,
                 restDistance: RestDistance, springLen: springLen,
                 prevSpringLen: prevSpringLen, deltaTime: Dt);
@@ -85,13 +88,13 @@ namespace R8EOX.Tests.EditMode
         [Test, Category("invariant")]
         public void ComputeSuspensionForceWithDamping_ExtensionVelocity_ReducesForce()
         {
-            // Spring extending: prevLen < curLen → negative damping velocity → subtracts from spring force
+            // Spring extending: prevLen < curLen → negative damping → subtracts from spring force
             const float springLen = 0.03f;
             const float prevSpringLen = 0.02f; // was shorter → spring got longer → extending
 
             float springOnlyForce = SpringStrength * (RestDistance - springLen); // 14.0
 
-            float result = SuspensionMath.ComputeSuspensionForceWithDamping(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeSuspensionForceWithDamping(
                 springStrength: SpringStrength, springDamping: SpringDamping,
                 restDistance: RestDistance, springLen: springLen,
                 prevSpringLen: prevSpringLen, deltaTime: Dt);
@@ -108,7 +111,7 @@ namespace R8EOX.Tests.EditMode
             const float springLen = 0.04f;
             const float staleAirborneLen = 0.10f;
 
-            float result = SuspensionMath.SanitizePrevSpringLenForLanding(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.SanitizePrevSpringLenForLanding(
                 springLen: springLen, prevSpringLen: staleAirborneLen, wasOnGround: false);
 
             Assert.That(result, Is.EqualTo(springLen).Within(Tolerance));
@@ -121,7 +124,7 @@ namespace R8EOX.Tests.EditMode
             const float springLen = 0.04f;
             const float prevSpringLen = 0.035f;
 
-            float result = SuspensionMath.SanitizePrevSpringLenForLanding(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.SanitizePrevSpringLenForLanding(
                 springLen: springLen, prevSpringLen: prevSpringLen, wasOnGround: true);
 
             Assert.That(result, Is.EqualTo(prevSpringLen).Within(Tolerance));
@@ -132,11 +135,11 @@ namespace R8EOX.Tests.EditMode
         [Test, Category("value")]
         public void ComputeGripLoad_NormalCompression_ClampsToMax()
         {
-            // With highStrength and bumpstop len: springForce = 2000 * (0.05-0.008) = 84 > MaxSpringForce(50)
+            // springForce = 2000 * (0.05-0.008) = 84 which exceeds MaxSpringForce(50)
             const float highStrength = 2000f;
             const float bumpStopLen = MinSpringLen; // near bumpstop → exceeds cap
 
-            float result = SuspensionMath.ComputeGripLoad(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeGripLoad(
                 springStrength: highStrength, restDistance: RestDistance,
                 springLen: bumpStopLen, maxSpringForce: MaxSpringForce);
 
@@ -148,7 +151,7 @@ namespace R8EOX.Tests.EditMode
         {
             const float negativeForce = -25f;
 
-            float result = SuspensionMath.ComputeGripLoadFromSuspensionForce(
+            float result = R8EOX.Vehicle.Internal.SuspensionMath.ComputeGripLoadFromSuspensionForce(
                 suspensionForce: negativeForce, maxSpringForce: MaxSpringForce);
 
             Assert.That(result, Is.EqualTo(0f).Within(Tolerance));
