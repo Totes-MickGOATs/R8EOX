@@ -121,6 +121,7 @@ namespace R8EOX.Editor.Builders
             vmSO.FindProperty("_gripCoeff").floatValue              = spec.GripCoeff;
             vmSO.FindProperty("_steeringMax").floatValue            = spec.SteeringMax;
             vmSO.FindProperty("_comGround").vector3Value            = spec.CenterOfMass;
+            vmSO.FindProperty("_gearRatio").floatValue              = spec.GearRatio;
             vmSO.ApplyModifiedProperties();
         }
 
