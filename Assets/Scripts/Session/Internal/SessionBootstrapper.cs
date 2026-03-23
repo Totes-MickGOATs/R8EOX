@@ -101,15 +101,15 @@ namespace R8EOX.Session.Internal
             sessionManager.OnSceneReady(
                 trackManager, raceManager, cameraManager, uiManager,
                 audioManager, vfxManager, aiManager);
+            sessionManager.SetSessionChannel(sessionChannel);
 
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
-            bool useOverlay = registry != null && registry.Count > 0;
+            bool useOverlay = registry != null && registry.Count > 0
+                && registry.OverlayPrefab != null;
 
             var config = useOverlay
-                ? SessionConfig.CreateRuntime(
-                    SessionMode.Practice,
-                    registry.GetDefault().VehiclePrefab)
+                ? SessionConfig.CreateRuntime(SessionMode.Practice, null)
                 : CreateDefaultConfig();
 
             sessionManager.BeginSession(config);
