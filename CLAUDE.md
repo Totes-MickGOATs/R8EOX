@@ -113,6 +113,10 @@ Assets/
 - **Input System**: This project uses `com.unity.inputsystem` (1.19.0). The legacy Input Manager is NOT active
 - **Camera.main**: Calls `FindGameObjectWithTag` internally — cache the result, never use in Update loops
 - **Test Runner**: Use `mcp__UnityMCP__run_tests` or Window > General > Test Runner. Tests use NUnit (`com.unity.test-framework`)
+- **PhysicsMaterial assets**: Use `.asset` extension, NOT `.physicsMaterial` — Unity 6 warns on `CreateAsset()` with the old extension
+- **Test files and top-down lint**: `Assets/Tests/` is exempt from the cross-system `using R8EOX.X.Internal` lint rule. If tests still fail the hook, use fully-qualified type names instead of `using` directives
+- **Friction circle**: `WheelForceSolver` applies `FrictionCircleMath` after computing lateral/longitudinal forces. Throttle reduces cornering grip naturally — no special 2WD/4WD code needed. Don't add drive-type-specific handling; it emerges from the friction ellipse.
+- **Air physics scales**: `WheelInertiaConfig` defaults are tuned for 1/10th RC scale (MoI=0.006, GyroScale=1.5, ReactionScale=30). Don't revert to the old 80x/2500x values — those caused floaty air behavior.
 
 ## Orchestration
 
