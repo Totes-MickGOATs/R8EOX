@@ -17,3 +17,5 @@ Internal implementation classes for the Session system. Only `SessionManager` sh
 - `TrackValidator.cs` — Validates track components against mode requirements (TODO)
 - `VehicleReadiness.cs` — Struct: flags for rigidbody, input, wheels, drivetrain, colliders, attachment points; readiness tiers (IsPlayable, IsRaceReady, IsFullyEquipped); missing-component report
 - `VehicleValidator.cs` — Static: inspects a vehicle GameObject for required components/transforms; populates VehicleReadiness; logs per-tier warnings/errors
+- `SetupErrorOverlay.cs` — IMGUI overlay: shows validation errors (red) and warnings (yellow) at runtime; auto-destroys after 30s if warnings-only; no Canvas/UIManager dependency
+- `SetupValidator.cs` — Static: validates all scene manager refs (camera=error, race/ui/audio/vfx/ai=warning); called by SessionManager during SetupSession
