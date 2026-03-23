@@ -24,6 +24,7 @@ namespace R8EOX.Menu
 
         private MenuNavigator navigator;
         private R8EOX.App.AppManager appManager;
+        private R8EOX.Settings.SettingsManager settingsManager;
         private SessionMode selectedMode;
         private GameObject optionsOverlayInstance;
 
@@ -37,6 +38,7 @@ namespace R8EOX.Menu
         {
             var root = GameObject.Find("[AppRoot]");
             appManager = root?.GetComponent<R8EOX.App.AppManager>();
+            settingsManager = root?.GetComponent<R8EOX.Settings.SettingsManager>();
 
             if (appManager == null)
             {
@@ -123,8 +125,6 @@ namespace R8EOX.Menu
 
         private void OnOptionsPressed()
         {
-            var appRoot = GameObject.Find("[AppRoot]");
-            var settingsManager = appRoot?.GetComponent<R8EOX.Settings.SettingsManager>();
             if (settingsManager == null)
             {
                 Debug.LogWarning("[MenuManager] No SettingsManager found on [AppRoot].");
