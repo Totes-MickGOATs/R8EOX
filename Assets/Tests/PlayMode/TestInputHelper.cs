@@ -8,7 +8,7 @@ namespace R8EOX.Tests.PlayMode
     /// Vehicle tests: use ScriptedInput (same path AI uses, bypasses Input System).
     /// Menu tests: use InputTestFixture + device simulation.
     /// </summary>
-    public static class TestInputHelper
+    internal static class TestInputHelper
     {
         /// <summary>
         /// Swaps the vehicle's input component from RCInput to ScriptedInput.
