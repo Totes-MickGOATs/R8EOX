@@ -121,6 +121,7 @@ Assets/
 - **FindObjectsByType (Unity 6)**: `FindObjectsByType<T>(FindObjectsSortMode.None)` is deprecated in Unity 6. Use `FindObjectsByType<T>(FindObjectsInactive.Exclude)` instead — no sort mode parameter
 - **EnvironmentBuilder auto-creates sun**: `SetupDirectionalLight` creates a Directional Light if none exists in the scene (rotation 50/-30/0). It also searches all `Light` components as a fallback before creating, so renamed lights are found too
 - **TrackFolderData optionals**: `EnvironmentSettingsAsset`, `TrackConfigAsset`, and `SkyboxHdrPath` can all be null. Downstream builder calls must null-guard these — `PostProcessBuilder` does not handle a null settings parameter
+- **Builders own their scenes**: Every builder (`BootSceneBuilder`, `MenuSceneBuilder`, `TrackBuilder`, `PhysicsTestTrackBuilder`) calls `EditorSceneManager.NewScene(EmptyScene)` at the start and `SaveScene()` at the end. They never modify the previously-active scene. If a new builder is added, it must follow this pattern — otherwise "Build All" will pollute whatever scene is open
 
 ## Orchestration
 
