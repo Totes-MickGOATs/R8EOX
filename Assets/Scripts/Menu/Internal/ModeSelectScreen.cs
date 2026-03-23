@@ -78,10 +78,14 @@ namespace R8EOX.Menu.Internal
 
         private void OnDestroy()
         {
-            testingButton.onClick.RemoveListener(HandleTesting);
-            raceButton.onClick.RemoveListener(HandleRace);
-            multiplayerButton.onClick.RemoveListener(HandleMultiplayer);
-            backButton.onClick.RemoveListener(HandleBack);
+            if (testingButton != null)
+                testingButton.onClick.RemoveListener(HandleTesting);
+            if (raceButton != null)
+                raceButton.onClick.RemoveListener(HandleRace);
+            if (multiplayerButton != null)
+                multiplayerButton.onClick.RemoveListener(HandleMultiplayer);
+            if (backButton != null)
+                backButton.onClick.RemoveListener(HandleBack);
         }
     }
 }
