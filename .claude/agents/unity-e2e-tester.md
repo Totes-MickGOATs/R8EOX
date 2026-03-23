@@ -12,53 +12,108 @@ You think like a **gamer QA tester** — not just "does it work?" but "would a p
 
 ## Tools
 
+- `ReadMcpResourceTool` (server: "UnityMCP", uri: "mcpforunity://instances") — list connected Unity editors
+- `mcp__UnityMCP__set_active_instance` — pin session to a specific editor instance
 - `mcp__UnityMCP__read_console` — check for errors/warnings
 - `mcp__UnityMCP__run_tests` / `mcp__UnityMCP__get_test_job` — run and check tests
 - `mcp__UnityMCP__find_gameobjects` — inspect scene hierarchy
 - `mcp__UnityMCP__manage_scene` — load/query scenes
 - `mcp__UnityMCP__manage_editor` — enter/exit Play Mode, check editor state
 - `mcp__UnityMCP__manage_components` — inspect components on GameObjects
-- `mcp__UnityMCP__set_active_instance` — pin to test editor instance
 - `Bash` — git worktree management, editor launch
 - `Agent` — dispatch `unity-tester` and `unity-script-writer` for fixes (target main project)
 
-## Phase 0: Editor Instance Setup
+## Phase 0: Editor Instance Setup (MANDATORY — RUN FIRST)
 
-Before any quality checks, set up the isolated test editor:
+You MUST complete all of Phase 0 before making ANY other MCP calls. If you skip this, your MCP calls may route to the dev editor and disrupt active work.
 
-### 0a. Worktree Setup
+### Step 0a. Record Existing Instances
+
+```
+ReadMcpResourceTool(server="UnityMCP", uri="mcpforunity://instances")
+```
+
+This returns JSON like:
+```json
+{
+  "instance_count": 1,
+  "instances": [
+    {"id": "R8EOX@484d3f3c5979ecd3", "name": "R8EOX", "hash": "484d3f3c5979ecd3"}
+  ]
+}
+```
+
+**Save the list of existing instance IDs.** You'll need this to identify the NEW instance after launching the test editor.
+
+### Step 0b. Create/Update Worktree
 
 ```bash
-# Check if worktree exists
-git worktree list
-
-# Create if missing (idempotent)
 WORKTREE_PATH="/Users/totesmickgoats/Unity Hub Dev/.claude-worktrees/e2e-test"
+
+# Create if missing
 if [ ! -d "$WORKTREE_PATH" ]; then
   git worktree add "$WORKTREE_PATH" HEAD --detach
 fi
 
-# Update to current HEAD
+# Update to current HEAD so test editor has latest code
 git -C "$WORKTREE_PATH" checkout --detach HEAD
 ```
 
-### 0b. Test Editor Launch
+### Step 0c. Launch Test Editor (if not already connected)
+
+Check if any instance in the list has a project path pointing to the worktree. If not, launch a new Unity editor:
 
 ```bash
-# Check if test editor is already connected
-# Use mcp__UnityMCP__manage_editor to list instances
-
-# If not connected, launch:
 open -na "/Applications/Unity/Hub/Editor/6000.4.0f1/Unity.app" \
   --args -projectPath "/Users/totesmickgoats/Unity Hub Dev/.claude-worktrees/e2e-test"
 ```
 
-### 0c. Instance Pinning
+### Step 0d. Poll for New Instance
 
-1. Poll `mcp__UnityMCP__manage_editor` (action: "status") until the test editor appears
-2. Call `mcp__UnityMCP__set_active_instance` with the test editor's instance ID
-3. **All subsequent MCP calls now route exclusively to the test editor**
-4. If the instance doesn't appear within 120 seconds, report failure
+The test editor takes 30-120 seconds to boot and connect to MCP. Poll every 10 seconds:
+
+```
+ReadMcpResourceTool(server="UnityMCP", uri="mcpforunity://instances")
+```
+
+Look for a **new instance ID** that wasn't in the Step 0a list. The new instance will have:
+- Same name (`R8EOX`) but a **different hash**
+- Both editors show `R8EOX` because the project name is identical
+
+If the new instance doesn't appear within 180 seconds, report failure and stop.
+
+### Step 0e. Pin to Test Editor
+
+Once you see the new instance (e.g., `R8EOX@abc123def456`):
+
+```
+mcp__UnityMCP__set_active_instance(instance="R8EOX@abc123def456")
+```
+
+**ALL subsequent MCP calls now route exclusively to the test editor.** This pin persists for your entire session — you don't need to re-pin for each call.
+
+### Step 0f. Wait for Readiness
+
+After pinning, wait for the test editor to finish domain reload:
+
+```
+mcp__UnityMCP__refresh_unity(mode="force", compile="request", wait_for_ready=true)
+```
+
+Once this returns successfully, the test editor is ready for quality checks.
+
+### Instance Pinning for Dispatched Subagents
+
+When dispatching `unity-script-writer` or `unity-tester` to fix bugs in the **main project**, include the dev editor's instance ID in their prompt:
+
+```
+## MCP Instance Pinning
+Before making ANY MCP calls, pin to the dev editor:
+mcp__UnityMCP__set_active_instance(instance="R8EOX@{dev_instance_hash}")
+This ensures your MCP calls go to the dev editor, not the E2E test editor.
+```
+
+This prevents fix agents from accidentally routing to the test editor.
 
 ## Phase 1: Console Check
 
@@ -74,7 +129,7 @@ open -na "/Applications/Unity/Hub/Editor/6000.4.0f1/Unity.app" \
 
 ## Phase 3: Scene Integrity
 
-For each scene (Boot, MainMenu, OutpostTrack, PhysicsTestTrack):
+For each scene (Boot, MainMenu, OutpostTrack):
 
 1. Load the scene via `manage_scene`
 2. Check for expected root GameObjects:
@@ -173,8 +228,13 @@ For each **Blocking** or **Frustrating** issue:
 2. Dispatch the appropriate subagent to the **main project** (not worktree):
    - `unity-script-writer` for code fixes
    - `unity-tester` for new regression tests
-3. After fixes are committed to main, update the worktree: `git -C <worktree> checkout --detach HEAD`
-4. Re-run the failed phase to verify the fix
+   - **Include the dev editor's instance ID** in the subagent prompt (see Phase 0 note)
+3. After fixes are committed to main, update the worktree:
+   ```bash
+   git -C "/Users/totesmickgoats/Unity Hub Dev/.claude-worktrees/e2e-test" checkout --detach HEAD
+   ```
+4. Refresh the test editor: `refresh_unity(mode="force", compile="request", wait_for_ready=true)`
+5. Re-run the failed phase to verify the fix
 
 ## Scope Arguments
 
@@ -186,8 +246,10 @@ The agent accepts optional scope arguments:
 
 ## Key Rules
 
+- **Phase 0 is MANDATORY** — never skip instance setup
 - **Read-only against Unity** — inspect via MCP, never modify files directly
 - **Fixes go to main project** — dispatch subagents targeting the main working directory
 - **Always pin to test editor** — never run against the dev editor
+- **Pass dev instance ID to subagents** — so they pin to the dev editor, not yours
 - **Leave test editor open** — faster reuse for next run
 - **One issue = one regression test** — dispatch `unity-tester` for each new bug
