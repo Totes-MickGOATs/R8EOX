@@ -20,3 +20,5 @@ Internal implementation for the UI system. Only `UIManager` should reference the
 - `VehicleStatsDisplay.cs` — Fill-bar display for vehicle stats (speed, acceleration, handling, weight) + description
 - `VehicleListEntry.cs` — Single row in vehicle list: thumbnail, name, category badge, selection highlight
 - `ConfirmDialog.cs` — Self-contained reusable modal for destructive confirmations. Static `Show()` creates its own Canvas (sortOrder=200, ScreenSpaceOverlay) so it renders above all other overlays. Supports danger (red border) and primary (cyan border) styling, full-screen backdrop that blocks clicks, Escape-to-cancel, and a 0.15s CanvasGroup fade-in via unscaledDeltaTime. Entirely code-built — no prefab required.
+- `StickVisualizer.cs` — Gamepad stick visualizer (140x140px): background, crosshair, deadzone circle, and cyan position dot built programmatically; Initialize/UpdateInput/SetDeadzoneRadius API
+- `TriggerVisualizer.cs` — Gamepad trigger fill bar (120x16px): dark track, cyan fill proportional to value, label (LT/RT) and percentage text built programmatically; Initialize/UpdateValue API
