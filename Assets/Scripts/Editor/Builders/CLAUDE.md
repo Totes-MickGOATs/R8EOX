@@ -42,6 +42,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 
 - Namespace: `R8EOX.Editor.Builders`
 - All builders are `internal static` classes
+- Builders that produce scenes must call `EditorSceneManager.NewScene(EmptyScene, Single)` at the start and `SaveScene()` at the end — never modify the previously-active scene
 - Materials use URP Lit shader (`Universal Render Pipeline/Lit`), never Standard
 - Vehicle internal types accessed via `InternalsVisibleTo("R8EOX.Editor")`
 - `BuggySpecSerializer.BuildBodyMeshes()` excludes control arms (name contains "Arm") — the viewer builds arms separately from `armY`/`armThickness`/`armDepth` fields
