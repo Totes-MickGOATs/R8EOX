@@ -6,9 +6,9 @@ namespace R8EOX
     public class TerrainSettings : ScriptableObject
     {
         [Header("Dimensions")]
-        [SerializeField] private float terrainWidth = 500f;
-        [SerializeField] private float terrainHeight = 10f;
-        [SerializeField] private float terrainLength = 500f;
+        [SerializeField] private float terrainWidth = 100f;
+        [SerializeField] private float terrainHeight = 2f;
+        [SerializeField] private float terrainLength = 100f;
 
         [Header("Resolution")]
         [SerializeField] private int heightmapResolution = 2049;
