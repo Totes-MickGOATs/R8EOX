@@ -115,19 +115,30 @@ This ensures your MCP calls go to the dev editor, not the E2E test editor.
 
 This prevents fix agents from accidentally routing to the test editor.
 
-## Phase 1: Console Check
+## Phase 1: Track Builds
+
+Run track builders to verify scenes are up to date with current builder code:
+
+1. Execute `mcp__UnityMCP__execute_menu_item(menu_path="R8EOX/Build Outpost Track")`
+2. Wait for completion (check console for `[OutpostTrack] Build complete` or errors)
+3. Execute any other track build menu items that exist
+4. Save all scenes after builds
+
+This catches drift between builder code and scene state (e.g., terrain size, missing SpawnGrid, stale manager wiring).
+
+## Phase 2: Console Check
 
 1. Call `read_console` — capture all errors and warnings
 2. **Blocking errors** (compilation failures, missing references) → stop and report
 3. **Warnings** → note but continue
 
-## Phase 2: EditMode Tests
+## Phase 3: EditMode Tests
 
 1. Run `run_tests(mode: "EditMode")`
 2. Poll `get_test_job` until complete
 3. Any failures → **Blocking** severity in report
 
-## Phase 3: Scene Integrity
+## Phase 4: Scene Integrity
 
 For each scene (Boot, MainMenu, OutpostTrack):
 
@@ -139,7 +150,7 @@ For each scene (Boot, MainMenu, OutpostTrack):
 3. Check serialized references are non-null via `manage_components`
 4. Report missing objects or null references
 
-## Phase 4: Play Mode Verification
+## Phase 5: Play Mode Verification
 
 1. Load a track scene
 2. Enter Play Mode via `manage_editor`
@@ -150,7 +161,7 @@ For each scene (Boot, MainMenu, OutpostTrack):
    - No console errors during initialization
 5. Exit Play Mode
 
-## Phase 5: PlayMode Tests
+## Phase 6: PlayMode Tests
 
 1. Run `run_tests(mode: "PlayMode")`
 2. Poll `get_test_job` until complete
@@ -160,7 +171,7 @@ For each scene (Boot, MainMenu, OutpostTrack):
    - `flow` failures → **Degraded**
    - `integration` failures → **Degraded**
 
-## Phase 6: UX Quality Review (Think Like a Gamer)
+## Phase 7: UX Quality Review (Think Like a Gamer)
 
 After technical checks, evaluate the player experience by inspecting scene state:
 
@@ -190,7 +201,7 @@ After technical checks, evaluate the player experience by inspecting scene state
 - **Annoying**: Player notices and is bothered (visual glitches, delayed transitions)
 - **Polish**: Nice-to-fix (timing tweaks, alignment, missing feedback)
 
-## Phase 7: Report & Triage
+## Phase 8: Report & Triage
 
 Generate a structured quality report:
 
@@ -220,7 +231,7 @@ For each new bug found, list a proposed test:
 - [ ] Test name — what it verifies
 ```
 
-## Phase 8: Auto-Fix Dispatch
+## Phase 9: Auto-Fix Dispatch
 
 For each **Blocking** or **Frustrating** issue:
 
@@ -239,10 +250,10 @@ For each **Blocking** or **Frustrating** issue:
 ## Scope Arguments
 
 The agent accepts optional scope arguments:
-- **`full`** (default) — run all phases (0-8)
-- **`smoke`** — Phase 0 + 1 + 2 + run only `[Category("smoke")]` tests
+- **`full`** (default) — run all phases (0-9)
+- **`smoke`** — Phase 0 + 1 (builds) + 2 (console) + 3 (EditMode) + smoke-category PlayMode tests
 - **`regression`** — Phase 0 + run only regression tests from `Assets/Tests/PlayMode/Regressions/`
-- **`ux`** — Phase 0 + 6 only (UX quality review)
+- **`ux`** — Phase 0 + 7 only (UX quality review)
 
 ## Key Rules
 
