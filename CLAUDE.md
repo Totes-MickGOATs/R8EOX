@@ -182,9 +182,11 @@ This applies to ALL file types: `.cs`, `.unity`, `.asset`, `.meta`, `CLAUDE.md`,
 - Silently skipping a failed commit — **BANNED** (report the error instead)
 - Using `--no-verify` — **BANNED** (pre-commit hook must validate every commit)
 
-#### Orchestrator Enforcement
+#### Orchestrator / Main Session — YOU ARE NOT EXEMPT
 
-The orchestrator (main session or `/do` skill) MUST:
+The main session is **also bound by this rule** when it edits files directly. Do not mentally categorize your own edits as "just config" or "just docs" — if you used the Edit, Write, or Bash tool to change a file, you commit it immediately before touching another file.
+
+The orchestrator (main session or `/do` skill) MUST ALSO:
 1. Include this commit rule **verbatim** in every agent prompt
 2. After each agent completes, verify commits happened via `git log`
 3. If an agent returned without committing, flag it as a failure
