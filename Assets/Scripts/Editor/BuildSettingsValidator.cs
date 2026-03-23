@@ -12,7 +12,8 @@ namespace R8EOX.Editor
     {
         private static readonly HashSet<string> EditorOnlyScenes = new HashSet<string>
         {
-            "PhysicsTestTrack"
+            "PhysicsTestTrack",
+            "UITestScene"
         };
 
         static BuildSettingsValidator()
