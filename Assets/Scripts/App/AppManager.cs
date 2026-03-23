@@ -27,7 +27,7 @@ namespace R8EOX.App
         public SessionChannel SessionChannel => sessionChannel;
 
         /// <summary>Current application state.</summary>
-        public AppState CurrentState => currentState;
+        internal AppState CurrentState => currentState;
 
         // ----- Events -----
 
