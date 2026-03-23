@@ -12,7 +12,7 @@ Internal implementation for the UI system. Only `UIManager` should reference the
 ## Contents
 - `RaceHUD.cs` — TMPro-based race HUD: speed (km/h), position (ordinal), lap counter, race time, current lap time, best lap time, countdown overlay; includes FormatTime and GetOrdinal helpers
 - `Leaderboard.cs` — Shows/hides race standings list (skeleton)
-- `PauseMenu.cs` — Pause screen with resume/quit and "Change Vehicle" trigger; routes swap through UIManager; controls Time.timeScale
+- `PauseMenu.cs` — Pause screen. Full button set: RESUME (primary), OPTIONS (secondary), RESTART, CHANGE VEHICLE, RETURN TO MENU, QUIT TO DESKTOP. Destructive actions (Restart, Return to Menu, Quit to Desktop) require ConfirmDialog confirmation. UI built programmatically on first Show() via lazy BuildUI(). Initialize(optionsCallback, restartCallback) wires caller-supplied handlers. Controls Time.timeScale (0 on Show, 1 on Hide). Routes vehicle swap and quit-to-menu through UIManager.
 - `VehicleSelectOverlay.cs` — Full-screen vehicle selection overlay: wires VehicleListPanel + VehiclePreviewPanel, confirm/back buttons, persists last selection via PlayerPrefs
 - `VehicleListPanel.cs` — Scrollable vehicle list: spawns VehicleListEntry rows from VehicleDefinition[], reports selection changes
 - `VehiclePreviewPanel.cs` — Container for VehiclePreviewRenderer + VehicleStatsDisplay + vehicle name label
