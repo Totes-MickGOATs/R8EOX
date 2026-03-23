@@ -79,7 +79,7 @@ namespace R8EOX.Session.Internal
             if (PlayerVehicle != null)
             {
                 spawnedVehicles.Remove(PlayerVehicle);
-                Object.Destroy(PlayerVehicle);
+                ShutdownAndDestroy(PlayerVehicle);
                 Debug.Log(
                     "[VehicleSpawner] Player vehicle destroyed.");
             }
@@ -128,11 +128,7 @@ namespace R8EOX.Session.Internal
             foreach (var vehicle in spawnedVehicles)
             {
                 if (vehicle != null)
-                {
-                    var rb = vehicle.GetComponent<Rigidbody>();
-                    if (rb != null) rb.isKinematic = true;
-                    Object.Destroy(vehicle);
-                }
+                    ShutdownAndDestroy(vehicle);
             }
 
             spawnedVehicles.Clear();
@@ -140,6 +136,25 @@ namespace R8EOX.Session.Internal
 
             Debug.Log(
                 "[VehicleSpawner] All spawned vehicles destroyed.");
+        }
+
+        private static void ShutdownAndDestroy(GameObject vehicle)
+        {
+            // Disable all MonoBehaviours to prevent callbacks during destroy frame
+            foreach (var mb in vehicle.GetComponentsInChildren<MonoBehaviour>())
+            {
+                if (mb != null) mb.enabled = false;
+            }
+
+            // Remove vehicle from physics simulation before destroy
+            var rb = vehicle.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.detectCollisions = false;
+            }
+
+            Object.Destroy(vehicle);
         }
 
         internal int SpawnedCount => spawnedVehicles.Count;
