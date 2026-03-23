@@ -6,7 +6,7 @@ namespace R8EOX.Vehicle
     [RequireComponent(typeof(Rigidbody))]
     public class VehicleManager : MonoBehaviour
     {
-        const float k_DefaultMass = 1.5f, k_DefaultBounciness = 0.05f;
+        const float k_DefaultMass = 1.5f;
         const float k_FlipHeightOffset = 0.35f, k_MsToKmh = 3.6f;
 
         [Header("Motor")]
@@ -74,14 +74,6 @@ namespace R8EOX.Vehicle
         [SerializeField] private float _tumbleFullDeg = 70f;
         [Tooltip("Hysteresis band (degrees) to prevent tumble state oscillation")]
         [SerializeField] private float _tumbleHysteresisDeg = 5f;
-        [Range(0f, 1f)]
-        [Tooltip("Bounciness of the physics material while tumbling (0=no bounce, 1=full bounce)")]
-        [SerializeField] private float _tumbleBounce = 0.35f;
-        [Range(0f, 1f)]
-        [Tooltip("Friction of the physics material while tumbling (0=frictionless, 1=full friction)")]
-        [SerializeField] private float _tumbleFriction = 0.3f;
-        [Tooltip("When true, switches to a low-friction physics material during tumble")]
-        [SerializeField] private bool _enableDynamicPhysicsMaterial = true;
 
         // State
         public float CurrentEngineForce { get; private set; } public float CurrentBrakeForce { get; private set; }
@@ -102,8 +94,7 @@ namespace R8EOX.Vehicle
         public float FrontSpringStrength => _frontSpringStrength; public float FrontSpringDamping => _frontSpringDamping;
         public float RearSpringStrength  => _rearSpringStrength;  public float RearSpringDamping  => _rearSpringDamping;
         public float GripCoeff => _gripCoeff; public float ComGroundY => _comGround.y;
-        public float TumbleEngageDeg => _tumbleEngageDeg; public float TumbleFullDeg  => _tumbleFullDeg;
-        public float TumbleBounce    => _tumbleBounce;    public float TumbleFriction => _tumbleFriction;
+        public float TumbleEngageDeg => _tumbleEngageDeg; public float TumbleFullDeg => _tumbleFullDeg;
         internal RCAirPhysics AirPhysics => _airPhysics; internal Drivetrain DrivetrainRef => _drivetrain;
         public float Mass => _rb != null ? _rb.mass : k_DefaultMass;
         public static float FlipHeightOffset => k_FlipHeightOffset;
@@ -128,13 +119,7 @@ namespace R8EOX.Vehicle
             ApplyMotorPreset();
             _rb.centerOfMass = _comGround;
 
-            var physMat = new PhysicsMaterial("CarBody") {
-                dynamicFriction = 0f, staticFriction = 0f, bounciness = k_DefaultBounciness,
-                frictionCombine = PhysicsMaterialCombine.Minimum, bounceCombine = PhysicsMaterialCombine.Maximum
-            };
-            foreach (var col in GetComponentsInChildren<Collider>()) col.material = physMat;
-
-            _tumble = new TumbleController(physMat);
+            _tumble = new TumbleController();
             _wheels.Discover(transform);
             _wheels.Configure(gameObject.layer, _drivetrain,
                 _frontSpringStrength, _frontSpringDamping, _rearSpringStrength, _rearSpringDamping, _gripCoeff);
@@ -159,8 +144,7 @@ namespace R8EOX.Vehicle
             InputStage.Execute(ref frame, _input, _rb, transform,
                 SmoothThrottle, _throttleRampUp, _throttleRampDown);
             AirborneStage.Execute(ref frame, _wheels, _airDetect, _tumble, transform,
-                _tumbleEngageDeg, _tumbleFullDeg, _tumbleHysteresisDeg,
-                _enableDynamicPhysicsMaterial, _tumbleBounce, _tumbleFriction);
+                _tumbleEngageDeg, _tumbleFullDeg, _tumbleHysteresisDeg);
             _rb.centerOfMass = _comGround;
             GroundDriveStage.Execute(ref frame, _rb, transform, _wheels,
                 _engineForceMax, _brakeForce, _reverseForce, _coastDrag, _maxSpeed);
@@ -230,8 +214,8 @@ namespace R8EOX.Vehicle
         public void SetAxleSuspension(float frontK, float frontDamp, float rearK, float rearDamp)
         { _frontSpringStrength = frontK; _frontSpringDamping = frontDamp; _rearSpringStrength = rearK; _rearSpringDamping = rearDamp; if (_wheels.All.Length > 0) ApplySuspensionSettings(); }
         public void SetTraction(float gripCoeff) { _gripCoeff = gripCoeff; if (_wheels.All.Length > 0) ApplyTractionSettings(); }
-        public void SetCrashParams(float engageDeg, float fullDeg, float bounce, float friction)
-        { _tumbleEngageDeg = engageDeg; _tumbleFullDeg = fullDeg; _tumbleBounce = bounce; _tumbleFriction = friction; }
+        public void SetCrashParams(float engageDeg, float fullDeg)
+        { _tumbleEngageDeg = engageDeg; _tumbleFullDeg = fullDeg; }
         public void SetCentreOfMass(float groundY) => _comGround = new Vector3(0f, groundY, 0f);
         public void SetMass(float mass) { if (_rb != null) _rb.mass = mass; }
         public void SetGearRatio(float ratio) { _gearRatio = ratio; }
