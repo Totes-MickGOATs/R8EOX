@@ -106,9 +106,9 @@ namespace R8EOX.Tests.EditMode
             Assert.IsNotNull(terrain.terrainData, "TerrainData must be assigned.");
 
             Vector3 size = terrain.terrainData.size;
-            Assert.AreEqual(500f, size.x, 0.01f, "Terrain width (X) should be 500m.");
-            Assert.AreEqual(10f, size.y, 0.01f, "Terrain height scale (Y) should be 10m.");
-            Assert.AreEqual(500f, size.z, 0.01f, "Terrain length (Z) should be 500m.");
+            Assert.AreEqual(100f, size.x, 0.01f, "Terrain width (X) should be 100m.");
+            Assert.AreEqual(2f, size.y, 0.01f, "Terrain height scale (Y) should be 2m.");
+            Assert.AreEqual(100f, size.z, 0.01f, "Terrain length (Z) should be 100m.");
         }
     }
 }
