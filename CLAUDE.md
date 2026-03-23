@@ -117,6 +117,10 @@ Assets/
 - **Test files and top-down lint**: `Assets/Tests/` is exempt from the cross-system `using R8EOX.X.Internal` lint rule. If tests still fail the hook, use fully-qualified type names instead of `using` directives
 - **Friction circle**: `WheelForceSolver` applies `FrictionCircleMath` after computing lateral/longitudinal forces. Throttle reduces cornering grip naturally — no special 2WD/4WD code needed. Don't add drive-type-specific handling; it emerges from the friction ellipse.
 - **Air physics scales**: `WheelInertiaConfig` defaults are tuned for 1/10th RC scale (MoI=0.006, GyroScale=1.5, ReactionScale=30). Don't revert to the old 80x/2500x values — those caused floaty air behavior.
+- **Editor asmdef + URP types**: `R8EOX.Editor.asmdef` must reference `Unity.RenderPipelines.Core.Runtime` and `Unity.RenderPipelines.Universal.Runtime` for editor builders that use `VolumeProfile`, `Bloom`, etc. The Runtime asmdef already has these; the Editor one was missing them until the PostProcessBuilder was added
+- **FindObjectsByType (Unity 6)**: `FindObjectsByType<T>(FindObjectsSortMode.None)` is deprecated in Unity 6. Use `FindObjectsByType<T>(FindObjectsInactive.Exclude)` instead — no sort mode parameter
+- **EnvironmentBuilder auto-creates sun**: `SetupDirectionalLight` creates a Directional Light if none exists in the scene (rotation 50/-30/0). It also searches all `Light` components as a fallback before creating, so renamed lights are found too
+- **TrackFolderData optionals**: `EnvironmentSettingsAsset`, `TrackConfigAsset`, and `SkyboxHdrPath` can all be null. Downstream builder calls must null-guard these — `PostProcessBuilder` does not handle a null settings parameter
 
 ## Orchestration
 
