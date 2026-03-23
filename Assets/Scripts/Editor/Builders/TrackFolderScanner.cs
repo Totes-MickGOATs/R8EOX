@@ -81,12 +81,16 @@ namespace R8EOX.Editor.Builders
             }
 
             // Fallback: FindAssets with t: filter can miss custom SOs after
-            // domain reload. Load by convention path as base ScriptableObject
-            // first (avoids type resolution issues), then cast.
-            string fallbackPath = $"{folder}/{typeName}.asset";
-            var fallback = AssetDatabase.LoadAssetAtPath<ScriptableObject>(fallbackPath);
-            if (fallback is T typed)
-                return typed;
+            // domain reload. Search by filename pattern without type filter.
+            string[] nameGuids = AssetDatabase.FindAssets(
+                typeName, new[] { folder });
+            foreach (string guid in nameGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (!path.EndsWith(".asset")) continue;
+                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                if (asset != null) return asset;
+            }
 
             return null;
         }
