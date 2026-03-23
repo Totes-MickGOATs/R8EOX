@@ -2,44 +2,79 @@ using UnityEngine;
 
 namespace R8EOX.AI.Internal
 {
+    /// <summary>
+    /// Wraps TrackManager centerline queries for AI path following.
+    /// Provides lookahead points and curvature queries with optional
+    /// lateral offset from the centerline for line variation.
+    /// </summary>
     internal class RacingLine
     {
-        private Vector3[] linePoints;
-        private int currentTargetIndex;
+        private Track.TrackManager trackManager;
+        private float trackLength;
+        private float lateralOffset;
 
-        internal void Initialize(Vector3[] points)
+        internal bool IsValid => trackManager != null && trackLength > 0f;
+
+        internal void Initialize(Track.TrackManager track, float offset)
         {
-            linePoints = points;
-            currentTargetIndex = 0;
+            trackManager = track;
+            trackLength = track.GetTrackLength();
+            lateralOffset = offset;
         }
 
-        internal Vector3 GetCurrentTarget()
+        /// <summary>
+        /// Get a target point ahead of the vehicle on the centerline,
+        /// offset perpendicular to the track direction for variety.
+        /// </summary>
+        internal Vector3 GetLookaheadPoint(float currentDistance, float lookaheadDistance)
         {
-            if (linePoints == null || linePoints.Length == 0)
-            {
-                return Vector3.zero;
-            }
+            if (!IsValid) return Vector3.zero;
 
-            return linePoints[currentTargetIndex];
+            float targetDist = WrapDistance(currentDistance + lookaheadDistance);
+            Vector3 centerPoint = trackManager.GetPointAtDistance(targetDist);
+
+            if (Mathf.Approximately(lateralOffset, 0f))
+                return centerPoint;
+
+            Vector3 direction = trackManager.GetDirectionAtDistance(targetDist);
+            Vector3 right = Vector3.Cross(Vector3.up, direction).normalized;
+            return centerPoint + right * lateralOffset;
         }
 
-        internal void AdvanceTarget(Vector3 currentPosition, float arrivalDistance)
+        /// <summary>
+        /// Query curvature at a point ahead of the current position.
+        /// Used for braking decisions before corners.
+        /// </summary>
+        internal float GetCurvatureAhead(float currentDistance, float lookDistance)
         {
-            if (linePoints == null)
-            {
-                return;
-            }
+            if (!IsValid) return 0f;
 
-            float dist = Vector3.Distance(currentPosition, linePoints[currentTargetIndex]);
-            if (dist < arrivalDistance)
-            {
-                currentTargetIndex = (currentTargetIndex + 1) % linePoints.Length;
-            }
+            float targetDist = WrapDistance(currentDistance + lookDistance);
+            return trackManager.GetCurvatureAtDistance(targetDist);
         }
 
-        internal float GetDistanceToTarget(Vector3 currentPosition)
+        /// <summary>
+        /// Project a world position onto the centerline and return distance along track.
+        /// </summary>
+        internal float GetCurrentDistance(Vector3 position)
         {
-            return Vector3.Distance(currentPosition, GetCurrentTarget());
+            if (!IsValid) return 0f;
+            return trackManager.GetDistanceAlongTrack(position);
+        }
+
+        /// <summary>
+        /// Get the direction of the track at a given distance.
+        /// </summary>
+        internal Vector3 GetDirectionAtDistance(float distance)
+        {
+            if (!IsValid) return Vector3.forward;
+            return trackManager.GetDirectionAtDistance(WrapDistance(distance));
+        }
+
+        private float WrapDistance(float distance)
+        {
+            if (trackLength <= 0f) return 0f;
+            return ((distance % trackLength) + trackLength) % trackLength;
         }
     }
 }

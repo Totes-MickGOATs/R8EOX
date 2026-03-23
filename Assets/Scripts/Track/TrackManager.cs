@@ -137,6 +137,14 @@ namespace R8EOX.Track
             return centerline.GetCurvatureAtDistance(distance);
         }
 
+        public Vector3 GetPointAtDistance(float distance)
+        {
+            if (centerline == null || !centerline.IsValid)
+                return Vector3.zero;
+
+            return centerline.GetPointAtDistance(distance);
+        }
+
         public int GetSpawnPointCount()
         {
             return cachedSpawnData != null ? cachedSpawnData.Length : 0;

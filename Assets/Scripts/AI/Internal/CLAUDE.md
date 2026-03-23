@@ -9,6 +9,6 @@ Internal implementation for the AI system. Only `AIManager` should reference the
 - AI drives vehicles through AIManager -> VehicleManager, never directly
 
 ## Contents
-- `AIDriver.cs` — Per-vehicle AI: calculates throttle/brake/steering from racing line and behavior
-- `RacingLine.cs` — Waypoint-based optimal path: tracks current target, advances on arrival
-- `AIBehavior.cs` — Difficulty-driven modifiers: aggression, consistency, overtake/draft decisions
+- `AIDriver.cs` — Per-vehicle AI: speed-scaled lookahead, curvature-based throttle/brake, dot-product steering; writes to ScriptedInput each Tick
+- `RacingLine.cs` — Centerline wrapper around TrackManager: lookahead points with lateral offset, curvature queries, distance projection
+- `AIBehavior.cs` — Difficulty-driven modifiers: aggression (0-1), consistency, max speed factor, brake sensitivity, overtake/draft decisions

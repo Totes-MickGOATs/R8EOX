@@ -50,7 +50,7 @@ Scripts/
 - `Camera/` — Camera control: chase cam, cinematic views, screen effects (skeleton)
 - `UI/` — HUD, menus, user interface (skeleton)
 - `Audio/` — Engine, tire, ambient, music (skeleton)
-- `AI/` — AI opponents: pathfinding, racing behavior (skeleton)
+- `AI/` — AI opponents: centerline-following drivers with difficulty scaling, wired via SessionManager
 - `VFX/` — Tire marks, exhaust, sparks, screen effects (skeleton)
 - `ScriptableObjects/` — Data containers: SessionConfig, TrackConfig, RaceConfig, motor/suspension/traction configs
 - `Editor/` — Builder tools: TrackBuilder, RCBuggyBuilder, material tools

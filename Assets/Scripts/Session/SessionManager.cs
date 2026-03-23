@@ -20,6 +20,7 @@ namespace R8EOX.Session
         private UI.UIManager uiManager;
         private Audio.AudioManager audioManager;
         private VFX.VFXManager vfxManager;
+        private AI.AIManager aiManager;
 
         private readonly SessionState state = new SessionState();
         private readonly VehicleSpawner vehicleSpawner = new VehicleSpawner();
@@ -44,16 +45,16 @@ namespace R8EOX.Session
         public void OnSceneReady(
             TrackManager track, Race.RaceManager race,
             Camera.CameraManager cam, UI.UIManager ui = null,
-            Audio.AudioManager audio = null, VFX.VFXManager vfx = null)
+            Audio.AudioManager audio = null, VFX.VFXManager vfx = null,
+            AI.AIManager ai = null)
         {
-            trackManager = track;
-            raceManager = race;
-            cameraManager = cam;
-            uiManager = ui;
-            audioManager = audio;
-            vfxManager = vfx;
-            if (uiManager != null) uiManager.SetSessionManager(this);
-            if (uiManager != null && race != null) uiManager.SetRaceManager(race);
+            trackManager = track; raceManager = race; cameraManager = cam;
+            uiManager = ui; audioManager = audio; vfxManager = vfx; aiManager = ai;
+            if (uiManager != null)
+            {
+                uiManager.SetSessionManager(this);
+                if (race != null) uiManager.SetRaceManager(race);
+            }
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
         }
 
@@ -68,7 +69,6 @@ namespace R8EOX.Session
             activeConfig = config;
             if (sessionChannel != null) sessionChannel.SetSession(config);
             state.BeginLoading();
-            Debug.Log($"[SessionManager] Session starting: mode={config.SessionMode}, vehicle={config.VehiclePrefab?.name ?? "null"}");
             if (trackManager != null) EnterVehicleSelectOrSpawn();
         }
 
@@ -79,13 +79,13 @@ namespace R8EOX.Session
             state.BeginTeardown();
             CleanupOverlay();
             isSwapping = false;
+            if (aiManager != null) aiManager.RemoveAllDrivers();
             if (raceManager != null) raceManager.EndRace();
             vehicleSpawner.DestroyAllSpawned();
             if (sessionChannel != null) sessionChannel.Clear();
             activeConfig = null;
-            trackManager = null; raceManager = null;
-            cameraManager = null; uiManager = null;
-            audioManager = null; vfxManager = null;
+            trackManager = null; raceManager = null; cameraManager = null;
+            uiManager = null; audioManager = null; vfxManager = null; aiManager = null;
             state.Reset();
         }
 
@@ -184,12 +184,10 @@ namespace R8EOX.Session
 
         private void Update()
         {
-            if (effectiveMode == SessionMode.Race
-                && raceManager != null
-                && state.CurrentPhase == SessionPhase.Ready)
-            {
+            if (state.CurrentPhase != SessionPhase.Ready) return;
+            if (aiManager != null) aiManager.Tick(Time.deltaTime);
+            if (effectiveMode == SessionMode.Race && raceManager != null)
                 raceManager.Tick(Time.deltaTime);
-            }
         }
 
         private void SetupSession()
@@ -197,6 +195,7 @@ namespace R8EOX.Session
             if (activeConfig == null || trackManager == null) return;
             InitializeTrack();
             if (raceManager != null) raceManager.Initialize(trackManager);
+            if (aiManager != null) aiManager.Initialize(trackManager);
             ValidateAndDegradeMode();
             if (activeConfig.VehiclePrefab == null)
             {
@@ -268,10 +267,10 @@ namespace R8EOX.Session
             var aiVehicles = vehicleSpawner.SpawnAIVehicles(
                 activeConfig.VehiclePrefab, aiSpawns.ToArray(),
                 activeConfig.AiOpponentCount);
-            if (raceManager != null)
+            foreach (var vehicle in aiVehicles)
             {
-                foreach (var vehicle in aiVehicles)
-                    raceManager.RegisterVehicle(vehicle);
+                if (raceManager != null) raceManager.RegisterVehicle(vehicle);
+                if (aiManager != null) aiManager.RegisterDriver(vehicle);
             }
         }
 
