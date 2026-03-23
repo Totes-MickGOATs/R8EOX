@@ -31,6 +31,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `OverlayScrollViewBuilder.cs` | Configures the ScrollView, Viewport, Content, and Scrollbar Vertical inside ListPanel |
 | `OverlayPreviewPanelBuilder.cs` | Configures VehicleName, PreviewImage, StatsDisplay (stat bars + labels + bg objects), and DescriptionText inside PreviewPanel |
 | `VehicleListEntryBuilder.cs` | Configures VehicleListEntry prefab: LayoutElement height, Highlight/Thumbnail/NameText/CategoryText layout and styles |
+| `MenuSceneBuilder.cs` | `R8EOX > Build Menu Scene` menu item: creates MainMenu.unity scene with Camera, Canvas, MenuManager, and all five screen panels (Splash, MainMenu, ModeSelect, TrackSelect, Loading) fully wired |
 
 ## Conventions
 
