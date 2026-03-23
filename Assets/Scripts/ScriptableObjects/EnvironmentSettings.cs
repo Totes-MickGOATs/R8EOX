@@ -25,6 +25,17 @@ namespace R8EOX
         [SerializeField] private Color sunColor = new(1.0f, 0.92f, 0.70f);
         [SerializeField] private float sunIntensity = 1.2f;
 
+        [Header("Post Processing")]
+        [SerializeField] private float bloomThreshold = 0.9f;
+        [SerializeField] private float bloomIntensity;
+        [SerializeField] private float bloomScatter = 0.7f;
+        [SerializeField] private float postExposure;
+        [SerializeField] private float contrast;
+        [SerializeField] private float saturation;
+        [SerializeField] private float vignetteIntensity;
+        [SerializeField] private float whiteBalanceTemperature;
+        [SerializeField] private float whiteBalanceTint;
+
         public float SkyboxExposure => skyboxExposure;
         public bool FogEnabled => fogEnabled;
         public FogMode FogMode => fogMode;
@@ -36,5 +47,14 @@ namespace R8EOX
         public Color AmbientGroundColor => ambientGroundColor;
         public Color SunColor => sunColor;
         public float SunIntensity => sunIntensity;
+        public float BloomThreshold => bloomThreshold;
+        public float BloomIntensity => bloomIntensity;
+        public float BloomScatter => bloomScatter;
+        public float PostExposure => postExposure;
+        public float Contrast => contrast;
+        public float Saturation => saturation;
+        public float VignetteIntensity => vignetteIntensity;
+        public float WhiteBalanceTemperature => whiteBalanceTemperature;
+        public float WhiteBalanceTint => whiteBalanceTint;
     }
 }

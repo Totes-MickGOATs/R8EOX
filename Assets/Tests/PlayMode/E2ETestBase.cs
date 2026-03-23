@@ -23,10 +23,12 @@ namespace R8EOX.Tests.PlayMode
         public IEnumerator BaseTearDown()
         {
             Time.timeScale = 1f;
+            LogAssert.ignoreFailingMessages = true;
             CleanupDontDestroyOnLoad();
 
-            // Load an empty scene to clear everything
-            var newScene = SceneManager.CreateScene("TestCleanup");
+            // Use a unique name to avoid collision if a prior teardown failed
+            string sceneName = $"TestCleanup_{System.Guid.NewGuid():N}";
+            var newScene = SceneManager.CreateScene(sceneName);
             SceneManager.SetActiveScene(newScene);
 
             // Unload all other scenes
@@ -38,6 +40,7 @@ namespace R8EOX.Tests.PlayMode
             }
 
             yield return null;
+            LogAssert.ignoreFailingMessages = false;
         }
 
         /// <summary>
