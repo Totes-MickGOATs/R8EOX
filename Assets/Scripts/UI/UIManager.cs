@@ -23,6 +23,7 @@ namespace R8EOX.UI
         private VehicleManager cachedVehicleManager;
         private bool isPaused;
         private bool countdownVisible;
+        private System.Action onQuitToMenu;
 
         /// <summary>Set by SessionManager to enable swap routing.</summary>
         public void SetSessionManager(R8EOX.Session.SessionManager manager)
@@ -36,6 +37,17 @@ namespace R8EOX.UI
             raceManager = rm;
             if (raceManager != null)
                 raceManager.OnPhaseChanged += HandlePhaseChanged;
+        }
+
+        /// <summary>Set by AppManager to enable quit-to-menu routing.</summary>
+        public void SetQuitToMenuCallback(System.Action callback)
+        {
+            onQuitToMenu = callback;
+        }
+
+        public void RequestQuitToMenu()
+        {
+            onQuitToMenu?.Invoke();
         }
 
         public void RequestVehicleSwap()
