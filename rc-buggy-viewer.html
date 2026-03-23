@@ -804,7 +804,7 @@ function updateInputSim(dt) {
     const isMotor = w.group.userData.motor;
 
     // Steer wheels turn
-    if (isSteer) w.group.rotation.y = steering;
+    if (isSteer) w.group.rotation.y = -steering;
 
     // Spin motor wheels on throttle
     if (isMotor) {
