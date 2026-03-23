@@ -140,7 +140,7 @@ namespace R8EOX.Menu
                 return;
             }
 
-            optionsOverlayInstance = Object.Instantiate(overlayRegistry.OptionsOverlayPrefab);
+            optionsOverlayInstance = Instantiate(overlayRegistry.OptionsOverlayPrefab);
             var overlayComp = optionsOverlayInstance.GetComponent<R8EOX.UI.Internal.OptionsOverlay>();
             overlayComp.Show(settingsManager, OnOptionsBack);
         }
