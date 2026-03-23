@@ -169,7 +169,7 @@ namespace R8EOX.Editor.Builders
             }
 
             // Fallback: search all lights in case named differently
-            foreach (Light light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            foreach (Light light in Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude))
             {
                 if (light.type == LightType.Directional)
                     return light;
