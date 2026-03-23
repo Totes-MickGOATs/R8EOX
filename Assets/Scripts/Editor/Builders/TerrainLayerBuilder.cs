@@ -68,7 +68,7 @@ namespace R8EOX.Editor.Builders
             float smoothness = settings != null ? settings.Smoothness : k_DefaultSmoothness;
             float normalScale = settings != null ? settings.NormalScale : k_DefaultNormalScale;
 
-            layer.name = layerData.Name;
+            layer.name = $"TerrainLayer_{layerData.Index}_{layerData.Name}";
             layer.tileSize = new Vector2(tileSize, tileSize);
             layer.tileOffset = Vector2.zero;
 
