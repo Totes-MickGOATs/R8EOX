@@ -29,13 +29,13 @@ namespace R8EOX.Vehicle.Internal
         [Tooltip("Front axle differential type")]
         [SerializeField] private DiffType _frontDiffType = DiffType.Open;
         [Tooltip("Max coupling force for front differential (N)")]
-        [SerializeField] private float _frontPreload = 10.0f;
+        [SerializeField] private float _frontPreload = 1.0f;
 
         [Header("Center Differential (AWD only)")]
         [Tooltip("Center differential type for AWD torque distribution")]
         [SerializeField] private DiffType _centerDiffType = DiffType.Open;
         [Tooltip("Max coupling force for center differential (N)")]
-        [SerializeField] private float _centerPreload = 20.0f;
+        [SerializeField] private float _centerPreload = 2.0f;
         [Tooltip("0.35 = 35% front / 65% rear torque split")]
         [Range(0f, 1f)]
         [SerializeField] private float _centerFrontBias = 0.35f;

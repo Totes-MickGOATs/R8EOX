@@ -7,7 +7,7 @@ namespace R8EOX.Vehicle
     public class VehicleManager : MonoBehaviour
     {
         const float k_DefaultMass = 1.5f, k_DefaultAngularDrag = 0.05f, k_DefaultBounciness = 0.05f;
-        const float k_FlipHeightOffset = 14.0f, k_MsToKmh = 3.6f;
+        const float k_FlipHeightOffset = 1.4f, k_MsToKmh = 3.6f;
         const float k_ReverseSpeedThreshold = 0.25f, k_ForwardSpeedClearThreshold = 0.50f, k_ReverseBrakeMinThreshold = 0.1f;
 
         [Header("Motor")]

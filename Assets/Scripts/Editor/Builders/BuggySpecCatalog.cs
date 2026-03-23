@@ -31,7 +31,7 @@ namespace R8EOX.Editor.Builders
             layout: BuggyDriveLayout.AWD,
             rearDiff: BuggyDiffType.BallDiff, rearPreload: 5f,
             frontDiff: BuggyDiffType.Open, frontPreload: 0f,
-            centerDiff: BuggyDiffType.Open, centerPreload: 20f, centerFrontBias: 0.35f,
+            centerDiff: BuggyDiffType.Open, centerPreload: 2f, centerFrontBias: 0.35f,
             chassisWidth: 0.52f, chassisHeight: 0.032f, chassisLength: 1.36f,
             wheelbaseHalf: 0.68f, trackHalf: 0.52f,
             tireRadius: 0.166f, frontTireWidth: 0.140f, rearTireWidth: 0.168f,

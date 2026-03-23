@@ -21,12 +21,12 @@ namespace R8EOX.Vehicle.Internal
         // ---- Serialized Fields ----
 
         [Header("Suspension")]
-        [SerializeField] private float _restDistance = 0.25f;
-        [SerializeField] private float _overExtend = 0.24f;
-        [SerializeField] private float _maxSpringForce = 500f;
-        [SerializeField] private float _minSpringLen = 0.12f;
+        [SerializeField] private float _restDistance = 0.20f;
+        [SerializeField] private float _overExtend = 0.08f;
+        [SerializeField] private float _maxSpringForce = 50.0f;
+        [SerializeField] private float _minSpringLen = 0.032f;
         [Header("Wheel")]
-        [SerializeField] private float _wheelRadius = 0.420f;
+        [SerializeField] private float _wheelRadius = 0.166f;
         [Header("Motor/Steer")]
         [SerializeField] private bool _isMotor;
         [SerializeField] private bool _isSteer;
@@ -43,8 +43,8 @@ namespace R8EOX.Vehicle.Internal
 
         // ---- Public Properties ----
 
-        public float SpringStrength { get; set; } = 750.0f;
-        public float SpringDamping  { get; set; } = 42.5f;
+        public float SpringStrength { get; set; } = 37.5f;
+        public float SpringDamping  { get; set; } = 3.0f;
         public float GripCoeff      { get; set; } = 0.7f;
         public LayerMask GroundMask { get => _groundMask; set => _groundMask = value; }
         public bool ShowDebug       { get => _showDebug;  set => _showDebug  = value; }
