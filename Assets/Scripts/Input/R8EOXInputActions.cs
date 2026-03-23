@@ -385,6 +385,76 @@ namespace R8EOX.Input
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Menu"",
+            ""id"": ""d1000001-0000-0000-0000-000000000001"",
+            ""actions"": [
+                {
+                    ""name"": ""TabLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""d2000001-0000-0000-0000-000000000001"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TabRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""d2000002-0000-0000-0000-000000000002"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""d3000001-0000-0000-0000-000000000001"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TabLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d3000002-0000-0000-0000-000000000002"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard+Mouse"",
+                    ""action"": ""TabLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d3000003-0000-0000-0000-000000000003"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TabRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d3000004-0000-0000-0000-000000000004"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard+Mouse"",
+                    ""action"": ""TabRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -429,11 +499,16 @@ namespace R8EOX.Input
             m_Gameplay_CameraOrbitEnable = m_Gameplay.FindAction("CameraOrbitEnable", throwIfNotFound: true);
             m_Gameplay_DebugToggle = m_Gameplay.FindAction("DebugToggle", throwIfNotFound: true);
             m_Gameplay_TuningToggle = m_Gameplay.FindAction("TuningToggle", throwIfNotFound: true);
+            // Menu
+            m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
+            m_Menu_TabLeft = m_Menu.FindAction("TabLeft", throwIfNotFound: true);
+            m_Menu_TabRight = m_Menu.FindAction("TabRight", throwIfNotFound: true);
         }
 
         ~@R8EOXInputActions()
         {
             UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, R8EOXInputActions.Gameplay.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Menu.enabled, "This will cause a leak and performance issues, R8EOXInputActions.Menu.Disable() has not been called.");
         }
 
         /// <summary>
@@ -700,6 +775,113 @@ namespace R8EOX.Input
         /// Provides a new <see cref="GameplayActions" /> instance referencing this action map.
         /// </summary>
         public GameplayActions @Gameplay => new GameplayActions(this);
+
+        // Menu
+        private readonly InputActionMap m_Menu;
+        private List<IMenuActions> m_MenuActionsCallbackInterfaces = new List<IMenuActions>();
+        private readonly InputAction m_Menu_TabLeft;
+        private readonly InputAction m_Menu_TabRight;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Menu".
+        /// </summary>
+        public struct MenuActions
+        {
+            private @R8EOXInputActions m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public MenuActions(@R8EOXInputActions wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Menu/TabLeft".
+            /// </summary>
+            public InputAction @TabLeft => m_Wrapper.m_Menu_TabLeft;
+            /// <summary>
+            /// Provides access to the underlying input action "Menu/TabRight".
+            /// </summary>
+            public InputAction @TabRight => m_Wrapper.m_Menu_TabRight;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Menu; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="MenuActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(MenuActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="MenuActions" />
+            public void AddCallbacks(IMenuActions instance)
+            {
+                if (instance == null || m_Wrapper.m_MenuActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_MenuActionsCallbackInterfaces.Add(instance);
+                @TabLeft.started += instance.OnTabLeft;
+                @TabLeft.performed += instance.OnTabLeft;
+                @TabLeft.canceled += instance.OnTabLeft;
+                @TabRight.started += instance.OnTabRight;
+                @TabRight.performed += instance.OnTabRight;
+                @TabRight.canceled += instance.OnTabRight;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="MenuActions" />
+            private void UnregisterCallbacks(IMenuActions instance)
+            {
+                @TabLeft.started -= instance.OnTabLeft;
+                @TabLeft.performed -= instance.OnTabLeft;
+                @TabLeft.canceled -= instance.OnTabLeft;
+                @TabRight.started -= instance.OnTabRight;
+                @TabRight.performed -= instance.OnTabRight;
+                @TabRight.canceled -= instance.OnTabRight;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="MenuActions.UnregisterCallbacks(IMenuActions)" />.
+            /// </summary>
+            /// <seealso cref="MenuActions.UnregisterCallbacks(IMenuActions)" />
+            public void RemoveCallbacks(IMenuActions instance)
+            {
+                if (m_Wrapper.m_MenuActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="MenuActions.AddCallbacks(IMenuActions)" />
+            /// <seealso cref="MenuActions.RemoveCallbacks(IMenuActions)" />
+            /// <seealso cref="MenuActions.UnregisterCallbacks(IMenuActions)" />
+            public void SetCallbacks(IMenuActions instance)
+            {
+                foreach (var item in m_Wrapper.m_MenuActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_MenuActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="MenuActions" /> instance referencing this action map.
+        /// </summary>
+        public MenuActions @Menu => new MenuActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
         /// Provides access to the input control scheme.
@@ -803,6 +985,28 @@ namespace R8EOX.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnTuningToggle(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Menu" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="MenuActions.AddCallbacks(IMenuActions)" />
+        /// <seealso cref="MenuActions.RemoveCallbacks(IMenuActions)" />
+        public interface IMenuActions
+        {
+            /// <summary>
+            /// Method invoked when associated input action "TabLeft" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnTabLeft(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "TabRight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnTabRight(InputAction.CallbackContext context);
         }
     }
 }
