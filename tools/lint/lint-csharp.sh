@@ -62,17 +62,23 @@ lint_cs_file() {
   fi
 
   # TOP-DOWN ARCHITECTURE: cross-system internal refs
-  local file_ns
-  file_ns=$(echo "$content" | grep -oE 'namespace R8EOX\.(\w+)' | head -1 | sed 's/namespace R8EOX\.//' || true)
-  if [ -n "$file_ns" ]; then
-    local cross_ref
-    cross_ref=$(echo "$content" | grep -nE "using R8EOX\.\w+\.Internal" | grep -v "R8EOX\.${file_ns}\.Internal" || true)
-    if [ -n "$cross_ref" ]; then
-      echo "FAIL [top-down] ${file}: cross-system internal reference"
-      echo "$cross_ref" | head -3 | sed 's/^/  /'
-      errors=$((errors + 1))
-    fi
-  fi
+  # Exempt: test files (Assets/Tests/) — white-box tests must access internal types directly.
+  case "$file" in
+    Assets/Tests/*) : ;;  # Test files legitimately reference any system's Internal namespace
+    *)
+      local file_ns
+      file_ns=$(echo "$content" | grep -oE 'namespace R8EOX\.(\w+)' | head -1 | sed 's/namespace R8EOX\.//' || true)
+      if [ -n "$file_ns" ]; then
+        local cross_ref
+        cross_ref=$(echo "$content" | grep -nE "using R8EOX\.\w+\.Internal" | grep -v "R8EOX\.${file_ns}\.Internal" || true)
+        if [ -n "$cross_ref" ]; then
+          echo "FAIL [top-down] ${file}: cross-system internal reference"
+          echo "$cross_ref" | head -3 | sed 's/^/  /'
+          errors=$((errors + 1))
+        fi
+      fi
+      ;;
+  esac
 
   # BANNED: SendMessage / BroadcastMessage
   local send_msg
