@@ -28,6 +28,7 @@ namespace R8EOX.UI.Internal
         private float[] _mins;
         private float[] _maxs;
         private float   _extremesTimer;
+        private float[] _axisBuffer = new float[6];
 
         private const int   AxisCount       = 6;
         private const int   NeutralFrames   = 60;
@@ -186,8 +187,8 @@ namespace R8EOX.UI.Internal
         private void TickNeutral(Gamepad pad)
         {
             if (pad == null) { _progressText.text = $"Sampling... {_sampleCount}/{NeutralFrames} (no controller)"; return; }
-            var axes = ReadAxes(pad);
-            for (int i = 0; i < AxisCount; i++) _neutralAccum[i] += axes[i];
+            ReadAxes(pad, _axisBuffer);
+            for (int i = 0; i < AxisCount; i++) _neutralAccum[i] += _axisBuffer[i];
             _sampleCount++;
             _progressText.text = $"Sampling... {_sampleCount}/{NeutralFrames}";
             if (_sampleCount >= NeutralFrames)
@@ -201,11 +202,11 @@ namespace R8EOX.UI.Internal
         {
             if (pad != null)
             {
-                var axes = ReadAxes(pad);
+                ReadAxes(pad, _axisBuffer);
                 for (int i = 0; i < AxisCount; i++)
                 {
-                    if (axes[i] < _mins[i]) _mins[i] = axes[i];
-                    if (axes[i] > _maxs[i]) _maxs[i] = axes[i];
+                    if (_axisBuffer[i] < _mins[i]) _mins[i] = _axisBuffer[i];
+                    if (_axisBuffer[i] > _maxs[i]) _maxs[i] = _axisBuffer[i];
                 }
             }
             _extremesTimer -= Time.unscaledDeltaTime;
@@ -230,11 +231,16 @@ namespace R8EOX.UI.Internal
 
         // ── Helpers ───────────────────────────────────────────────────────
 
-        private static float[] ReadAxes(Gamepad pad)
+        private static void ReadAxes(Gamepad pad, float[] buffer)
         {
             var ls = pad.leftStick.ReadValue();
             var rs = pad.rightStick.ReadValue();
-            return new[] { ls.x, ls.y, rs.x, rs.y, pad.leftTrigger.ReadValue(), pad.rightTrigger.ReadValue() };
+            buffer[0] = ls.x;
+            buffer[1] = ls.y;
+            buffer[2] = rs.x;
+            buffer[3] = rs.y;
+            buffer[4] = pad.leftTrigger.ReadValue();
+            buffer[5] = pad.rightTrigger.ReadValue();
         }
 
         private bool Validate(out string summary)
