@@ -7,8 +7,7 @@ namespace R8EOX.UI.Internal
 {
     internal class ControlsTabContent : MonoBehaviour
     {
-        [Header("State")]
-        [SerializeField] private Settings.SettingsManager settingsManager;
+        private Settings.SettingsManager settingsManager;
 
         private const float STEP_DEADZONE       = 0.005f;
         private const float STEP_CURVE          = 0.05f;
