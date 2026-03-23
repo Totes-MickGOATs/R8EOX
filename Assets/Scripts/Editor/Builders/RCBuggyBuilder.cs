@@ -241,7 +241,7 @@ namespace R8EOX.Editor.Builders
             PhysicsMaterialCombine bounceCombine = PhysicsMaterialCombine.Average)
         {
             const string matDir = "Assets/Materials/Physics";
-            string path = $"{matDir}/{name}.physicsMaterial";
+            string path = $"{matDir}/{name}.asset";
             var existing = AssetDatabase.LoadAssetAtPath<PhysicsMaterial>(path);
             if (existing != null)
             {
