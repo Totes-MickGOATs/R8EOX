@@ -36,3 +36,8 @@ VehicleManager's serialized fields are set by `RCBuggyBuilder.ConfigureVehicleMa
 ## Static Accessors for Exporter
 - `VehicleManager.FlipHeightOffset` — exposes `k_FlipHeightOffset` for `BuggySpecExporter`
 - `Drivetrain.DiffStiffnessConst` — exposes `k_DiffStiffness` for `BuggySpecExporter`
+
+## Rigidbody Safety
+- Public API methods that access `_rb` (GetSpeedKmh, GetForwardSpeedKmh, GetTelemetry) must null-guard against destroyed Rigidbody
+- AudioManager and VFXManager poll these in LateUpdate — the vehicle can be destroyed mid-frame
+- FixedUpdate already has `if (_rb == null) return` guard at the top
