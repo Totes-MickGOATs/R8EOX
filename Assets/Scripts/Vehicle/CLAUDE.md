@@ -23,3 +23,10 @@ RC car vehicle physics — suspension, drivetrain, grip, and handling. This is t
 
 ## Telemetry Contracts
 `WheelTelemetry` and `VehicleTelemetry` are public DTOs in `R8EOX.Vehicle` — other systems (Audio, VFX, UI) read them without touching Vehicle internals. `VehicleTelemetry` is returned by `VehicleManager.GetTelemetry()`.
+
+## Spec Contract
+VehicleManager's serialized fields are set by `RCBuggyBuilder.ConfigureVehicleManager()` at build time. `Start()` must NOT re-assign Rigidbody properties (mass, damping, interpolation, collision mode) — these come from the prefab. Only `centerOfMass` is applied in `Start()` because it reads from the serialized `_comGround` field. Motor params are applied via `ApplyMotorPreset()` from the serialized `_motorPreset` enum.
+
+## Static Accessors for Exporter
+- `VehicleManager.FlipHeightOffset` — exposes `k_FlipHeightOffset` for `BuggySpecExporter`
+- `Drivetrain.DiffStiffnessConst` — exposes `k_DiffStiffness` for `BuggySpecExporter`

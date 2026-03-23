@@ -10,4 +10,5 @@ All Unity scene files (.unity).
 - Save scenes after modifications: `mcp__UnityMCP__manage_scene(action="save")`
 
 ## Contents
-No scenes yet — create as needed.
+- `OutpostTrack.unity` — Outdoor RC track with terrain, environment, SpawnGrid, all managers wired via SceneSetupBuilder
+- `PhysicsTestTrack.unity` — Flat test track with waypoint path, obstacles, and PhysicsTestManager for vehicle physics debugging

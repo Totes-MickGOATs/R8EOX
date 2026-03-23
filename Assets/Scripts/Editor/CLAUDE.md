@@ -8,6 +8,7 @@ Editor-only scripts excluded from runtime builds by Unity's convention.
 - Must use `using UnityEditor;`
 - Never create circular dependencies between editor and runtime scripts
 - Place custom inspectors, editor windows, property drawers, and build tools here
+- Validators follow the pattern: `#if UNITY_EDITOR` wrapper, `public static class`, `[MenuItem("R8EOX/...")]`, console log summary (see `BuildSettingsValidator.cs`)
 - See `Builders/` subfolder for programmatic scene/prefab construction
 
 ## Contents

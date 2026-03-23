@@ -36,6 +36,15 @@
             "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); LAST_FILE=$(cat /tmp/r8eox_last_edit 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -n \"$LAST_FILE\" ] && [ \"$FILE_PATH\" != \"$LAST_FILE\" ]; then REPO=$(git -C \"$(dirname \"$LAST_FILE\")\" rev-parse --show-toplevel 2>/dev/null); if [ -n \"$REPO\" ]; then STAGED=$(git -C \"$REPO\" diff --cached --name-only 2>/dev/null); if [ -n \"$STAGED\" ]; then git -C \"$REPO\" commit -m \"auto: update $(basename \"$LAST_FILE\")\" 2>/dev/null; fi; fi; fi; echo \"$FILE_PATH\" > /tmp/r8eox_last_edit"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo \"$TOOL_INPUT\" | python3 -c \"import sys,json; d=json.loads(sys.stdin.read()); print(d.get('file_path',''))\" 2>/dev/null); if [ -n \"$FILE_PATH\" ] && [ -f \"$FILE_PATH\" ] && echo \"$FILE_PATH\" | grep -q '.cs$'; then LINES=$(wc -l < \"$FILE_PATH\" | tr -d ' '); if [ \"$LINES\" -gt 250 ]; then echo \"WARNING: $(basename \"$FILE_PATH\") is $LINES lines (limit: 300). Consider refactoring.\"; fi; fi"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -45,6 +54,10 @@
           {
             "type": "command",
             "command": "if echo \"$TOOL_INPUT\" | grep -qE '(ProjectSettings/|Packages/manifest\\.json|_RPAsset\\.asset|_Renderer\\.asset|UniversalRenderPipelineGlobalSettings)'; then echo 'BLOCKED: Do not directly edit pipeline assets, ProjectSettings, or package manifest. Use Unity Editor or MCP tools instead.' >&2; exit 2; fi"
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -qE '\\.meta'; then echo 'BLOCKED: Do not edit .meta files directly — Unity manages these.' >&2; exit 2; fi"
           }
         ]
       }
