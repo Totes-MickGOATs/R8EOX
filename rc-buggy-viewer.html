@@ -15,6 +15,10 @@
   button:hover { background: #3a3a5a; color: #fff; }
   button.active { background: #2E73E6; color: #fff; border-color: #4a8af0; }
   button.active-green { background: #2d8a4e; color: #fff; border-color: #44b868; }
+  button.ref-variant { background: transparent; color: #666; border: 1px dashed #3a3a5a; display: none; }
+  button.ref-variant:hover { color: #999; border-color: #5a5a7a; }
+  button.ref-variant.active { background: #2a2a4a; color: #8888cc; border: 1px solid #4a4a6a; }
+  button.ref-variant.visible { display: inline-block; }
   #canvas-wrap { flex: 1; position: relative; }
   canvas { display: block; width: 100%; height: 100%; }
   #info { position: absolute; bottom: 12px; left: 16px; font-size: 11px; color: #667; font-family: 'SF Mono', 'Consolas', monospace; line-height: 1.6; background: rgba(22,33,62,0.85); padding: 8px 12px; border-radius: 6px; border: 1px solid #2a2a4a; }
@@ -729,22 +733,60 @@ window.setVariant = function(key) {
   simSpeed = 0; // reset speed on variant switch
   document.querySelectorAll('#variant-buttons button').forEach(b => b.classList.remove('active', 'active-green'));
   const btn = document.getElementById('btn-' + key);
-  if (btn) btn.classList.add(variantKeys.indexOf(key) > 0 ? 'active-green' : 'active');
+  const isRef = SPECS.variants[key]?.reference;
+  if (btn) btn.classList.add(isRef ? 'active' : (gameKeys.indexOf(key) > 0 ? 'active-green' : 'active'));
   buildVehicle(); updateSpecsPanel();
 };
 
 // Build variant buttons dynamically from JSON
 const variantKeys = Object.keys(SPECS.variants);
+const gameKeys = variantKeys.filter(k => !SPECS.variants[k].reference);
+const refKeys = variantKeys.filter(k => SPECS.variants[k].reference);
 const variantContainer = document.getElementById('variant-buttons');
-variantKeys.forEach((key, i) => {
+
+// Game variant buttons
+gameKeys.forEach((key, i) => {
   const v = SPECS.variants[key];
   const btn = document.createElement('button');
   btn.id = 'btn-' + key;
   btn.textContent = v.name.replace('Buggy', '').trim() || key.toUpperCase();
   btn.onclick = () => window.setVariant(key);
-  if (i === 0) btn.classList.add('active');
   variantContainer.appendChild(btn);
 });
+
+// Set initial active button
+const initBtn = document.getElementById('btn-' + currentVariant);
+if (initBtn) initBtn.classList.add(gameKeys.indexOf(currentVariant) > 0 ? 'active-green' : 'active');
+
+// Reference variant buttons (hidden by default)
+if (refKeys.length > 0) {
+  const refSep = document.createElement('span');
+  refSep.className = 'ref-sep';
+  refSep.style.cssText = 'width:1px;height:16px;background:#2a2a4a;margin:0 4px;display:none';
+  variantContainer.appendChild(refSep);
+  refKeys.forEach(key => {
+    const v = SPECS.variants[key];
+    const btn = document.createElement('button');
+    btn.id = 'btn-' + key;
+    btn.textContent = (v.name.replace('Buggy', '').trim() || key.toUpperCase()) + ' (ref)';
+    btn.className = 'ref-variant';
+    btn.onclick = () => window.setVariant(key);
+    variantContainer.appendChild(btn);
+  });
+  // Add reference toggle to toolbar
+  const toolbar = document.getElementById('toolbar');
+  const sep = document.createElement('div'); sep.className = 'sep';
+  const wrap = document.createElement('div'); wrap.className = 'toggle-wrap';
+  wrap.innerHTML = '<label>Reference</label><div class="toggle" id="ref-toggle"></div>';
+  toolbar.appendChild(sep); toolbar.appendChild(wrap);
+  wrap.querySelector('.toggle').onclick = function() {
+    this.classList.toggle('on');
+    const show = this.classList.contains('on');
+    refSep.style.display = show ? '' : 'none';
+    document.querySelectorAll('.ref-variant').forEach(b => b.classList.toggle('visible', show));
+    if (!show && refKeys.includes(currentVariant)) window.setVariant(gameKeys[0]);
+  };
+}
 
 // ---- Input Simulation (Arrow Keys) ----
 const input = { throttle: false, brake: false, steerL: false, steerR: false };
