@@ -60,6 +60,8 @@ namespace R8EOX.Editor.Builders
 
         public readonly float Mass;
         public readonly Vector3 CenterOfMass;
+        /// <summary>Custom inertia tensor (kg*m^2). (0,0,0) = use Unity default.</summary>
+        public readonly Vector3 InertiaTensor;
 
 
         // ---- Spring Tuning ----
@@ -109,6 +111,7 @@ namespace R8EOX.Editor.Builders
             float hubRadius, float frontHubWidth, float rearHubWidth,
             float restDistance, float overExtend, float minSpringLen, float maxSpringForce,
             float mass, Vector3 centerOfMass,
+            Vector3 inertiaTensor,
             float frontSpringStrength, float frontSpringDamping,
             float rearSpringStrength, float rearSpringDamping,
             float gripCoeff, float steeringMax,
@@ -127,7 +130,7 @@ namespace R8EOX.Editor.Builders
             HubRadius = hubRadius; FrontHubWidth = frontHubWidth; RearHubWidth = rearHubWidth;
             RestDistance = restDistance; OverExtend = overExtend;
             MinSpringLen = minSpringLen; MaxSpringForce = maxSpringForce;
-            Mass = mass; CenterOfMass = centerOfMass;
+            Mass = mass; CenterOfMass = centerOfMass; InertiaTensor = inertiaTensor;
             FrontSpringStrength = frontSpringStrength; FrontSpringDamping = frontSpringDamping;
             RearSpringStrength = rearSpringStrength; RearSpringDamping = rearSpringDamping;
             GripCoeff = gripCoeff; SteeringMax = steeringMax;
