@@ -10,13 +10,7 @@ namespace R8EOX.Vehicle.Internal
     {
         // ---- Constants ----
 
-        const float k_DiffStiffness = 5000f;
-
-
-        // ---- Enums ----
-
-        public enum DiffType { Open, BallDiff, Spool }
-        public enum DriveLayout { RWD, AWD }
+        const float k_DiffStiffness = 500f;
 
 
         // ---- Serialized Fields ----
@@ -29,7 +23,7 @@ namespace R8EOX.Vehicle.Internal
         [Tooltip("Rear axle differential type")]
         [SerializeField] private DiffType _rearDiffType = DiffType.Open;
         [Tooltip("Max coupling force the rear ball diff transfers between wheels (N)")]
-        [SerializeField] private float _rearPreload = 50.0f;
+        [SerializeField] private float _rearPreload = 5.0f;
 
         [Header("Front Differential")]
         [Tooltip("Front axle differential type")]

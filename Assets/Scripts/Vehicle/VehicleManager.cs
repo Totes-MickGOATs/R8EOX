@@ -6,29 +6,29 @@ namespace R8EOX.Vehicle
     [RequireComponent(typeof(Rigidbody))]
     public class VehicleManager : MonoBehaviour
     {
-        const float k_DefaultMass = 15.0f, k_DefaultAngularDrag = 0.05f, k_DefaultBounciness = 0.05f;
+        const float k_DefaultMass = 1.5f, k_DefaultAngularDrag = 0.05f, k_DefaultBounciness = 0.05f;
         const float k_FlipHeightOffset = 14.0f, k_MsToKmh = 3.6f;
         const float k_ReverseSpeedThreshold = 0.25f, k_ForwardSpeedClearThreshold = 0.50f, k_ReverseBrakeMinThreshold = 0.1f;
 
         [Header("Motor")]
         [Tooltip("Motor preset selecting predefined engine parameters")]
-        [SerializeField] private MotorPreset _motorPreset = MotorPreset.Motor13_5T;
+        [SerializeField] private MotorPreset _motorPreset = MotorPreset.Motor17_5T;
 
         [Header("Engine")]
         [Tooltip("Maximum engine force applied at the wheels (Newtons)")]
-        [SerializeField] private float _engineForceMax = 260f;
+        [SerializeField] private float _engineForceMax = 18.0f;
         [Tooltip("Maximum forward speed (m/s)")]
-        [SerializeField] private float _maxSpeed = 27f;
+        [SerializeField] private float _maxSpeed = 20f;
         [Tooltip("Braking force applied when brake input is active (Newtons)")]
-        [SerializeField] private float _brakeForce = 221f;
+        [SerializeField] private float _brakeForce = 15.3f;
         [Tooltip("Reverse drive force (Newtons)")]
-        [SerializeField] private float _reverseForce = 143f;
+        [SerializeField] private float _reverseForce = 9.9f;
         [Tooltip("Coast drag force applied when no throttle is given (Newtons)")]
-        [SerializeField] private float _coastDrag = 30f;
+        [SerializeField] private float _coastDrag = 2.5f;
 
         [Header("Throttle")]
         [Tooltip("Rate at which throttle ramps up (units/sec)")]
-        [SerializeField] private float _throttleRampUp = 5.5f;
+        [SerializeField] private float _throttleRampUp = 4.0f;
         [Tooltip("Rate at which throttle ramps down when released (units/sec)")]
         [SerializeField] private float _throttleRampDown = 10f;
 
@@ -45,15 +45,15 @@ namespace R8EOX.Vehicle
 
         [Header("Suspension Front")]
         [Tooltip("Front axle spring strength (N/m)")]
-        [SerializeField] private float _frontSpringStrength = 700.0f;
+        [SerializeField] private float _frontSpringStrength = 75.0f;
         [Tooltip("Front axle spring damping coefficient (N·s/m)")]
-        [SerializeField] private float _frontSpringDamping = 41.0f;
+        [SerializeField] private float _frontSpringDamping = 4.25f;
 
         [Header("Suspension Rear")]
         [Tooltip("Rear axle spring strength (N/m)")]
-        [SerializeField] private float _rearSpringStrength = 350.0f;
+        [SerializeField] private float _rearSpringStrength = 75.0f;
         [Tooltip("Rear axle spring damping coefficient (N·s/m)")]
-        [SerializeField] private float _rearSpringDamping = 29.0f;
+        [SerializeField] private float _rearSpringDamping = 4.25f;
 
         [Header("Traction")]
         [Range(0f, 1f)]
@@ -62,7 +62,7 @@ namespace R8EOX.Vehicle
 
         [Header("CoM")]
         [Tooltip("Centre of mass offset from the Rigidbody origin (world-space Y is most critical)")]
-        [SerializeField] private Vector3 _comGround = new Vector3(0f, -0.12f, 0f);
+        [SerializeField] private Vector3 _comGround = new Vector3(0f, -0.20f, 0f);
 
         [Header("Crash")]
         [Tooltip("Tilt angle (degrees) at which tumble mode begins to engage")]

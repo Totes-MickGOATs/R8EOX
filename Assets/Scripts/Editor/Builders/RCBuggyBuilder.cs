@@ -137,16 +137,16 @@ namespace R8EOX.Editor.Builders
         }
 
         // ---- Enum Mappers ----
-        static R8EOX.Vehicle.Internal.Drivetrain.DriveLayout MapLayout(BuggyDriveLayout layout) =>
+        static R8EOX.Vehicle.Internal.DriveLayout MapLayout(BuggyDriveLayout layout) =>
             layout == BuggyDriveLayout.AWD
-                ? R8EOX.Vehicle.Internal.Drivetrain.DriveLayout.AWD
-                : R8EOX.Vehicle.Internal.Drivetrain.DriveLayout.RWD;
+                ? R8EOX.Vehicle.Internal.DriveLayout.AWD
+                : R8EOX.Vehicle.Internal.DriveLayout.RWD;
 
-        static R8EOX.Vehicle.Internal.Drivetrain.DiffType MapDiff(BuggyDiffType diff) =>
+        static R8EOX.Vehicle.Internal.DiffType MapDiff(BuggyDiffType diff) =>
             diff switch {
-                BuggyDiffType.BallDiff => R8EOX.Vehicle.Internal.Drivetrain.DiffType.BallDiff,
-                BuggyDiffType.Spool    => R8EOX.Vehicle.Internal.Drivetrain.DiffType.Spool,
-                _                      => R8EOX.Vehicle.Internal.Drivetrain.DiffType.Open,
+                BuggyDiffType.BallDiff => R8EOX.Vehicle.Internal.DiffType.BallDiff,
+                BuggyDiffType.Spool    => R8EOX.Vehicle.Internal.DiffType.Spool,
+                _                      => R8EOX.Vehicle.Internal.DiffType.Open,
             };
 
         // ---- Private Helpers ----
