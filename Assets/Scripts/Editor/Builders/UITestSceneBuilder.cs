@@ -10,6 +10,14 @@ namespace R8EOX.Editor.Builders
         [MenuItem("R8EOX/Build UI Test Scene")]
         static void Build()
         {
+            // Save current scene before replacing it
+            var currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (currentScene.isDirty)
+            {
+                EditorSceneManager.SaveScene(currentScene);
+                Debug.Log($"[UITestSceneBuilder] Saved dirty scene '{currentScene.name}' before creating test scene.");
+            }
+
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "UITestScene";
 
