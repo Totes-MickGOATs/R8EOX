@@ -14,3 +14,7 @@ URP render pipeline assets and volume profiles that control rendering quality an
 - `PC_RPAsset.asset` / `PC_Renderer.asset` — PC/desktop quality tier
 - `DefaultVolumeProfile.asset` — Post-processing profile for Global Volumes
 - `UniversalRenderPipelineGlobalSettings.asset` — URP global config
+- `RCBuggy_VehicleDef.asset` — VehicleDefinition for RCBuggy prefab (Buggy category)
+- `2WDBuggy_VehicleDef.asset` — VehicleDefinition for 2WDBuggy prefab (Buggy category)
+- `4WDBuggy_VehicleDef.asset` — VehicleDefinition for 4WDBuggy prefab (Buggy category)
+- `VehicleRegistry.asset` — VehicleRegistry with all 3 vehicle definitions + overlay prefab
