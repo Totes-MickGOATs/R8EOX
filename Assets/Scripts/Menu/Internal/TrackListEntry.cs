@@ -74,5 +74,12 @@ namespace R8EOX.Menu.Internal
         {
             onClicked?.Invoke(entryIndex);
         }
+
+        private void OnDestroy()
+        {
+            var button = GetComponent<Button>();
+            if (button != null)
+                button.onClick.RemoveListener(HandleClick);
+        }
     }
 }
