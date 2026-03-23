@@ -9,7 +9,7 @@ Internal implementation classes for the Track system. Only `TrackManager` should
 - Checkpoint and TrackBoundary are MonoBehaviours (they use triggers/collisions)
 
 ## Contents
-- `Centerline.cs` — Spline-based track center path: point sampling, nearest point projection, total length
+- `Centerline.cs` — MonoBehaviour [RequireComponent(SplineContainer)]: wraps com.unity.splines for centerline queries — position at distance, nearest point projection, distance along track, direction, curvature. Discovered by TrackManager via GetComponentInChildren
 - `Checkpoint.cs` — MonoBehaviour with trigger collider: detects vehicle passage, notifies TrackManager via Action
 - `TrackBoundary.cs` — MonoBehaviour with collision: applies bounce force when vehicles hit walls
 - `SpawnPoint.cs` — MonoBehaviour marking vehicle spawn locations: serializes index, isPlayerSpawn flag; provides SpawnPointData DTO via ToData(); draws Gizmo in editor (fallback when no SpawnGrid)

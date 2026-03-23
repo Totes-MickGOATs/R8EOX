@@ -13,7 +13,7 @@ Track/circuit definition — path, checkpoints, boundaries, and surface types.
 ## Contents
 - `SpawnPointData.cs` — Public struct (DTO) exposing spawn point data across system boundaries
 - `TrackManager.cs` — Top-level API: track queries, checkpoint tracking; discovers SpawnGrid (preferred) or individual SpawnPoints
-- `Internal/Centerline.cs` — Spline/path defining track center
+- `Internal/Centerline.cs` — MonoBehaviour wrapping SplineContainer (com.unity.splines): evaluates position, tangent, curvature, nearest point, distance along track
 - `Internal/Checkpoint.cs` — Lap tracking, position detection triggers
 - `Internal/SpawnPoint.cs` — Vehicle spawn location markers with index and player flag (fallback when no SpawnGrid)
 - `Internal/SpawnGrid.cs` — Configurable grid-based spawn layout: dimensions, spacing, fill order, stagger, grouping; live editor gizmos

@@ -7,7 +7,7 @@ Read this index first. Only load the specific document you need for your current
 | Working on... | Read these docs |
 |---------------|----------------|
 | Writing C# scripts | `conventions/csharp-style.md`, `conventions/unity-patterns.md` |
-| System architecture | `architecture/top-down-systems.md` |
+| System architecture | `architecture/top-down-systems.md`, `architecture/track-contract.md` |
 | Creating scenes | `architecture/urp-rendering.md`, `gotchas/unity6-urp-gotchas.md` |
 | Input handling | `architecture/input-system.md` |
 | Writing tests | `testing/test-guidelines.md` |
