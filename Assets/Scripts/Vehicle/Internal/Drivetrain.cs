@@ -10,7 +10,7 @@ namespace R8EOX.Vehicle.Internal
     {
         // ---- Constants ----
 
-        const float k_DiffStiffness = 500f;
+        const float k_DiffStiffness = 125f;
 
 
         // ---- Serialized Fields ----

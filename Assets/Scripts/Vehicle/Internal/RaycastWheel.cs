@@ -13,20 +13,20 @@ namespace R8EOX.Vehicle.Internal
 
         const float k_DebugScale = 0.024f;
         const float k_DroopSpeed = 200f;
-        // SphereCast radius (~150mm tire contact patch, anti-snag).
-        private const float k_SphereCastRadius = 0.15f;
+        // SphereCast radius (~37.5mm tire contact patch, anti-snag).
+        private const float k_SphereCastRadius = 0.0375f;
         /// <summary>SphereCast radius accessor used by tests.</summary>
         public static float SphereCastRadius => k_SphereCastRadius;
 
         // ---- Serialized Fields ----
 
         [Header("Suspension")]
-        [SerializeField] private float _restDistance = 0.20f;
-        [SerializeField] private float _overExtend = 0.08f;
+        [SerializeField] private float _restDistance = 0.05f;
+        [SerializeField] private float _overExtend = 0.02f;
         [SerializeField] private float _maxSpringForce = 50.0f;
-        [SerializeField] private float _minSpringLen = 0.032f;
+        [SerializeField] private float _minSpringLen = 0.008f;
         [Header("Wheel")]
-        [SerializeField] private float _wheelRadius = 0.166f;
+        [SerializeField] private float _wheelRadius = 0.0415f;
         [Header("Motor/Steer")]
         [SerializeField] private bool _isMotor;
         [SerializeField] private bool _isSteer;
@@ -43,8 +43,8 @@ namespace R8EOX.Vehicle.Internal
 
         // ---- Public Properties ----
 
-        public float SpringStrength { get; set; } = 37.5f;
-        public float SpringDamping  { get; set; } = 3.0f;
+        public float SpringStrength { get; set; } = 350.0f;
+        public float SpringDamping  { get; set; } = 9.2f;
         public float GripCoeff      { get; set; } = 0.7f;
         public LayerMask GroundMask { get => _groundMask; set => _groundMask = value; }
         public bool ShowDebug       { get => _showDebug;  set => _showDebug  = value; }

@@ -7,7 +7,7 @@ namespace R8EOX.Vehicle
     public class VehicleManager : MonoBehaviour
     {
         const float k_DefaultMass = 1.5f, k_DefaultAngularDrag = 0.05f, k_DefaultBounciness = 0.05f;
-        const float k_FlipHeightOffset = 1.4f, k_MsToKmh = 3.6f;
+        const float k_FlipHeightOffset = 0.35f, k_MsToKmh = 3.6f;
         const float k_ReverseSpeedThreshold = 0.25f, k_ForwardSpeedClearThreshold = 0.50f, k_ReverseBrakeMinThreshold = 0.1f;
 
         [Header("Motor")]
@@ -45,15 +45,15 @@ namespace R8EOX.Vehicle
 
         [Header("Suspension Front")]
         [Tooltip("Front axle spring strength (N/m)")]
-        [SerializeField] private float _frontSpringStrength = 75.0f;
+        [SerializeField] private float _frontSpringStrength = 700.0f;
         [Tooltip("Front axle spring damping coefficient (N·s/m)")]
-        [SerializeField] private float _frontSpringDamping = 4.25f;
+        [SerializeField] private float _frontSpringDamping = 13.0f;
 
         [Header("Suspension Rear")]
         [Tooltip("Rear axle spring strength (N/m)")]
-        [SerializeField] private float _rearSpringStrength = 75.0f;
+        [SerializeField] private float _rearSpringStrength = 350.0f;
         [Tooltip("Rear axle spring damping coefficient (N·s/m)")]
-        [SerializeField] private float _rearSpringDamping = 4.25f;
+        [SerializeField] private float _rearSpringDamping = 9.2f;
 
         [Header("Traction")]
         [Range(0f, 1f)]
@@ -62,7 +62,7 @@ namespace R8EOX.Vehicle
 
         [Header("CoM")]
         [Tooltip("Centre of mass offset from the Rigidbody origin (world-space Y is most critical)")]
-        [SerializeField] private Vector3 _comGround = new Vector3(0f, -0.20f, 0f);
+        [SerializeField] private Vector3 _comGround = new Vector3(0f, -0.05f, 0f);
 
         [Header("Crash")]
         [Tooltip("Tilt angle (degrees) at which tumble mode begins to engage")]
