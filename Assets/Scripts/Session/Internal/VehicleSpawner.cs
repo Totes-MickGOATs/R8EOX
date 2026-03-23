@@ -140,20 +140,10 @@ namespace R8EOX.Session.Internal
 
         private static void ShutdownAndDestroy(GameObject vehicle)
         {
-            // Disable all MonoBehaviours to prevent callbacks during destroy frame
-            foreach (var mb in vehicle.GetComponentsInChildren<MonoBehaviour>())
-            {
-                if (mb != null) mb.enabled = false;
-            }
-
-            // Remove vehicle from physics simulation before destroy
-            var rb = vehicle.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.isKinematic = true;
-                rb.detectCollisions = false;
-            }
-
+            // Deactivate the entire hierarchy first — this immediately removes
+            // the GO from physics, rendering, and all Unity callbacks. Then
+            // Destroy cleans up on the next frame with nothing left to process.
+            vehicle.SetActive(false);
             Object.Destroy(vehicle);
         }
 
