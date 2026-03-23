@@ -105,8 +105,9 @@ namespace R8EOX.Session.Internal
 
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
+            var overlayRegistry = sessionChannel?.OverlayRegistry;
             bool useOverlay = registry != null && registry.Count > 0
-                && registry.OverlayPrefab != null;
+                && overlayRegistry?.VehicleSelectOverlayPrefab != null;
 
             var config = useOverlay
                 ? SessionConfig.CreateRuntime(SessionMode.Practice, null)
