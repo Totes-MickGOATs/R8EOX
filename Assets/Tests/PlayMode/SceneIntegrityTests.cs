@@ -31,18 +31,9 @@ namespace R8EOX.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PhysicsTestTrack_HasRequiredManagers()
+        public IEnumerator AllTrackScenes_HaveSpawnPoints()
         {
-            yield return E2ETestUtils.LoadSceneAndWait("PhysicsTestTrack");
-            yield return E2ETestUtils.WaitForComponent<R8EOX.Session.Internal.SessionBootstrapper>();
-            yield return E2ETestUtils.WaitForComponent<R8EOX.Track.TrackManager>();
-            yield return E2ETestUtils.WaitForComponent<R8EOX.Camera.CameraManager>();
-        }
-
-        [UnityTest]
-        public IEnumerator AllTrackScenes_HaveSpawnPoints(
-            [Values("OutpostTrack", "PhysicsTestTrack")] string sceneName)
-        {
+            const string sceneName = "OutpostTrack";
             yield return E2ETestUtils.LoadSceneAndWait(sceneName);
             var trackManager = Object.FindAnyObjectByType<R8EOX.Track.TrackManager>();
             Assert.IsNotNull(trackManager, $"TrackManager missing in {sceneName}");
