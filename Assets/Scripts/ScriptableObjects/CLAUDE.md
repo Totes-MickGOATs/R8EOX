@@ -28,3 +28,5 @@ ScriptableObject class definitions. Asset instances created from these go in app
 - `VehicleDefinition.cs` — Vehicle metadata: name, description, thumbnail, prefab reference, category, stats
 - `VehicleRegistry.cs` — Collection of VehicleDefinition refs + overlay prefab reference for vehicle selection UI
 - `MenuThemeConfig.cs` — Menu visual theme data: colors (background, accents, danger, text), TMP font refs, animation timing
+- `TrackDefinition.cs` — Track metadata: name, description, thumbnail, scene name, TrackType, supported SessionModes, locked state
+- `TrackRegistry.cs` — Collection of TrackDefinition refs; GetAll, GetDefault, FindBySceneName, Count
