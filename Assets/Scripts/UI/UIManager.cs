@@ -18,6 +18,8 @@ namespace R8EOX.UI
         private RaceManager raceManager;
         private GameObject overlayInstance;
         private VehicleSelectOverlay activeOverlay;
+        private GameObject optionsOverlayInstance;
+        private bool overlayActive;
 
         private GameObject cachedPlayerVehicle;
         private VehicleManager cachedVehicleManager;
@@ -58,12 +60,13 @@ namespace R8EOX.UI
 
         /// <summary>Instantiate and show the vehicle selection overlay.</summary>
         public void ShowVehicleSelectOverlay(
+            GameObject overlayPrefab,
             VehicleRegistry registry,
             Action<VehicleDefinition> confirmCallback,
             Action cancelCallback = null)
         {
             CleanupVehicleSelectOverlay();
-            overlayInstance = Instantiate(registry.OverlayPrefab);
+            overlayInstance = Instantiate(overlayPrefab);
             activeOverlay = overlayInstance.GetComponent<VehicleSelectOverlay>();
             if (activeOverlay == null)
             {
@@ -84,6 +87,24 @@ namespace R8EOX.UI
             if (overlayInstance != null) Destroy(overlayInstance);
             activeOverlay = null;
             overlayInstance = null;
+        }
+
+        public void ShowOptionsOverlay(R8EOX.Settings.SettingsManager settingsManager)
+        {
+            if (optionsOverlayInstance != null) return;
+            optionsOverlayInstance = new GameObject("[OptionsOverlay]");
+            var overlay =
+                optionsOverlayInstance.AddComponent<R8EOX.UI.Internal.OptionsOverlay>();
+            overlay.Show(settingsManager, HideOptionsOverlay);
+            overlayActive = true;
+        }
+
+        public void HideOptionsOverlay()
+        {
+            if (optionsOverlayInstance != null)
+                Destroy(optionsOverlayInstance);
+            optionsOverlayInstance = null;
+            overlayActive = false;
         }
 
         public void UpdateHUD(
@@ -132,6 +153,7 @@ namespace R8EOX.UI
 
         private void HandlePauseInput()
         {
+            if (overlayActive) return;
             if (Keyboard.current == null) return;
             if (!Keyboard.current.escapeKey.wasPressedThisFrame) return;
             TogglePause();
