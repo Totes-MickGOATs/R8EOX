@@ -168,8 +168,8 @@ namespace R8EOX.Vehicle
         }
 
         // Public API
-        public float GetSpeedKmh()        => _rb.linearVelocity.magnitude * k_MsToKmh;
-        public float GetForwardSpeedKmh() => Vector3.Dot(_rb.linearVelocity, transform.forward) * k_MsToKmh;
+        public float GetSpeedKmh()        => _rb != null ? _rb.linearVelocity.magnitude * k_MsToKmh : 0f;
+        public float GetForwardSpeedKmh() => _rb != null ? Vector3.Dot(_rb.linearVelocity, transform.forward) * k_MsToKmh : 0f;
 
         public float GetSlip()
         {
