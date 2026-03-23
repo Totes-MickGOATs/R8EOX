@@ -18,6 +18,7 @@ with `internal` access modifiers — never exposed outside the Menu system.
 | `MenuButton.cs` | `internal class : MonoBehaviour` | UI button component — configures color, hover state, locked state, and label text |
 | `MenuButtonStyle.cs` | `internal enum` | Button style variants: Primary, Secondary, Danger, Locked, Ghost |
 | `MenuScreen.cs` | `internal abstract class : MonoBehaviour` | Base class for all menu screens — owns CanvasGroup fade in/out, Show/Hide/ShowImmediate/HideImmediate lifecycle |
+| `ModeSelectScreen.cs` | `internal class : MenuScreen` | Mode selection screen — Testing Session (Practice), Race (locked), Multiplayer (locked); initialized with mode and back callbacks |
 
 ## Usage Pattern
 
