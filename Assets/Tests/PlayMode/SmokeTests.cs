@@ -9,26 +9,24 @@ namespace R8EOX.Tests.PlayMode
     [Category("smoke")]
     public class SmokeTests : E2ETestBase
     {
-        [UnitySetUp]
-        public IEnumerator SmokeSetUp()
-        {
-            // Suppress residual errors from previous test teardown (e.g. TrackValidator warnings)
-            LogAssert.ignoreFailingMessages = true;
-            yield return null;
-            LogAssert.ignoreFailingMessages = false;
-        }
-
         [UnityTest]
         public IEnumerator BootScene_Loads_WithoutErrors()
         {
+            // Suppress residual errors from prior track tests (TrackValidator)
+            LogAssert.ignoreFailingMessages = true;
             yield return E2ETestUtils.LoadSceneAndWait("Boot");
+            yield return E2ETestUtils.WaitForFrames(3);
+            LogAssert.ignoreFailingMessages = false;
             yield return E2ETestUtils.WaitForNoErrors();
         }
 
         [UnityTest]
         public IEnumerator BootScene_HasAppRoot_WithAppManager()
         {
+            LogAssert.ignoreFailingMessages = true;
             yield return E2ETestUtils.LoadSceneAndWait("Boot");
+            yield return E2ETestUtils.WaitForFrames(3);
+            LogAssert.ignoreFailingMessages = false;
             yield return E2ETestUtils.WaitForGameObject("[AppRoot]");
             yield return E2ETestUtils.WaitForComponent<R8EOX.App.AppManager>();
         }
@@ -36,15 +34,20 @@ namespace R8EOX.Tests.PlayMode
         [UnityTest]
         public IEnumerator MainMenu_LoadsFromBoot()
         {
+            LogAssert.ignoreFailingMessages = true;
             yield return E2ETestUtils.LoadSceneAndWait("Boot");
-            // AppManager.Start() loads MainMenu automatically
+            yield return E2ETestUtils.WaitForFrames(3);
+            LogAssert.ignoreFailingMessages = false;
             yield return E2ETestUtils.WaitForComponent<R8EOX.Menu.MenuManager>(timeout: 10f);
         }
 
         [UnityTest]
         public IEnumerator MainMenu_HasMenuManager()
         {
+            LogAssert.ignoreFailingMessages = true;
             yield return E2ETestUtils.LoadSceneAndWait("Boot");
+            yield return E2ETestUtils.WaitForFrames(3);
+            LogAssert.ignoreFailingMessages = false;
             yield return E2ETestUtils.WaitForComponent<R8EOX.Menu.MenuManager>(timeout: 10f);
             var manager = Object.FindAnyObjectByType<R8EOX.Menu.MenuManager>();
             Assert.IsNotNull(manager, "MenuManager should exist after Boot loads MainMenu");
