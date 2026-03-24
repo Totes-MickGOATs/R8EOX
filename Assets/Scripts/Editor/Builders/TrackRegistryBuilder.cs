@@ -30,6 +30,7 @@ namespace R8EOX.Editor.Builders
 
             var definitions = new List<TrackDefinition>();
             ScanConventionFolders(definitions);
+            ScanExistingDefinitions(definitions);
 
             if (!definitions.Exists(d => d.SceneName == "PhysicsTestTrack"))
                 definitions.Add(BuildPhysicsTestFallback());
@@ -83,6 +84,20 @@ namespace R8EOX.Editor.Builders
                 Debug.LogWarning(
                     "[TrackRegistryBuilder] No subfolders found under " +
                     TracksArtRoot + ".");
+        }
+
+        private static void ScanExistingDefinitions(List<TrackDefinition> results)
+        {
+            string[] guids = AssetDatabase.FindAssets(
+                "t:TrackDefinition", new[] { OutputDir });
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var def = AssetDatabase.LoadAssetAtPath<TrackDefinition>(path);
+                if (def == null) continue;
+                if (results.Exists(d => d.SceneName == def.SceneName)) continue;
+                results.Add(def);
+            }
         }
 
         // ---- Per-folder build -----------------------------------------------
