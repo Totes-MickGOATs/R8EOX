@@ -15,7 +15,6 @@ namespace R8EOX.Editor.Builders
         // ---- Constants ----
 
         const int k_DefaultCarLayer = 8;
-        const string k_UrpLitShader = "Universal Render Pipeline/Lit";
 
         // ---- Menu Items ----
 
@@ -88,7 +87,13 @@ namespace R8EOX.Editor.Builders
             PrefabUtility.SaveAsPrefabAsset(go, path); Object.DestroyImmediate(go);
             string defPath = $"Assets/Settings/{spec.Name}_VehicleDef.asset";
             var def = AssetDatabase.LoadAssetAtPath<VehicleDefinition>(defPath);
-            if (def != null) { var so = new SerializedObject(def); so.FindProperty("isPlayable").boolValue = !spec.IsReference; so.ApplyModifiedProperties(); EditorUtility.SetDirty(def); }
+            if (def != null)
+            {
+                var so = new SerializedObject(def);
+                var p = so.FindProperty("isPlayable");
+                if (p == null) Debug.LogError($"[RCBuggyBuilder] Property 'isPlayable' not found on VehicleDefinition");
+                else { p.boolValue = !spec.IsReference; so.ApplyModifiedProperties(); EditorUtility.SetDirty(def); }
+            }
             AssetDatabase.SaveAssets(); Debug.Log($"[RCBuggyBuilder] Saved {path}");
         }
 
@@ -96,29 +101,29 @@ namespace R8EOX.Editor.Builders
         static void ConfigureDrivetrain(R8EOX.Vehicle.Internal.Drivetrain dt, BuggySpec s)
         {
             var so = new SerializedObject(dt);
-            so.FindProperty("_driveLayout").enumValueIndex    = (int)MapLayout(s.Layout);
-            so.FindProperty("_rearDiffType").enumValueIndex   = (int)MapDiff(s.RearDiff);
-            so.FindProperty("_rearPreload").floatValue        = s.RearPreload;
-            so.FindProperty("_frontDiffType").enumValueIndex  = (int)MapDiff(s.FrontDiff);
-            so.FindProperty("_frontPreload").floatValue       = s.FrontPreload;
-            so.FindProperty("_centerDiffType").enumValueIndex = (int)MapDiff(s.CenterDiff);
-            so.FindProperty("_centerPreload").floatValue      = s.CenterPreload;
-            so.FindProperty("_centerFrontBias").floatValue    = s.CenterFrontBias;
+            SetEnum(so,  dt, "_driveLayout",    (int)MapLayout(s.Layout));
+            SetEnum(so,  dt, "_rearDiffType",   (int)MapDiff(s.RearDiff));
+            SetFloat(so, dt, "_rearPreload",    s.RearPreload);
+            SetEnum(so,  dt, "_frontDiffType",  (int)MapDiff(s.FrontDiff));
+            SetFloat(so, dt, "_frontPreload",   s.FrontPreload);
+            SetEnum(so,  dt, "_centerDiffType", (int)MapDiff(s.CenterDiff));
+            SetFloat(so, dt, "_centerPreload",  s.CenterPreload);
+            SetFloat(so, dt, "_centerFrontBias",s.CenterFrontBias);
             so.ApplyModifiedProperties();
         }
 
         static void ConfigureVehicleManager(VehicleManager vm, BuggySpec s)
         {
             var so = new SerializedObject(vm);
-            so.FindProperty("_motorPreset").enumValueIndex     = (int)s.Motor;
-            so.FindProperty("_frontSpringStrength").floatValue = s.FrontSpringStrength;
-            so.FindProperty("_frontSpringDamping").floatValue  = s.FrontSpringDamping;
-            so.FindProperty("_rearSpringStrength").floatValue  = s.RearSpringStrength;
-            so.FindProperty("_rearSpringDamping").floatValue   = s.RearSpringDamping;
-            so.FindProperty("_gripCoeff").floatValue           = s.GripCoeff;
-            so.FindProperty("_steeringMax").floatValue         = s.SteeringMax;
-            so.FindProperty("_comGround").vector3Value         = s.CenterOfMass;
-            so.FindProperty("_gearRatio").floatValue           = s.GearRatio;
+            SetEnum(so,  vm, "_motorPreset",         (int)s.Motor);
+            SetFloat(so, vm, "_frontSpringStrength",  s.FrontSpringStrength);
+            SetFloat(so, vm, "_frontSpringDamping",   s.FrontSpringDamping);
+            SetFloat(so, vm, "_rearSpringStrength",   s.RearSpringStrength);
+            SetFloat(so, vm, "_rearSpringDamping",    s.RearSpringDamping);
+            SetFloat(so, vm, "_gripCoeff",            s.GripCoeff);
+            SetFloat(so, vm, "_steeringMax",          s.SteeringMax);
+            SetVec3(so,  vm, "_comGround",            s.CenterOfMass);
+            SetFloat(so, vm, "_gearRatio",            s.GearRatio);
             so.ApplyModifiedProperties();
         }
 
@@ -193,10 +198,10 @@ namespace R8EOX.Editor.Builders
             wheel.SpringDamping  = front ? spec.FrontSpringDamping  : spec.RearSpringDamping;
             wheel.RestDistance   = spec.RestDistance;
             var so = new SerializedObject(wheel);
-            so.FindProperty("_wheelRadius").floatValue    = tireR;
-            so.FindProperty("_overExtend").floatValue     = spec.OverExtend;
-            so.FindProperty("_minSpringLen").floatValue   = spec.MinSpringLen;
-            so.FindProperty("_maxSpringForce").floatValue = spec.MaxSpringForce;
+            SetFloat(so, wheel, "_wheelRadius",    tireR);
+            SetFloat(so, wheel, "_overExtend",     spec.OverExtend);
+            SetFloat(so, wheel, "_minSpringLen",   spec.MinSpringLen);
+            SetFloat(so, wheel, "_maxSpringForce", spec.MaxSpringForce);
             so.ApplyModifiedProperties();
             BuildWheelVisual(pivot, "WheelVisual", tireR, tireH, tireMat, layer);
             BuildWheelVisual(pivot, "HubVisual",   hubR,  hubH,  hubMat,  layer);
@@ -238,46 +243,37 @@ namespace R8EOX.Editor.Builders
             Object.DestroyImmediate(go.GetComponent<Collider>()); return go;
         }
 
-        static PhysicsMaterial GetOrCreatePhysicsMaterial(string name, float bounce, float friction,
-            PhysicsMaterialCombine bounceCombine = PhysicsMaterialCombine.Average)
+        // ---- Material helpers (delegate to shared helper) ----
+
+        static PhysicsMaterial GetOrCreatePhysicsMaterial(string name, float bounce,
+            float friction,
+            PhysicsMaterialCombine bounceCombine = PhysicsMaterialCombine.Average) =>
+            BuilderMaterialHelper.GetOrCreatePhysicsMaterial(name, bounce, friction, bounceCombine);
+
+        static Material GetOrCreateMaterial(string name, Color color, bool transparent = false) =>
+            BuilderMaterialHelper.GetOrCreateMaterial(name, color, transparent);
+
+        // ---- Null-guarded SerializedObject helpers ----
+
+        static void SetFloat(SerializedObject so, Object ctx, string prop, float v)
         {
-            const string matDir = "Assets/Materials/Physics";
-            string path = $"{matDir}/{name}.asset";
-            var existing = AssetDatabase.LoadAssetAtPath<PhysicsMaterial>(path);
-            if (existing != null)
-            {
-                existing.bounciness = bounce; existing.dynamicFriction = friction;
-                existing.staticFriction = friction; existing.bounceCombine = bounceCombine;
-                existing.frictionCombine = PhysicsMaterialCombine.Average;
-                EditorUtility.SetDirty(existing); return existing;
-            }
-            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Application.dataPath, "..", matDir));
-            var mat = new PhysicsMaterial(name) {
-                bounciness = bounce, dynamicFriction = friction, staticFriction = friction,
-                bounceCombine = bounceCombine, frictionCombine = PhysicsMaterialCombine.Average
-            };
-            AssetDatabase.CreateAsset(mat, path); return mat;
+            var p = so.FindProperty(prop);
+            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
+            p.floatValue = v;
         }
 
-        static Material GetOrCreateMaterial(string name, Color color, bool transparent = false)
+        static void SetEnum(SerializedObject so, Object ctx, string prop, int v)
         {
-            const string matDir = "Assets/Materials/Vehicle";
-            string path = $"{matDir}/{name}.mat";
-            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (existing != null) { existing.SetColor("_BaseColor", color); EditorUtility.SetDirty(existing); return existing; }
-            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Application.dataPath, "..", matDir));
-            var mat = new Material(Shader.Find(k_UrpLitShader)) { name = name };
-            mat.SetColor("_BaseColor", color);
-            if (transparent)
-            {
-                mat.SetFloat("_Surface", 1f); mat.SetFloat("_Blend", 0f); mat.SetFloat("_AlphaClip", 0f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                mat.SetInt("_ZWrite", 0); mat.DisableKeyword("_ALPHATEST_ON"); mat.EnableKeyword("_ALPHABLEND_ON");
-                mat.renderQueue = 3000;
-            }
-            AssetDatabase.CreateAsset(mat, path); return mat;
+            var p = so.FindProperty(prop);
+            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
+            p.enumValueIndex = v;
+        }
+
+        static void SetVec3(SerializedObject so, Object ctx, string prop, Vector3 v)
+        {
+            var p = so.FindProperty(prop);
+            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
+            p.vector3Value = v;
         }
 
         static void AddAttachmentPoints(GameObject root, BuggySpec spec)
