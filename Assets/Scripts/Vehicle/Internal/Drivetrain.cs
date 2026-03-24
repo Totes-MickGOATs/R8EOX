@@ -86,6 +86,17 @@ namespace R8EOX.Vehicle.Internal
         /// </summary>
         public void Distribute(float engineForce, RaycastWheel[] frontWheels, RaycastWheel[] rearWheels)
         {
+            if (rearWheels == null || rearWheels.Length < 2)
+            {
+                Debug.LogWarning("[Drivetrain] Distribute requires at least 2 rear wheels.", this);
+                return;
+            }
+            if (frontWheels == null || frontWheels.Length < 2)
+            {
+                Debug.LogWarning("[Drivetrain] Distribute requires at least 2 front wheels.", this);
+                return;
+            }
+
             if (_driveLayout == DriveLayout.RWD)
             {
                 foreach (var w in frontWheels)
