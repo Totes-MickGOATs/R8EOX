@@ -32,6 +32,10 @@ namespace R8EOX.Track.Internal
         private const float k_WarnThreshold = 0.5f;
         private const float k_ErrorThreshold = 2.0f;
 
+#if UNITY_EDITOR
+        private static GUIStyle s_gizmoStyle;
+#endif
+
         internal SpawnPointData[] ComputeSpawnPoints()
         {
             return SpawnGridMath.ComputeSpawnPoints(
@@ -81,12 +85,15 @@ namespace R8EOX.Track.Internal
             Terrain terrain = Terrain.activeTerrain;
 
 #if UNITY_EDITOR
-            var labelStyle = new GUIStyle
+            if (s_gizmoStyle == null)
             {
-                normal = { textColor = Color.white },
-                fontStyle = FontStyle.Bold,
-                fontSize = 12
-            };
+                s_gizmoStyle = new GUIStyle
+                {
+                    normal = { textColor = Color.white },
+                    fontStyle = FontStyle.Bold,
+                    fontSize = 12
+                };
+            }
 #endif
 
             // Grid center marker.
@@ -129,7 +136,7 @@ namespace R8EOX.Track.Internal
                 Handles.Label(
                     point.Position + Vector3.up * 0.7f,
                     point.Index.ToString(),
-                    labelStyle);
+                    s_gizmoStyle);
 #endif
             }
 
