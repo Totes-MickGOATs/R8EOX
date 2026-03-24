@@ -40,6 +40,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `LoadingLayoutData.cs` | Shared color constants, size constants, and font paths used by the loading screen builders |
 | `LoadingPanelBuilder.cs` | Creates the full loading screen UI hierarchy (Background, ContentArea, TitleGlow, TitleLabel, BarTrack, ProgressFill, ProgressLabel, TipLabel) under a parent Transform; called from `MenuSceneBuilder.BuildLoadingPanel()` |
 | `TrackListEntryBuilder.cs` | Creates a TrackListEntry template GameObject with Button, nameLabel, statusIcon, highlightOverlay for TrackListPanel to instantiate |
+| `TrackSelectPanelBuilder.cs` | Builds the Track Select screen layout: title label (top 10%), TrackListArea with ScrollRect+VerticalLayoutGroup (left 40%, rows 15–85%), TrackPreviewArea with preview content (right 58%, rows 15–85%), and START/BACK buttons anchored to the bottom row; delegates from `MenuSceneBuilder.BuildTrackSelectPanel()` |
 
 ## Conventions
 
