@@ -30,17 +30,5 @@ namespace R8EOX.Settings.Internal
         {
             return new SettingsData();
         }
-
-        internal SettingsData Clone()
-        {
-            var clone = new SettingsData();
-            clone.video = video.Clone();
-            clone.audio = audio.Clone();
-            clone.controls = controls.Clone();
-            clone.calibration = calibration.Clone();
-            clone.gameplay = gameplay.Clone();
-            clone.profiles = profiles.Clone();
-            return clone;
-        }
     }
 }
