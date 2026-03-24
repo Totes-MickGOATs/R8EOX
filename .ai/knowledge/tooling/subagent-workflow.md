@@ -12,24 +12,35 @@ Every subagent must follow this process. The orchestrator injects this into your
 
 ```bash
 # 1. Write or modify ONE file
-# 2. Stage ONLY that file by exact path
+# 2. Check for companion .meta files (Unity auto-generates these!)
+git status
+# 3. Stage the file AND its .meta (if new file/folder, .meta WILL exist)
 git add path/to/ExactFile.cs
+git add path/to/ExactFile.cs.meta   # ← REQUIRED for new files
+# For new folders, also: git add path/to/NewFolder.meta
 
-# 3. Commit it NOW
+# 4. Commit them together NOW
 git commit -m "feat: description of this specific file change"
 
-# 4. STOP — verify commit succeeded
-# 5. Only NOW may you proceed to the next file
+# 5. STOP — verify commit succeeded
+# 6. Only NOW may you proceed to the next file
 ```
+
+### ⚠️ UNITY .meta FILES — THE #1 MISSED ITEM
+
+Unity generates a `.meta` file for **every** new file and folder. If you create `Foo.cs`, Unity creates `Foo.cs.meta`. If you create a new folder `Bar/`, Unity creates `Bar.meta`. **These .meta files are required** — without them, Unity loses track of asset GUIDs and references break (magenta materials, missing scripts, etc.).
+
+**After writing any new file, ALWAYS run `git status` and stage the companion `.meta` file in the same commit.** A `.cs` commit without its `.meta` is an incomplete commit.
 
 ### BANNED — Violations Will Cause Lost Work
 
 - `git add -A` / `git add .` / `git add --all` — **BANNED** (stages other agents' work)
-- Batching multiple files into one commit — **BANNED**
+- Batching multiple files into one commit — **BANNED** (exception: a file + its companion `.meta` = one commit)
 - Deferring commits to "after all work is done" — **BANNED**
 - Silently skipping a failed commit — **BANNED** (report the error)
 - `--no-verify` — **BANNED** (pre-commit hook must validate)
 - Proceeding to the next file before the current commit succeeds — **BANNED**
+- Committing a new file without its `.meta` — **BANNED** (causes broken references)
 
 ---
 
