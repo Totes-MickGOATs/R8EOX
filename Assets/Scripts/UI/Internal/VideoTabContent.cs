@@ -8,8 +8,7 @@ namespace R8EOX.UI.Internal
 {
     internal class VideoTabContent : MonoBehaviour
     {
-        [Header("Runtime State")]
-        [SerializeField] private bool isInitialized;
+        private bool isInitialized;
 
         private SettingsManager settingsManager;
         private Slider renderScaleSlider;
