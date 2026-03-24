@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 namespace R8EOX.Editor.Builders
 {
@@ -39,8 +41,8 @@ namespace R8EOX.Editor.Builders
             var aiManager     = FindOrAdd<R8EOX.AI.AIManager>(
                 managersParent, "AIManager");
 
+            EnsureEventSystem();
             WireCameraMainRef(cameraManager);
-
             var trackManager = FindOrAddTrackManager(managersParent);
             EnsureSpawnGrid(trackManager);
 
@@ -267,6 +269,13 @@ namespace R8EOX.Editor.Builders
             return new GameObject(parentName);
         }
 
+        private static void EnsureEventSystem()
+        {
+            if (Object.FindAnyObjectByType<EventSystem>() != null) return;
+            var go = new GameObject("[EventSystem]");
+            go.AddComponent<EventSystem>();
+            go.AddComponent<InputSystemUIInputModule>();
+        }
         private static void LogSummary(
             R8EOX.Track.TrackManager   trackManager,
             R8EOX.Camera.CameraManager cameraManager,
@@ -276,23 +285,15 @@ namespace R8EOX.Editor.Builders
             R8EOX.VFX.VFXManager       vfxManager,
             R8EOX.AI.AIManager         aiManager)
         {
-            string track = trackManager  != null ? "placed" : "missing";
-            string cam   = cameraManager != null ? "placed" : "missing";
-            string race  = raceManager   != null ? "placed" : "missing";
-            string ui    = uiManager     != null ? "placed" : "missing";
-            string audio = audioManager  != null ? "placed" : "missing";
-            string vfx   = vfxManager    != null ? "placed" : "missing";
-            string ai    = aiManager     != null ? "placed" : "missing";
-
             Debug.Log(
                 $"[SceneSetupBuilder] Managers placed.\n" +
-                $"  TrackManager:  {track}\n" +
-                $"  CameraManager: {cam}\n" +
-                $"  RaceManager:   {race}\n" +
-                $"  UIManager:     {ui}\n" +
-                $"  AudioManager:  {audio}\n" +
-                $"  VFXManager:    {vfx}\n" +
-                $"  AIManager:     {ai}");
+                $"  TrackManager:  {(trackManager  != null ? "placed" : "missing")}\n" +
+                $"  CameraManager: {(cameraManager != null ? "placed" : "missing")}\n" +
+                $"  RaceManager:   {(raceManager   != null ? "placed" : "missing")}\n" +
+                $"  UIManager:     {(uiManager     != null ? "placed" : "missing")}\n" +
+                $"  AudioManager:  {(audioManager  != null ? "placed" : "missing")}\n" +
+                $"  VFXManager:    {(vfxManager    != null ? "placed" : "missing")}\n" +
+                $"  AIManager:     {(aiManager     != null ? "placed" : "missing")}");
         }
     }
 }
