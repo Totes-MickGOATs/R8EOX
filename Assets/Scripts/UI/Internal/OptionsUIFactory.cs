@@ -19,6 +19,29 @@ namespace R8EOX.UI.Internal
         private const float SECTION_RULE_HEIGHT = 1f;
 
 
+        // ── Tab Layout Setup ──────────────────────────────────────────────────
+
+        internal static VerticalLayoutGroup SetupTabLayout(
+            GameObject go, float spacing = 8f,
+            RectOffset padding = null, bool addFitter = false)
+        {
+            var vlg = go.GetComponent<VerticalLayoutGroup>();
+            if (vlg == null) vlg = go.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = spacing;
+            vlg.padding = padding ?? new RectOffset(0, 0, 0, 0);
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = true;
+            if (addFitter)
+            {
+                var fitter = go.GetComponent<ContentSizeFitter>();
+                if (fitter == null) fitter = go.AddComponent<ContentSizeFitter>();
+                fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            }
+            return vlg;
+        }
+
         // ── Section Header ────────────────────────────────────────────────────
 
         internal static GameObject CreateSectionHeader(Transform parent, string text)
