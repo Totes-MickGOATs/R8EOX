@@ -1,19 +1,15 @@
+using System;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace R8EOX.Settings.Internal
 {
     internal static class VideoApplier
     {
-        /// <summary>
-        /// Apply all video settings. Caller must supply the post-process Volume
-        /// to avoid banned scene-search APIs. Pass null to skip
-        /// motion blur toggling (graceful degradation).
-        /// </summary>
-        internal static void Apply(VideoSettings settings, Volume postProcessVolume)
+        /// <summary>Apply all video settings to the engine.</summary>
+        internal static void Apply(VideoSettings settings)
         {
-            ApplyQualityTier(settings.QualityTier, postProcessVolume);
+            ApplyQualityTier(settings.QualityTier);
             ApplyWindowMode(settings.WindowMode, settings.ResolutionWidth, settings.ResolutionHeight);
             ApplyVSync(settings.VSync);
             ApplyFpsCap(settings.FpsCap);
@@ -25,7 +21,7 @@ namespace R8EOX.Settings.Internal
         // Quality tier
         // -------------------------------------------------------------------------
 
-        private static void ApplyQualityTier(QualityTier tier, Volume postProcessVolume)
+        private static void ApplyQualityTier(QualityTier tier)
         {
             var urpAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             if (urpAsset == null)
@@ -41,7 +37,6 @@ namespace R8EOX.Settings.Internal
                     urpAsset.shadowDistance = 70f;
                     urpAsset.renderScale = 1.0f;
                     SetSsaoEnabled(urpAsset, true);
-                    SetMotionBlurEnabled(postProcessVolume, true);
                     break;
 
                 case QualityTier.High:
@@ -49,7 +44,6 @@ namespace R8EOX.Settings.Internal
                     urpAsset.shadowDistance = 40f;
                     urpAsset.renderScale = 1.0f;
                     SetSsaoEnabled(urpAsset, true);
-                    SetMotionBlurEnabled(postProcessVolume, true);
                     break;
 
                 case QualityTier.Balanced:
@@ -57,7 +51,6 @@ namespace R8EOX.Settings.Internal
                     urpAsset.shadowDistance = 25f;
                     urpAsset.renderScale = 0.85f;
                     SetSsaoEnabled(urpAsset, false);
-                    SetMotionBlurEnabled(postProcessVolume, false);
                     break;
 
                 case QualityTier.Performance:
@@ -65,7 +58,6 @@ namespace R8EOX.Settings.Internal
                     urpAsset.shadowDistance = 15f;
                     urpAsset.renderScale = 0.7f;
                     SetSsaoEnabled(urpAsset, false);
-                    SetMotionBlurEnabled(postProcessVolume, false);
                     break;
             }
         }
@@ -76,9 +68,21 @@ namespace R8EOX.Settings.Internal
 
         private static void SetSsaoEnabled(UniversalRenderPipelineAsset urpAsset, bool enabled)
         {
-            var dataList = urpAsset.rendererDataList;
-            bool found = false;
+            // FRAGILE: rendererDataList is an internal URP API (URP 17.4.0 / Unity 6000.4.0f1).
+            // It is not part of the public URP surface and may be removed or renamed in future
+            // versions. If this throws, SSAO toggling silently degrades rather than crashing.
+            ScriptableRendererData[] dataList;
+            try
+            {
+                dataList = urpAsset.rendererDataList;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[VideoApplier] rendererDataList inaccessible — SSAO toggle skipped. ({e.GetType().Name})");
+                return;
+            }
 
+            bool found = false;
             foreach (var rendererData in dataList)
             {
                 if (rendererData == null) continue;
@@ -93,28 +97,8 @@ namespace R8EOX.Settings.Internal
             }
         }
 
-        // -------------------------------------------------------------------------
-        // Motion blur — volume component, lives on a Volume in the scene
-        // -------------------------------------------------------------------------
-
-        private static void SetMotionBlurEnabled(Volume postProcessVolume, bool enabled)
-        {
-            // Volume reference is injected by the caller (SettingsManager).
-            // This sidesteps banned scene-search APIs in runtime scripts.
-            if (postProcessVolume == null || postProcessVolume.profile == null)
-            {
-                Debug.LogWarning("[VideoApplier] No post-process Volume supplied — skipping motion blur toggle.");
-                return;
-            }
-
-            if (!postProcessVolume.profile.TryGet<MotionBlur>(out var motionBlur))
-            {
-                Debug.LogWarning("[VideoApplier] MotionBlur not found in Volume profile — skipping.");
-                return;
-            }
-
-            motionBlur.active = enabled;
-        }
+        // TODO: Motion blur toggling requires a scene-specific Volume reference. Implement
+        // once a Volume injection point exists (e.g. via TrackSystem or a volume registry).
 
         // -------------------------------------------------------------------------
         // Window mode
