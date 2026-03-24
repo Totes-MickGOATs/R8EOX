@@ -126,10 +126,24 @@ namespace R8EOX.Session.Internal
 
         private SessionManager FindExistingSessionManager()
         {
-            var existing = GameObject.Find(ManagerObjectName);
-            if (existing != null)
-                return existing.GetComponent<SessionManager>();
-            return null;
+            if (sessionChannel == null)
+            {
+                Debug.LogError(
+                    "[SessionBootstrapper] SessionChannel is not " +
+                    "assigned — cannot locate SessionManager.");
+                return null;
+            }
+
+            var manager = sessionChannel.ActiveManager;
+            if (manager == null)
+            {
+                Debug.LogError(
+                    "[SessionBootstrapper] SessionChannel has no " +
+                    "ActiveManager reference. AppManager must call " +
+                    "SetManager before loading the track scene.");
+            }
+
+            return manager;
         }
 
         private SessionConfig CreateDefaultConfig()
