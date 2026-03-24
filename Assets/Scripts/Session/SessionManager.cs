@@ -78,6 +78,10 @@ namespace R8EOX.Session
             isSwapping = false;
             if (aiManager != null) aiManager.RemoveAllDrivers();
             if (raceManager != null) raceManager.EndRace();
+            // Clear telemetry consumers before destroying vehicles to prevent
+            // LateUpdate MissingReferenceException on destroyed Rigidbody/VehicleManager.
+            if (audioManager != null) audioManager.SetTarget(null);
+            if (vfxManager != null) vfxManager.SetTarget(null);
             vehicleSpawner.DestroyAllSpawned();
             if (sessionChannel != null) sessionChannel.Clear();
             activeConfig = null;
