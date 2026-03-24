@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using R8EOX.Settings;
 
 namespace R8EOX.UI.Internal
@@ -16,10 +15,7 @@ namespace R8EOX.UI.Internal
 
         private void BuildUI()
         {
-            var vg = gameObject.AddComponent<VerticalLayoutGroup>();
-            vg.childForceExpandWidth = true;
-            vg.childForceExpandHeight = false;
-            vg.spacing = 8f;
+            OptionsUIFactory.SetupTabLayout(gameObject);
 
             var gameplay = settingsManager.GetGameplaySettings();
 
