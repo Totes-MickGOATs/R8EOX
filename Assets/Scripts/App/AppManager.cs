@@ -93,6 +93,7 @@ namespace R8EOX.App
             sessionManager = sessionManagerObject.AddComponent<SessionManager>();
             sessionManager.SetSessionChannel(sessionChannel);
             sessionManager.BeginSession(config);
+            sessionManager.SetAbortCallback(ReturnToMenu);
 
             StartCoroutine(sceneLoader.LoadSceneAsync(
                 trackDef.SceneName,
