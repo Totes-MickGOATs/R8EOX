@@ -3,6 +3,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -27,14 +28,14 @@ namespace R8EOX.Editor.Builders
             // Highlight overlay
             var hlGo = new GameObject("Highlight");
             hlGo.transform.SetParent(entryGo.transform, false);
-            StretchFill(hlGo.AddComponent<RectTransform>());
+            BRH.StretchFill(hlGo.AddComponent<RectTransform>());
             var hlImg = hlGo.AddComponent<Image>();
             hlImg.color = new Color(1f, 1f, 1f, 0f);
 
             // Name label
             var nameGo = new GameObject("NameLabel");
             nameGo.transform.SetParent(entryGo.transform, false);
-            StretchFill(nameGo.AddComponent<RectTransform>());
+            BRH.StretchFill(nameGo.AddComponent<RectTransform>());
             var nameTmp = nameGo.AddComponent<TextMeshProUGUI>();
             nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
             nameTmp.fontSize = 20f;
@@ -62,13 +63,6 @@ namespace R8EOX.Editor.Builders
             return entryGo;
         }
 
-        private static void StretchFill(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
     }
 }
 #endif
