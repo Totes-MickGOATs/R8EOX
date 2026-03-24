@@ -44,14 +44,6 @@ namespace R8EOX.UI.Internal
 
         // ── Colors ────────────────────────────────────────────────────────
         private static readonly Color BackdropColor = new Color(0f, 0f, 0f, 0.75f);
-        private static readonly Color PanelColor    = new Color(20/255f, 20/255f, 26/255f, 0.97f);
-        private static readonly Color TitleColor    = new Color(0f, 0.784f, 1f, 1f);
-        private static readonly Color ButtonFill    = new Color(0.078f, 0.082f, 0.102f, 1f);
-        private static readonly Color PrimaryBorder = new Color(0f, 0.784f, 1f, 1f);
-        private static readonly Color DangerBorder  = new Color(1f, 0.318f, 0.329f, 1f);
-        private static readonly Color ValidColor    = new Color(0.2f, 0.9f, 0.4f, 1f);
-        private static readonly Color InvalidColor  = new Color(1f, 0.318f, 0.329f, 1f);
-        private static readonly Color MutedText     = new Color(0.7f, 0.7f, 0.7f, 1f);
 
         // ── Public API ────────────────────────────────────────────────────
 
@@ -93,9 +85,9 @@ namespace R8EOX.UI.Internal
 
             // Panel
             var panel = Child("Panel", transform);
-            panel.AddComponent<Image>().color = PanelColor;
+            panel.AddComponent<Image>().color = UIColors.PanelBg;
             var oline = panel.AddComponent<Outline>();
-            oline.effectColor = new Color(0f, 0.784f, 1f, 0.3f); oline.effectDistance = new Vector2(1f, -1f);
+            oline.effectColor = UIColors.BorderStrong; oline.effectDistance = new Vector2(1f, -1f);
             var prt   = panel.GetComponent<RectTransform>();
             prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0.5f);
             prt.sizeDelta = new Vector2(480f, 270f); prt.anchoredPosition = Vector2.zero;
@@ -108,7 +100,7 @@ namespace R8EOX.UI.Internal
             titleGo.AddComponent<LayoutElement>().minHeight = 28f;
             var title  = titleGo.AddComponent<TextMeshProUGUI>();
             title.text = "CONTROLLER CALIBRATION"; title.fontSize = 20f;
-            title.color = TitleColor; title.fontStyle = FontStyles.Bold;
+            title.color = UIColors.Primary; title.fontStyle = FontStyles.Bold;
             title.alignment = TextAlignmentOptions.Center;
 
             // Instruction
@@ -123,7 +115,7 @@ namespace R8EOX.UI.Internal
             var progGo = Child("Progress", panel.transform);
             progGo.AddComponent<LayoutElement>().minHeight = 24f;
             _progressText = progGo.AddComponent<TextMeshProUGUI>();
-            _progressText.fontSize = 13f; _progressText.color = MutedText;
+            _progressText.fontSize = 13f; _progressText.color = UIColors.SubtleText;
             _progressText.alignment = TextAlignmentOptions.Center;
             _progressText.textWrappingMode = TMPro.TextWrappingModes.Normal;
 
@@ -134,9 +126,9 @@ namespace R8EOX.UI.Internal
             hg.spacing = 16f; hg.childAlignment = TextAnchor.MiddleCenter;
             row.AddComponent<LayoutElement>().minHeight = 44f;
 
-            MakeBtn(row.transform, "CANCEL", DangerBorder,  Cancel, out _);
-            MakeBtn(row.transform, "OK",     PrimaryBorder, OnOkPressed, out _okButton);
-            MakeBtn(row.transform, "SAVE",   ValidColor,    OnSave, out _saveButton);
+            MakeBtn(row.transform, "CANCEL", UIColors.Danger,   Cancel, out _);
+            MakeBtn(row.transform, "OK",     UIColors.Primary,  OnOkPressed, out _okButton);
+            MakeBtn(row.transform, "SAVE",   UIColors.Valid,    OnSave, out _saveButton);
             _saveButton.gameObject.SetActive(false);
 
             StartCoroutine(FadeIn());
@@ -174,7 +166,7 @@ namespace R8EOX.UI.Internal
                 bool valid = Validate(out string summary);
                 _instructionText.text = summary;
                 _progressText.text    = valid ? "Calibration looks good!" : "Try again for better results.";
-                _progressText.color   = valid ? ValidColor : InvalidColor;
+                _progressText.color   = valid ? UIColors.Valid : UIColors.Danger;
                 _saveButton.gameObject.SetActive(true);
             }
         }
@@ -263,7 +255,7 @@ namespace R8EOX.UI.Internal
             UnityEngine.Events.UnityAction onClick, out Button btn)
         {
             var go  = Child(label + "Btn", parent);
-            var img = go.AddComponent<Image>(); img.color = ButtonFill;
+            var img = go.AddComponent<Image>(); img.color = UIColors.ButtonFill;
             var ol  = go.AddComponent<Outline>(); ol.effectColor = border; ol.effectDistance = new Vector2(1f, -1f);
             var le  = go.AddComponent<LayoutElement>(); le.minWidth = 140f; le.preferredWidth = 140f; le.minHeight = 40f;
             btn = go.AddComponent<Button>(); btn.targetGraphic = img; btn.onClick.AddListener(onClick);
