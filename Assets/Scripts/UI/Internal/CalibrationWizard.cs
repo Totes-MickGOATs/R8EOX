@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace R8EOX.UI.Internal
@@ -72,6 +73,7 @@ namespace R8EOX.UI.Internal
             wizard._onCancel   = onCancel;
             wizard.Build();
             wizard.EnterState(StateRelease);
+            SceneManager.sceneLoaded += wizard.OnSceneLoaded;
             return wizard;
         }
 
@@ -227,7 +229,9 @@ namespace R8EOX.UI.Internal
             Destroy(gameObject);
         }
 
-        private void Cancel() { _onCancel?.Invoke(); Destroy(gameObject); }
+        private void OnSceneLoaded(Scene s, LoadSceneMode m) => Cancel();
+
+        private void Cancel() { SceneManager.sceneLoaded -= OnSceneLoaded; _onCancel?.Invoke(); Destroy(gameObject); }
 
         // ── Helpers ───────────────────────────────────────────────────────
 
