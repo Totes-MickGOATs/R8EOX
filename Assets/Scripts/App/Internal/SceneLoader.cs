@@ -8,6 +8,7 @@ namespace R8EOX.App.Internal
     internal class SceneLoader
     {
         private const float DefaultTimeout = 30f;
+        private const float MinLoadDuration = 3f;
 
         // Unity's async loading reports 0–0.9 during load, then stalls at 0.9 waiting for activation.
         private const float LoadCompleteThreshold = 0.9f;
@@ -71,7 +72,10 @@ namespace R8EOX.App.Internal
                 if (operation.progress >= LoadCompleteThreshold)
                 {
                     onProgress?.Invoke(1f);
-                    operation.allowSceneActivation = true;
+                    if (elapsed >= MinLoadDuration)
+                    {
+                        operation.allowSceneActivation = true;
+                    }
                 }
 
                 yield return null;
