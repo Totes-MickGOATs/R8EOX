@@ -14,6 +14,7 @@ namespace R8EOX.Diagnostics.Internal
 
         private const int MaxCompletedHistory = 32;
         private const int MaxFailedHistory = 32;
+        private readonly List<string> toTimeout = new List<string>();
 
         public FlowTracer(EventLog log)
         {
@@ -83,7 +84,7 @@ namespace R8EOX.Diagnostics.Internal
         public void Tick(float currentTime)
         {
             // Check timeouts on active flows
-            var toTimeout = new List<string>();
+            toTimeout.Clear();
             foreach (var kvp in activeFlows)
             {
                 kvp.Value.CheckTimeouts(currentTime);
