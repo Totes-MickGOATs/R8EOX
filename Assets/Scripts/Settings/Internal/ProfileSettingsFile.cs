@@ -5,9 +5,14 @@ namespace R8EOX.Settings.Internal
     [Serializable]
     internal class ProfileSettingsFile
     {
-        public AudioSettings audio = new AudioSettings();
-        public ControlsSettings controls = new ControlsSettings();
-        public CalibrationSettings calibration = new CalibrationSettings();
-        public GameplaySettings gameplay = new GameplaySettings();
+        [SerializeField] private AudioSettings audio = new AudioSettings();
+        [SerializeField] private ControlsSettings controls = new ControlsSettings();
+        [SerializeField] private CalibrationSettings calibration = new CalibrationSettings();
+        [SerializeField] private GameplaySettings gameplay = new GameplaySettings();
+
+        public AudioSettings Audio { get => audio; set => audio = value; }
+        public ControlsSettings Controls { get => controls; set => controls = value; }
+        public CalibrationSettings Calibration { get => calibration; set => calibration = value; }
+        public GameplaySettings Gameplay { get => gameplay; set => gameplay = value; }
     }
 }
