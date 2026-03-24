@@ -21,9 +21,7 @@ namespace R8EOX.UI.Internal
 
         private bool _isRebinding;
 
-        private static readonly Color LabelColor   = Color.white;
-        private static readonly Color BindingColor = new Color(0f, 0.784f, 1f);
-        private static readonly Color WaitingColor = new Color(0.91f, 0.722f, 0.286f);
+        private static readonly Color LabelColor = Color.white;
 
         // ── Initialization ────────────────────────────────────────────────
 
@@ -61,7 +59,7 @@ namespace R8EOX.UI.Internal
             if (bindingLabel != null)
             {
                 bindingLabel.text  = "Press key...";
-                bindingLabel.color = WaitingColor;
+                bindingLabel.color = UIColors.Warning;
             }
 
             if (rebindButton != null)
@@ -82,7 +80,7 @@ namespace R8EOX.UI.Internal
             if (bindingLabel != null)
             {
                 bindingLabel.text  = displayText;
-                bindingLabel.color = BindingColor;
+                bindingLabel.color = UIColors.Primary;
             }
 
             if (rebindButton != null)
