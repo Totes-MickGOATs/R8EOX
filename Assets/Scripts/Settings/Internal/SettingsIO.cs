@@ -28,10 +28,10 @@ namespace R8EOX.Settings.Internal
         {
             var file = new ProfileSettingsFile
             {
-                audio = data.audio,
-                controls = data.controls,
-                calibration = data.calibration,
-                gameplay = data.gameplay
+                Audio = data.audio,
+                Controls = data.controls,
+                Calibration = data.calibration,
+                Gameplay = data.gameplay
             };
             string json = JsonUtility.ToJson(file, prettyPrint: true);
             string path = ProfileSettingsPath(profileName);
@@ -66,10 +66,10 @@ namespace R8EOX.Settings.Internal
                 {
                     string json = File.ReadAllText(profilePath);
                     var file = JsonUtility.FromJson<ProfileSettingsFile>(json);
-                    result.audio = file.audio;
-                    result.controls = file.controls;
-                    result.calibration = file.calibration;
-                    result.gameplay = file.gameplay;
+                    result.audio = file.Audio;
+                    result.controls = file.Controls;
+                    result.calibration = file.Calibration;
+                    result.gameplay = file.Gameplay;
                 }
                 catch (Exception ex)
                 {
