@@ -39,6 +39,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `LightingProbeBuilder.cs` | Places a box-projected ReflectionProbe and a 2-layer LightProbeGroup grid sized to terrain dimensions |
 | `LoadingLayoutData.cs` | Shared color constants, size constants, and font paths used by the loading screen builders |
 | `LoadingPanelBuilder.cs` | Creates the full loading screen UI hierarchy (Background, ContentArea, TitleGlow, TitleLabel, BarTrack, ProgressFill, ProgressLabel, TipLabel) under a parent Transform; called from `MenuSceneBuilder.BuildLoadingPanel()` |
+| `TrackListEntryBuilder.cs` | Creates a TrackListEntry template GameObject with Button, nameLabel, statusIcon, highlightOverlay for TrackListPanel to instantiate |
 
 ## Conventions
 
