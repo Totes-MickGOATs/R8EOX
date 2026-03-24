@@ -177,9 +177,27 @@ namespace R8EOX.Editor.Builders
         private static void AssignFont(TextMeshProUGUI tmp, TMP_FontAsset font)
         {
             if (font == null) return;
+            EnsureAtlas(font);
             var so = new SerializedObject(tmp);
             so.FindProperty("m_fontAsset").objectReferenceValue = font;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void EnsureAtlas(TMP_FontAsset font)
+        {
+            var so = new SerializedObject(font);
+            var prop = so.FindProperty("m_AtlasTextures");
+            if (prop == null || prop.arraySize > 0) return;
+            var tex = new Texture2D(1, 1, TextureFormat.Alpha8, false) { name = font.name + " Atlas" };
+            prop.arraySize = 1;
+            prop.GetArrayElementAtIndex(0).objectReferenceValue = tex;
+            var widthProp = so.FindProperty("m_AtlasWidth");
+            var heightProp = so.FindProperty("m_AtlasHeight");
+            if (widthProp != null) widthProp.intValue = 1;
+            if (heightProp != null) heightProp.intValue = 1;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.AddObjectToAsset(tex, font);
+            AssetDatabase.SaveAssetIfDirty(font);
         }
 
         internal static void SetRect(
