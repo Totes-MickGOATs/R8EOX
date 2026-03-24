@@ -23,6 +23,7 @@ namespace R8EOX.Session
 
         private SessionConfig activeConfig;
         private SessionMode effectiveMode;
+        private System.Action onAborted;
 
         private Vector3 swapPosition;
         private Quaternion swapRotation;
@@ -51,6 +52,7 @@ namespace R8EOX.Session
         }
 
         public void SetSessionChannel(SessionChannel channel) { sessionChannel = channel; }
+        public void SetAbortCallback(System.Action callback) { onAborted = callback; }
         public void BeginSession(SessionConfig config)
         {
             if (config == null)
@@ -161,8 +163,7 @@ namespace R8EOX.Session
             }
             else
             {
-                state.BeginSpawning();
-                SetupSession();
+                onAborted?.Invoke();
             }
         }
 
@@ -182,8 +183,10 @@ namespace R8EOX.Session
         private void SetupSession()
         {
             if (activeConfig == null || trackManager == null) return;
+            Debug.Log("[SessionManager] SetupSession — start");
             CreateErrorOverlay();
             InitializeTrack();
+            Debug.Log("[SessionManager] SetupSession — track initialized");
             if (raceManager != null) raceManager.Initialize(trackManager);
             if (aiManager != null) aiManager.Initialize(trackManager);
             ValidateAndDegradeMode();
@@ -197,13 +200,18 @@ namespace R8EOX.Session
                     "Assign a vehicle prefab to SessionConfig or VehicleDefinition");
                 return;
             }
+            Debug.Log("[SessionManager] SetupSession — spawning player");
             SpawnPlayer();
+            Debug.Log("[SessionManager] SetupSession — validating vehicle");
             ValidateVehicle();
+            Debug.Log("[SessionManager] SetupSession — spawning AI");
             SpawnAIOpponents();
+            Debug.Log("[SessionManager] SetupSession — wiring player vehicle");
             WirePlayerVehicle();
+            Debug.Log("[SessionManager] SetupSession — starting race if applicable");
             StartRaceIfApplicable();
             state.MarkReady();
-            Debug.Log($"[SessionManager] Session ready: mode={effectiveMode}, vehicles={vehicleSpawner.SpawnedCount}");
+            Debug.Log($"[SessionManager] Session ready: mode={effectiveMode}");
         }
 
         private void CreateErrorOverlay()
