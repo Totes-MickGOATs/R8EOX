@@ -124,8 +124,10 @@ namespace R8EOX.Vehicle
             _wheels.Configure(gameObject.layer, _drivetrain,
                 _frontSpringStrength, _frontSpringDamping, _rearSpringStrength, _rearSpringDamping, _gripCoeff);
 
+#if UNITY_EDITOR || DEBUG
             Debug.Log($"[VehicleManager] Motor={_motorPreset} engine={_engineForceMax}N max={_maxSpeed}m/s " +
                       $"mass={_rb.mass}kg frontSpring={_frontSpringStrength} rearSpring={_rearSpringStrength} grip={_gripCoeff}");
+#endif
         }
 
         void Update()
