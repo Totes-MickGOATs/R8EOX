@@ -19,16 +19,7 @@ namespace R8EOX.UI.Internal
 
         private void BuildUI()
         {
-            var vlg = gameObject.GetComponent<VerticalLayoutGroup>();
-            if (vlg == null)
-            {
-                vlg = gameObject.AddComponent<VerticalLayoutGroup>();
-            }
-
-            vlg.spacing = 8f;
-            vlg.childForceExpandWidth = true;
-            vlg.childForceExpandHeight = false;
-            vlg.padding = new RectOffset(0, 0, 0, 0);
+            OptionsUIFactory.SetupTabLayout(gameObject);
 
             OptionsUIFactory.CreateSectionHeader(transform, "Active Profile");
 
