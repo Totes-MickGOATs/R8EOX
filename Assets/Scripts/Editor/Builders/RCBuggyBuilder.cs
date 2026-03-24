@@ -101,29 +101,29 @@ namespace R8EOX.Editor.Builders
         static void ConfigureDrivetrain(R8EOX.Vehicle.Internal.Drivetrain dt, BuggySpec s)
         {
             var so = new SerializedObject(dt);
-            SetEnum(so,  dt, "_driveLayout",    (int)MapLayout(s.Layout));
-            SetEnum(so,  dt, "_rearDiffType",   (int)MapDiff(s.RearDiff));
-            SetFloat(so, dt, "_rearPreload",    s.RearPreload);
-            SetEnum(so,  dt, "_frontDiffType",  (int)MapDiff(s.FrontDiff));
-            SetFloat(so, dt, "_frontPreload",   s.FrontPreload);
-            SetEnum(so,  dt, "_centerDiffType", (int)MapDiff(s.CenterDiff));
-            SetFloat(so, dt, "_centerPreload",  s.CenterPreload);
-            SetFloat(so, dt, "_centerFrontBias",s.CenterFrontBias);
+            SerializedPropertyHelper.SetEnum(so,  "_driveLayout",    (int)MapLayout(s.Layout));
+            SerializedPropertyHelper.SetEnum(so,  "_rearDiffType",   (int)MapDiff(s.RearDiff));
+            SerializedPropertyHelper.SetFloat(so, "_rearPreload",    s.RearPreload);
+            SerializedPropertyHelper.SetEnum(so,  "_frontDiffType",  (int)MapDiff(s.FrontDiff));
+            SerializedPropertyHelper.SetFloat(so, "_frontPreload",   s.FrontPreload);
+            SerializedPropertyHelper.SetEnum(so,  "_centerDiffType", (int)MapDiff(s.CenterDiff));
+            SerializedPropertyHelper.SetFloat(so, "_centerPreload",  s.CenterPreload);
+            SerializedPropertyHelper.SetFloat(so, "_centerFrontBias",s.CenterFrontBias);
             so.ApplyModifiedProperties();
         }
 
         static void ConfigureVehicleManager(VehicleManager vm, BuggySpec s)
         {
             var so = new SerializedObject(vm);
-            SetEnum(so,  vm, "_motorPreset",         (int)s.Motor);
-            SetFloat(so, vm, "_frontSpringStrength",  s.FrontSpringStrength);
-            SetFloat(so, vm, "_frontSpringDamping",   s.FrontSpringDamping);
-            SetFloat(so, vm, "_rearSpringStrength",   s.RearSpringStrength);
-            SetFloat(so, vm, "_rearSpringDamping",    s.RearSpringDamping);
-            SetFloat(so, vm, "_gripCoeff",            s.GripCoeff);
-            SetFloat(so, vm, "_steeringMax",          s.SteeringMax);
-            SetVec3(so,  vm, "_comGround",            s.CenterOfMass);
-            SetFloat(so, vm, "_gearRatio",            s.GearRatio);
+            SerializedPropertyHelper.SetEnum(so,  "_motorPreset",         (int)s.Motor);
+            SerializedPropertyHelper.SetFloat(so, "_frontSpringStrength",  s.FrontSpringStrength);
+            SerializedPropertyHelper.SetFloat(so, "_frontSpringDamping",   s.FrontSpringDamping);
+            SerializedPropertyHelper.SetFloat(so, "_rearSpringStrength",   s.RearSpringStrength);
+            SerializedPropertyHelper.SetFloat(so, "_rearSpringDamping",    s.RearSpringDamping);
+            SerializedPropertyHelper.SetFloat(so, "_gripCoeff",            s.GripCoeff);
+            SerializedPropertyHelper.SetFloat(so, "_steeringMax",          s.SteeringMax);
+            SerializedPropertyHelper.SetVec3(so,  "_comGround",            s.CenterOfMass);
+            SerializedPropertyHelper.SetFloat(so, "_gearRatio",            s.GearRatio);
             so.ApplyModifiedProperties();
         }
 
@@ -198,10 +198,10 @@ namespace R8EOX.Editor.Builders
             wheel.SpringDamping  = front ? spec.FrontSpringDamping  : spec.RearSpringDamping;
             wheel.RestDistance   = spec.RestDistance;
             var so = new SerializedObject(wheel);
-            SetFloat(so, wheel, "_wheelRadius",    tireR);
-            SetFloat(so, wheel, "_overExtend",     spec.OverExtend);
-            SetFloat(so, wheel, "_minSpringLen",   spec.MinSpringLen);
-            SetFloat(so, wheel, "_maxSpringForce", spec.MaxSpringForce);
+            SerializedPropertyHelper.SetFloat(so, "_wheelRadius",    tireR);
+            SerializedPropertyHelper.SetFloat(so, "_overExtend",     spec.OverExtend);
+            SerializedPropertyHelper.SetFloat(so, "_minSpringLen",   spec.MinSpringLen);
+            SerializedPropertyHelper.SetFloat(so, "_maxSpringForce", spec.MaxSpringForce);
             so.ApplyModifiedProperties();
             BuildWheelVisual(pivot, "WheelVisual", tireR, tireH, tireMat, layer);
             BuildWheelVisual(pivot, "HubVisual",   hubR,  hubH,  hubMat,  layer);
@@ -252,29 +252,6 @@ namespace R8EOX.Editor.Builders
 
         static Material GetOrCreateMaterial(string name, Color color, bool transparent = false) =>
             BuilderMaterialHelper.GetOrCreateMaterial(name, color, transparent);
-
-        // ---- Null-guarded SerializedObject helpers ----
-
-        static void SetFloat(SerializedObject so, Object ctx, string prop, float v)
-        {
-            var p = so.FindProperty(prop);
-            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
-            p.floatValue = v;
-        }
-
-        static void SetEnum(SerializedObject so, Object ctx, string prop, int v)
-        {
-            var p = so.FindProperty(prop);
-            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
-            p.enumValueIndex = v;
-        }
-
-        static void SetVec3(SerializedObject so, Object ctx, string prop, Vector3 v)
-        {
-            var p = so.FindProperty(prop);
-            if (p == null) { Debug.LogError($"[RCBuggyBuilder] Property '{prop}' not found on {ctx.GetType().Name}"); return; }
-            p.vector3Value = v;
-        }
 
         static void AddAttachmentPoints(GameObject root, BuggySpec spec)
         {
