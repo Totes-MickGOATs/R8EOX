@@ -217,7 +217,13 @@ namespace R8EOX.Editor.Builders
         private static void Wire(Object target, string field, Object value)
         {
             var so = new SerializedObject(target);
-            so.FindProperty(field).objectReferenceValue = value;
+            var prop = so.FindProperty(field);
+            if (prop == null)
+            {
+                Debug.LogError($"[MenuSceneBuilder] Property '{field}' not found on {target.GetType().Name}");
+                return;
+            }
+            prop.objectReferenceValue = value;
             so.ApplyModifiedProperties();
         }
 
