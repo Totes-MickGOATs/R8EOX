@@ -29,13 +29,11 @@ namespace R8EOX.UI.Internal
         {
             if (!_isBuilt) BuildUI();
             gameObject.SetActive(true);
-            Time.timeScale = 0f;
         }
 
         internal void Hide()
         {
             gameObject.SetActive(false);
-            Time.timeScale = 1f;
         }
 
         // ── UI construction ───────────────────────────────────────────────────
@@ -159,7 +157,7 @@ namespace R8EOX.UI.Internal
 
         // ── Button handlers ───────────────────────────────────────────────────
 
-        private void OnResumePressed() => Hide();
+        private void OnResumePressed() => uiManager?.HidePauseMenu();
 
         private void OnOptionsPressed()
         {
@@ -174,12 +172,12 @@ namespace R8EOX.UI.Internal
                 "Restart the current race?",
                 "RESTART",
                 false,
-                () => { Hide(); _onRestartPressed?.Invoke(); });
+                () => { uiManager?.HidePauseMenu(); _onRestartPressed?.Invoke(); });
         }
 
         private void OnChangeVehiclePressed()
         {
-            Hide();
+            uiManager?.HidePauseMenu();
             uiManager?.RequestVehicleSwap();
         }
 
@@ -190,7 +188,7 @@ namespace R8EOX.UI.Internal
                 "Progress will be lost.",
                 "RETURN",
                 true,
-                () => { Hide(); uiManager?.RequestQuitToMenu(); });
+                () => { uiManager?.HidePauseMenu(); uiManager?.RequestQuitToMenu(); });
         }
 
         private void OnQuitToDesktopPressed()
