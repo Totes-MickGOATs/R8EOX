@@ -16,18 +16,10 @@ namespace R8EOX.Menu.Internal
         private System.Action onAnyKeyPressed;
         private bool inputEnabled;
 
-        // ------------------------------------------------------------------ //
-        // Public API
-        // ------------------------------------------------------------------ //
-
         internal void Initialize(System.Action onKeyPressed)
         {
             onAnyKeyPressed = onKeyPressed;
         }
-
-        // ------------------------------------------------------------------ //
-        // MenuScreen overrides
-        // ------------------------------------------------------------------ //
 
         internal override void OnEnter()
         {
@@ -61,10 +53,6 @@ namespace R8EOX.Menu.Internal
             }
         }
 
-        // ------------------------------------------------------------------ //
-        // Unity messages
-        // ------------------------------------------------------------------ //
-
         private void Update()
         {
             if (!inputEnabled)
@@ -84,10 +72,6 @@ namespace R8EOX.Menu.Internal
                 onAnyKeyPressed?.Invoke();
             }
         }
-
-        // ------------------------------------------------------------------ //
-        // Helpers
-        // ------------------------------------------------------------------ //
 
         private IEnumerator DelayedEnableInput(IEnumerator scaleAnimation)
         {
