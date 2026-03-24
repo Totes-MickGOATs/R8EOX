@@ -103,8 +103,9 @@ namespace R8EOX.Session
         {
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
-            if (registry != null && registry.Count > 0
-                && sessionChannel?.OverlayRegistry?.VehicleSelectOverlayPrefab != null)
+            var overlayPrefab = sessionChannel?.OverlayRegistry?.VehicleSelectOverlayPrefab;
+            Debug.Log($"[SessionManager] EnterVehicleSelectOrSpawn: channel={sessionChannel != null} registry={registry != null} count={registry?.Count ?? 0} overlayPrefab={overlayPrefab != null} uiManager={uiManager != null}");
+            if (registry != null && registry.Count > 0 && overlayPrefab != null)
             {
                 state.BeginVehicleSelect();
                 ShowVehicleSelectOverlay(registry);
