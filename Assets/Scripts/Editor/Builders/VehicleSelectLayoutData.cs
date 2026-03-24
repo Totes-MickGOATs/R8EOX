@@ -56,32 +56,6 @@ namespace R8EOX.Editor.Builders
             return go.AddComponent<RectTransform>();
         }
 
-        // Sets RectTransform to stretch-fill (anchor 0,0 -> 1,1, zero offsets)
-        internal static void SetRectStretch(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-            rt.pivot = new Vector2(0.5f, 0.5f);
-        }
-
-        // Sets RectTransform with specific anchor and offset values
-        internal static void SetRectAnchored(
-            RectTransform rt,
-            Vector2 anchorMin,
-            Vector2 anchorMax,
-            Vector2 offsetMin,
-            Vector2 offsetMax,
-            Vector2 pivot)
-        {
-            rt.anchorMin = anchorMin;
-            rt.anchorMax = anchorMax;
-            rt.offsetMin = offsetMin;
-            rt.offsetMax = offsetMax;
-            rt.pivot = pivot;
-        }
-
         // Creates a ColorBlock for Button components
         internal static UnityEngine.UI.ColorBlock MakeColorBlock(
             Color normal,
