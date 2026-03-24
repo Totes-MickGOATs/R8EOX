@@ -136,19 +136,49 @@ namespace R8EOX.Editor.Builders
 
         private static void BuildTrackPreviewContent(Transform p, R8EOX.Menu.Internal.TrackPreviewPanel pp)
         {
+            var mutedGray = new Color(0.533f, 0.533f, 0.533f);
+
             var imgGo = new GameObject("PreviewImage");
             imgGo.transform.SetParent(p, false);
-            StretchFill(imgGo.AddComponent<RectTransform>());
+            SetAnchors(imgGo.AddComponent<RectTransform>(), 0.05f, 0.6f, 0.95f, 0.98f);
             var previewImg = imgGo.AddComponent<Image>();
 
-            var nameGo   = CreateLabel("TrackNameLabel",   string.Empty, p);
-            var typeGo   = CreateLabel("TrackTypeLabel",   string.Empty, p);
-            var descGo   = CreateLabel("DescriptionLabel", string.Empty, p);
-            var statusGo = CreateLabel("StatusLabel",      string.Empty, p);
+            var nameGo = new GameObject("TrackNameLabel");
+            nameGo.transform.SetParent(p, false);
+            SetAnchors(nameGo.AddComponent<RectTransform>(), 0.05f, 0.48f, 0.95f, 0.58f);
+            var nameTmp = nameGo.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize  = 28f;
+            nameTmp.alignment = TextAlignmentOptions.Left;
+            nameTmp.color     = Color.white;
+
+            var typeGo = new GameObject("TrackTypeLabel");
+            typeGo.transform.SetParent(p, false);
+            SetAnchors(typeGo.AddComponent<RectTransform>(), 0.05f, 0.40f, 0.95f, 0.48f);
+            var typeTmp = typeGo.AddComponent<TextMeshProUGUI>();
+            typeTmp.fontSize  = 16f;
+            typeTmp.alignment = TextAlignmentOptions.Left;
+            typeTmp.color     = mutedGray;
+
+            var descGo = new GameObject("DescriptionLabel");
+            descGo.transform.SetParent(p, false);
+            SetAnchors(descGo.AddComponent<RectTransform>(), 0.05f, 0.15f, 0.95f, 0.40f);
+            var descTmp = descGo.AddComponent<TextMeshProUGUI>();
+            descTmp.fontSize         = 16f;
+            descTmp.alignment        = TextAlignmentOptions.TopLeft;
+            descTmp.color            = mutedGray;
+            descTmp.textWrappingMode = TextWrappingModes.Normal;
+
+            var statusGo = new GameObject("StatusLabel");
+            statusGo.transform.SetParent(p, false);
+            SetAnchors(statusGo.AddComponent<RectTransform>(), 0.10f, 0.05f, 0.95f, 0.13f);
+            var statusTmp = statusGo.AddComponent<TextMeshProUGUI>();
+            statusTmp.fontSize  = 14f;
+            statusTmp.alignment = TextAlignmentOptions.Left;
+            statusTmp.color     = Color.white;
 
             var indGo = new GameObject("StatusIndicator");
             indGo.transform.SetParent(p, false);
-            indGo.AddComponent<RectTransform>().sizeDelta = new Vector2(16f, 16f);
+            SetAnchors(indGo.AddComponent<RectTransform>(), 0.05f, 0.06f, 0.09f, 0.12f);
             var indImg = indGo.AddComponent<Image>();
             indImg.color = Color.green;
 
@@ -161,13 +191,21 @@ namespace R8EOX.Editor.Builders
 
             var so = new SerializedObject(pp);
             so.FindProperty("previewImage").objectReferenceValue     = previewImg;
-            so.FindProperty("trackNameLabel").objectReferenceValue   = nameGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("trackTypeLabel").objectReferenceValue   = typeGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("descriptionLabel").objectReferenceValue = descGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("statusLabel").objectReferenceValue      = statusGo.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("trackNameLabel").objectReferenceValue   = nameTmp;
+            so.FindProperty("trackTypeLabel").objectReferenceValue   = typeTmp;
+            so.FindProperty("descriptionLabel").objectReferenceValue = descTmp;
+            so.FindProperty("statusLabel").objectReferenceValue      = statusTmp;
             so.FindProperty("statusIndicator").objectReferenceValue  = indImg;
             so.FindProperty("emptyState").objectReferenceValue       = emptyGo;
             so.ApplyModifiedProperties();
+        }
+
+        private static void SetAnchors(RectTransform rt, float minX, float minY, float maxX, float maxY)
+        {
+            rt.anchorMin = new Vector2(minX, minY);
+            rt.anchorMax = new Vector2(maxX, maxY);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         private static GameObject CreateButton(string name, string label, Transform parent)
@@ -182,18 +220,6 @@ namespace R8EOX.Editor.Builders
             StretchFill(textGo.AddComponent<RectTransform>());
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             tmp.text = label;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.fontSize = 24f;
-            return go;
-        }
-
-        private static GameObject CreateLabel(string name, string text, Transform parent)
-        {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            StretchFill(go.AddComponent<RectTransform>());
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text = text;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 24f;
             return go;
