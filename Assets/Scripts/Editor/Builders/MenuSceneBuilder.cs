@@ -109,6 +109,9 @@ namespace R8EOX.Editor.Builders
             var playGo    = CreateButton("PlayButton",    "PLAY",    p);
             var optionsGo = CreateButton("OptionsButton", "OPTIONS", p);
             var quitGo    = CreateButton("QuitButton",   "QUIT",    p);
+            playGo.GetComponent<RectTransform>().anchoredPosition    = new Vector2(0f,  40f);
+            optionsGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -30f);
+            quitGo.GetComponent<RectTransform>().anchoredPosition    = new Vector2(0f, -100f);
             var so = new SerializedObject(s);
             so.FindProperty("playButton").objectReferenceValue    = playGo.GetComponent<Button>();
             so.FindProperty("optionsButton").objectReferenceValue = optionsGo.GetComponent<Button>();
@@ -122,6 +125,10 @@ namespace R8EOX.Editor.Builders
             var raceGo  = CreateButton("RaceButton",        "RACE",            p);
             var multiGo = CreateButton("MultiplayerButton", "MULTIPLAYER",     p);
             var backGo  = CreateButton("BackButton",        "BACK",            p);
+            testGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f,  75f);
+            raceGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f,   5f);
+            multiGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -65f);
+            backGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f, -135f);
             var so = new SerializedObject(s);
             so.FindProperty("testingButton").objectReferenceValue     = testGo.GetComponent<Button>();
             so.FindProperty("raceButton").objectReferenceValue        = raceGo.GetComponent<Button>();
@@ -144,6 +151,8 @@ namespace R8EOX.Editor.Builders
 
             var startGo = CreateButton("StartButton",      "START", p);
             var backGo  = CreateButton("BackButton_Track", "BACK",  p);
+            startGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -200f);
+            backGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f, -270f);
 
             var soList = new SerializedObject(tlp);
             soList.FindProperty("listContent").objectReferenceValue = listContentGo.GetComponent<Transform>();
@@ -209,9 +218,7 @@ namespace R8EOX.Editor.Builders
             so.ApplyModifiedProperties();
         }
 
-        // ------------------------------------------------------------------ //
         // Helpers
-        // ------------------------------------------------------------------ //
 
         private static GameObject CreatePanel(string name, Transform parent)
         {
@@ -229,7 +236,9 @@ namespace R8EOX.Editor.Builders
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            StretchFill(go.AddComponent<RectTransform>());
+            var rt = go.AddComponent<RectTransform>();
+            CenterAnchor(rt);
+            rt.sizeDelta = new Vector2(400f, 60f);
             go.AddComponent<Image>().color = PanelColor;
             go.AddComponent<Button>();
 
