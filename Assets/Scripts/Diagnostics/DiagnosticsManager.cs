@@ -66,10 +66,6 @@ namespace R8EOX.Diagnostics
             }
         }
 
-        private void OnGUI()
-        {
-            // Overlay handles its own OnGUI — this is here for fallback if needed
-        }
 #endif
     }
 }
