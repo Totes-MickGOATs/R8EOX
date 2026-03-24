@@ -189,22 +189,12 @@ namespace R8EOX.Editor.Builders
 
         private static void BuildLoadingPanel(Transform p, R8EOX.Menu.Internal.TrackLoadingScreen s)
         {
-            var fillGo = new GameObject("ProgressFill");
-            fillGo.transform.SetParent(p, false);
-            StretchFill(fillGo.AddComponent<RectTransform>());
-            var fillImg = fillGo.AddComponent<Image>();
-            fillImg.type = Image.Type.Filled;
-            fillImg.fillMethod = Image.FillMethod.Horizontal;
-            fillImg.fillAmount = 0f;
-            fillImg.color = new Color(0.2f, 0.6f, 1f);
-
-            var progressGo = CreateLabel("ProgressLabel", "Loading...", p);
-            var tipGo      = CreateLabel("TipLabel",      string.Empty, p);
+            LoadingPanelBuilder.Build(p, out var fillImg, out var progressTmp, out var tipTmp);
 
             var so = new SerializedObject(s);
             so.FindProperty("progressFill").objectReferenceValue  = fillImg;
-            so.FindProperty("progressLabel").objectReferenceValue = progressGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("tipLabel").objectReferenceValue      = tipGo.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("progressLabel").objectReferenceValue = progressTmp;
+            so.FindProperty("tipLabel").objectReferenceValue      = tipTmp;
             so.ApplyModifiedProperties();
         }
 
