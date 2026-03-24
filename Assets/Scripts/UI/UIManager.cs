@@ -144,12 +144,14 @@ namespace R8EOX.UI
         public void ShowPauseMenu()
         {
             isPaused = true;
+            Time.timeScale = 0f;
             if (pauseMenu != null) pauseMenu.Show();
         }
 
         public void HidePauseMenu()
         {
             isPaused = false;
+            Time.timeScale = 1f;
             if (pauseMenu != null) pauseMenu.Hide();
         }
 
