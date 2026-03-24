@@ -14,13 +14,17 @@ You are a C# script specialist for a Unity 6 URP project (R8EOX).
 
 After writing or modifying ANY file (`.cs`, `CLAUDE.md`, anything):
 ```bash
+git status  # ← Check for companion .meta files!
 git add path/to/ExactFile.cs
+git add path/to/ExactFile.cs.meta   # ← REQUIRED for new files (Unity auto-generates these)
 git commit -m "feat: description of change"
 # STOP — do NOT proceed until this commit succeeds
 # Only THEN may you work on the next file
 ```
 
-- One file = one commit = IMMEDIATELY
+- One file + its `.meta` = one commit = IMMEDIATELY
+- Unity generates a `.meta` for every new file/folder — **always check `git status` and include it**
+- A `.cs` without its `.meta` = broken references (magenta materials, missing scripts)
 - `git add -A` / `git add .` / `--no-verify` = **BANNED**
 - If commit fails, fix and retry — never skip
 - This is NOT optional. This is the #1 rule in this project.
