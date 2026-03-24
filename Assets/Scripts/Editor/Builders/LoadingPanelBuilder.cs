@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using TMPro;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.UI;
 using LD = R8EOX.Editor.Builders.LoadingLayoutData;
 
@@ -69,6 +70,7 @@ namespace R8EOX.Editor.Builders
             var glowColor = LD.TitleColor;
             glowColor.a = 0.2f;
             tmp.color = glowColor;
+            AssignFont(tmp, LD.TitleFontPath);
 
             go.transform.localScale = new Vector3(1.03f, 1.03f, 1f);
         }
@@ -90,6 +92,7 @@ namespace R8EOX.Editor.Builders
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.characterSpacing = LD.TitleCharSpacing;
             tmp.color = LD.TitleColor;
+            AssignFont(tmp, LD.TitleFontPath);
         }
 
         private static Image CreateProgressBar(Transform content)
@@ -134,6 +137,7 @@ namespace R8EOX.Editor.Builders
             tmp.fontSize = LD.LabelFontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = LD.MutedTextColor;
+            AssignFont(tmp, LD.MonoFontPath);
             return tmp;
         }
 
@@ -154,7 +158,17 @@ namespace R8EOX.Editor.Builders
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.fontStyle = FontStyles.Italic;
             tmp.color = LD.MutedTextColor;
+            AssignFont(tmp, LD.BodyFontPath);
             return tmp;
+        }
+
+        private static void AssignFont(TextMeshProUGUI tmp, string fontPath)
+        {
+            var fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontPath);
+            if (fontAsset != null)
+                tmp.font = fontAsset;
+            else
+                Debug.LogWarning($"[LoadingPanelBuilder] Font not found at {fontPath}");
         }
 
         internal static void SetRect(
