@@ -37,6 +37,8 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `OptionsOverlayBuilder.cs` | `R8EOX > Build Options Overlay` menu item: creates OptionsOverlay prefab at `Assets/Prefabs/UI/OptionsOverlay.prefab` and wires it into OverlayRegistry if one exists |
 | `PostProcessBuilder.cs` | Creates per-track URP VolumeProfile with Bloom, ColorAdjustments, Vignette, WhiteBalance, Tonemapping overrides from EnvironmentSettings SO; places Global Volume in scene |
 | `LightingProbeBuilder.cs` | Places a box-projected ReflectionProbe and a 2-layer LightProbeGroup grid sized to terrain dimensions |
+| `LoadingLayoutData.cs` | Shared color constants, size constants, and font paths used by the loading screen builders |
+| `LoadingPanelBuilder.cs` | Creates the full loading screen UI hierarchy (Background, ContentArea, TitleGlow, TitleLabel, BarTrack, ProgressFill, ProgressLabel, TipLabel) under a parent Transform; called from `MenuSceneBuilder.BuildLoadingPanel()` |
 
 ## Conventions
 
