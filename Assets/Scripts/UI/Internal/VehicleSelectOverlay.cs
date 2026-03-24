@@ -33,7 +33,7 @@ namespace R8EOX.UI.Internal
             }
 
             previewPanel.Initialize();
-            listPanel.Initialize(registry.GetAll(), OnSelectionChanged);
+            listPanel.Initialize(registry.GetPlayable(), OnSelectionChanged);
 
             confirmButton.onClick.AddListener(OnConfirmPressed);
 
