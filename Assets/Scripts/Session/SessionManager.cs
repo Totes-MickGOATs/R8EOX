@@ -109,16 +109,6 @@ namespace R8EOX.Session
             }
             else
             {
-                if (registry != null && registry.Count > 0 && activeConfig != null
-                    && activeConfig.VehiclePrefab == null)
-                {
-                    var defaultVehicle = registry.GetDefault();
-                    if (defaultVehicle != null && defaultVehicle.VehiclePrefab != null)
-                    {
-                        activeConfig.SetVehiclePrefab(defaultVehicle.VehiclePrefab);
-                        Debug.Log($"[SessionManager] No vehicle overlay — using default: {defaultVehicle.DisplayName}");
-                    }
-                }
                 state.BeginSpawning();
                 SetupSession();
             }
