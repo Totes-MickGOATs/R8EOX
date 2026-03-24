@@ -69,40 +69,25 @@ namespace R8EOX.Settings
 
         // ── Setters ────────────────────────────────────────────────────────
 
+        private void ModifySettings<T>(Action<T> modifier, T data, Action applier = null)
+        {
+            if (modifier == null) return;
+            modifier(data);
+            Save();
+            applier?.Invoke();
+            OnSettingsChanged?.Invoke();
+        }
+
         internal void SetVideoSettings(Action<VideoSettings> modifier)
-        {
-            if (modifier == null) return;
-            modifier(currentData.video);
-            Save(); ApplyVideo(); OnSettingsChanged?.Invoke();
-        }
-
+            => ModifySettings(modifier, currentData.video, ApplyVideo);
         internal void SetAudioSettings(Action<AudioSettingsData> modifier)
-        {
-            if (modifier == null) return;
-            modifier(currentData.audio);
-            Save(); ApplyAudio(); OnSettingsChanged?.Invoke();
-        }
-
+            => ModifySettings(modifier, currentData.audio, ApplyAudio);
         internal void SetControlsSettings(Action<ControlsSettings> modifier)
-        {
-            if (modifier == null) return;
-            modifier(currentData.controls);
-            Save(); OnSettingsChanged?.Invoke();
-        }
-
+            => ModifySettings(modifier, currentData.controls);
         internal void SetCalibrationSettings(Action<CalibrationSettings> modifier)
-        {
-            if (modifier == null) return;
-            modifier(currentData.calibration);
-            Save(); OnSettingsChanged?.Invoke();
-        }
-
+            => ModifySettings(modifier, currentData.calibration);
         internal void SetGameplaySettings(Action<GameplaySettings> modifier)
-        {
-            if (modifier == null) return;
-            modifier(currentData.gameplay);
-            Save(); OnSettingsChanged?.Invoke();
-        }
+            => ModifySettings(modifier, currentData.gameplay);
 
         // ── Profile Management ─────────────────────────────────────────────
 
