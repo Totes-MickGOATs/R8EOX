@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using R8EOX.UI.Internal;
 using R8EOX.Race;
 using R8EOX.Vehicle;
+using R8EOX.Diagnostics;
 
 namespace R8EOX.UI
 {
@@ -78,12 +79,13 @@ namespace R8EOX.UI
                 return;
             }
             activeOverlay.Show(registry, confirmCallback, cancelCallback);
+            Diag.Log(DiagChannel.UI, "Vehicle select overlay shown");
         }
 
         /// <summary>Destroy the vehicle selection overlay if active.</summary>
         public void CleanupVehicleSelectOverlay()
         {
-            Debug.Log($"[UIManager] CleanupVehicleSelectOverlay: activeOverlay={activeOverlay != null} overlayInstance={overlayInstance != null}");
+            Diag.Log(DiagChannel.UI, $"CleanupVehicleSelectOverlay: overlay={activeOverlay != null} instance={overlayInstance != null}");
             try
             {
                 if (activeOverlay != null) activeOverlay.Hide();
@@ -94,8 +96,9 @@ namespace R8EOX.UI
             }
             if (overlayInstance != null)
             {
-                Debug.Log($"[UIManager] Destroying overlay instance: {overlayInstance.name}");
+                Diag.Log(DiagChannel.UI, $"Destroying overlay: {overlayInstance.name}");
                 Destroy(overlayInstance);
+                Diag.VerifyDestroyed(overlayInstance, "VehicleSelectOverlay");
             }
             else
             {
