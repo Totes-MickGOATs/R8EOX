@@ -187,6 +187,7 @@ namespace R8EOX.UI.Internal
 
         private void Update()
         {
+            if (ConfirmDialog.IsDialogOpen) return;
             if (UnityEngine.InputSystem.Keyboard.current != null &&
                 UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
                 OnBackPressed();
