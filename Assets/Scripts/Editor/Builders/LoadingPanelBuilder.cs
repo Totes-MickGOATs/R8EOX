@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using LD = R8EOX.Editor.Builders.LoadingLayoutData;
@@ -15,20 +14,16 @@ namespace R8EOX.Editor.Builders
             out TextMeshProUGUI progressLabel,
             out TextMeshProUGUI tipLabel)
         {
-            var titleFont = LoadFont(LD.TitleFontPath);
-            var monoFont  = LoadFont(LD.MonoFontPath);
-            var bodyFont  = LoadFont(LD.BodyFontPath);
-
             CreateBackground(parent);
 
             var content = CreateContentArea(parent);
 
-            CreateTitleGlow(content, titleFont);
-            CreateTitle(content, titleFont);
+            CreateTitleGlow(content);
+            CreateTitle(content);
 
             progressFill  = CreateProgressBar(content);
-            progressLabel = CreateProgressLabel(content, monoFont);
-            tipLabel      = CreateTipLabel(content, bodyFont);
+            progressLabel = CreateProgressLabel(content);
+            tipLabel      = CreateTipLabel(content);
         }
 
         private static void CreateBackground(Transform parent)
@@ -56,7 +51,7 @@ namespace R8EOX.Editor.Builders
             return rt;
         }
 
-        private static void CreateTitleGlow(Transform content, TMP_FontAsset font)
+        private static void CreateTitleGlow(Transform content)
         {
             var go = new GameObject("TitleGlow");
             go.transform.SetParent(content, false);
@@ -71,7 +66,6 @@ namespace R8EOX.Editor.Builders
             tmp.fontSize = LD.TitleFontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.characterSpacing = LD.TitleCharSpacing;
-            AssignFont(tmp, font);
             var glowColor = LD.TitleColor;
             glowColor.a = 0.2f;
             tmp.color = glowColor;
@@ -79,7 +73,7 @@ namespace R8EOX.Editor.Builders
             go.transform.localScale = new Vector3(1.03f, 1.03f, 1f);
         }
 
-        private static void CreateTitle(Transform content, TMP_FontAsset font)
+        private static void CreateTitle(Transform content)
         {
             var go = new GameObject("TitleLabel");
             go.transform.SetParent(content, false);
@@ -95,7 +89,6 @@ namespace R8EOX.Editor.Builders
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.characterSpacing = LD.TitleCharSpacing;
-            AssignFont(tmp, font);
             tmp.color = LD.TitleColor;
         }
 
@@ -126,7 +119,7 @@ namespace R8EOX.Editor.Builders
             return fillImg;
         }
 
-        private static TextMeshProUGUI CreateProgressLabel(Transform content, TMP_FontAsset font)
+        private static TextMeshProUGUI CreateProgressLabel(Transform content)
         {
             var go = new GameObject("ProgressLabel");
             go.transform.SetParent(content, false);
@@ -140,12 +133,11 @@ namespace R8EOX.Editor.Builders
             tmp.text = "Loading... 0%";
             tmp.fontSize = LD.LabelFontSize;
             tmp.alignment = TextAlignmentOptions.Center;
-            AssignFont(tmp, font);
             tmp.color = LD.MutedTextColor;
             return tmp;
         }
 
-        private static TextMeshProUGUI CreateTipLabel(Transform content, TMP_FontAsset font)
+        private static TextMeshProUGUI CreateTipLabel(Transform content)
         {
             var go = new GameObject("TipLabel");
             go.transform.SetParent(content, false);
@@ -161,43 +153,8 @@ namespace R8EOX.Editor.Builders
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.fontStyle = FontStyles.Italic;
-            AssignFont(tmp, font);
             tmp.color = LD.MutedTextColor;
             return tmp;
-        }
-
-        private static TMP_FontAsset LoadFont(string path)
-        {
-            var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(path);
-            if (font == null)
-                Debug.LogWarning($"[LoadingPanelBuilder] Font not found at: {path}");
-            return font;
-        }
-
-        private static void AssignFont(TextMeshProUGUI tmp, TMP_FontAsset font)
-        {
-            if (font == null) return;
-            EnsureAtlas(font);
-            var so = new SerializedObject(tmp);
-            so.FindProperty("m_fontAsset").objectReferenceValue = font;
-            so.ApplyModifiedPropertiesWithoutUndo();
-        }
-
-        private static void EnsureAtlas(TMP_FontAsset font)
-        {
-            var so = new SerializedObject(font);
-            var prop = so.FindProperty("m_AtlasTextures");
-            if (prop == null || prop.arraySize > 0) return;
-            var tex = new Texture2D(1, 1, TextureFormat.Alpha8, false) { name = font.name + " Atlas" };
-            prop.arraySize = 1;
-            prop.GetArrayElementAtIndex(0).objectReferenceValue = tex;
-            var widthProp = so.FindProperty("m_AtlasWidth");
-            var heightProp = so.FindProperty("m_AtlasHeight");
-            if (widthProp != null) widthProp.intValue = 1;
-            if (heightProp != null) heightProp.intValue = 1;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            AssetDatabase.AddObjectToAsset(tex, font);
-            AssetDatabase.SaveAssetIfDirty(font);
         }
 
         internal static void SetRect(
