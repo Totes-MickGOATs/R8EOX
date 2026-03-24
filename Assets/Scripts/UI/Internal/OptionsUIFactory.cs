@@ -18,9 +18,6 @@ namespace R8EOX.UI.Internal
         private const float SECTION_SPACING     = 16f;
         private const float SECTION_RULE_HEIGHT = 1f;
 
-
-        // ── Tab Layout Setup ──────────────────────────────────────────────────
-
         internal static VerticalLayoutGroup SetupTabLayout(
             GameObject go, float spacing = 8f,
             RectOffset padding = null, bool addFitter = false)
@@ -42,8 +39,6 @@ namespace R8EOX.UI.Internal
             return vlg;
         }
 
-        // ── Section Header ────────────────────────────────────────────────────
-
         internal static GameObject CreateSectionHeader(Transform parent, string text)
         {
             var root = NewGO("Section_" + text, parent);
@@ -61,8 +56,6 @@ namespace R8EOX.UI.Internal
             SetH(rule.gameObject, SECTION_RULE_HEIGHT);
             return root;
         }
-
-        // ── Slider Row ────────────────────────────────────────────────────────
 
         internal static Slider CreateSliderRow(
             Transform parent, string label,
@@ -91,8 +84,6 @@ namespace R8EOX.UI.Internal
             return slider;
         }
 
-        // ── Dropdown Row ──────────────────────────────────────────────────────
-
         internal static TMP_Dropdown CreateDropdownRow(
             Transform parent, string label,
             string[] options, int selectedIndex, Action<int> onChange)
@@ -117,8 +108,6 @@ namespace R8EOX.UI.Internal
             return dd;
         }
 
-        // ── Checkbox Row ──────────────────────────────────────────────────────
-
         internal static Toggle CreateCheckboxRow(
             Transform parent, string label, bool isChecked, Action<bool> onChange)
         {
@@ -142,8 +131,6 @@ namespace R8EOX.UI.Internal
             toggle.onValueChanged.AddListener(v => onChange?.Invoke(v));
             return toggle;
         }
-
-        // ── Tier Buttons ──────────────────────────────────────────────────────
 
         internal static GameObject CreateTierButtons(
             Transform parent, string[] labels, int selectedIndex, Action<int> onChange)
@@ -178,8 +165,6 @@ namespace R8EOX.UI.Internal
             return row;
         }
 
-        // ── Action Button ─────────────────────────────────────────────────────
-
         internal static Button CreateActionButton(
             Transform parent, string text, int style, Action onClick)
         {
@@ -203,8 +188,6 @@ namespace R8EOX.UI.Internal
             btn.onClick.AddListener(() => onClick?.Invoke());
             return btn;
         }
-
-        // ── Helpers ───────────────────────────────────────────────────────────
 
         private static GameObject MakeHRow(string name, Transform parent)
         {
