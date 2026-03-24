@@ -36,9 +36,13 @@ namespace R8EOX.Menu
 
         private void Start()
         {
+            Debug.Log("[MenuManager] Start() called");
+
             var root = GameObject.Find("[AppRoot]");
             appManager = root?.GetComponent<R8EOX.App.AppManager>();
             settingsManager = root?.GetComponent<R8EOX.Settings.SettingsManager>();
+
+            Debug.Log($"[MenuManager] AppManager found: {appManager != null}");
 
             if (appManager == null)
             {
@@ -50,8 +54,14 @@ namespace R8EOX.Menu
             navigator = new MenuNavigator(transitionDuration);
 
             InitializeScreens();
+            Debug.Log("[MenuManager] Screens initialized");
+
             HideAllScreensImmediate();
+            Debug.Log("[MenuManager] All screens hidden");
+
             SubscribeToAppEvents();
+
+            Debug.Log($"[MenuManager] Pushing splash (skipSplash={skipSplash}), splash null? {splashScreen == null}");
 
             if (skipSplash)
             {
@@ -61,6 +71,8 @@ namespace R8EOX.Menu
             {
                 navigator.PushScreen(splashScreen);
             }
+
+            Debug.Log("[MenuManager] PushScreen called");
 
             skipSplash = true;
         }
@@ -110,6 +122,7 @@ namespace R8EOX.Menu
 
         private void OnSplashComplete()
         {
+            Debug.Log("[MenuManager] OnSplashComplete — transitioning to main menu");
             navigator.ReplaceScreen(mainMenuScreen);
         }
 
