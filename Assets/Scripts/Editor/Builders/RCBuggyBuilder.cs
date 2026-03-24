@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using R8EOX;
 using R8EOX.Vehicle;
 
 namespace R8EOX.Editor.Builders
@@ -71,12 +72,10 @@ namespace R8EOX.Editor.Builders
             airGO.AddComponent<R8EOX.Vehicle.Internal.RCAirPhysics>();
             var dtGO = new GameObject("Drivetrain"); dtGO.transform.SetParent(root.transform, false);
             var drivetrain = dtGO.AddComponent<R8EOX.Vehicle.Internal.Drivetrain>();
-
             ConfigureDrivetrain(drivetrain, spec);
             ConfigureVehicleManager(vehicleManager, spec);
             root.AddComponent<R8EOX.Vehicle.Internal.CollisionTracker>();
             AddAttachmentPoints(root, spec);
-
             SetLayerRecursive(root, carLayer);
             return root;
         }
@@ -87,6 +86,9 @@ namespace R8EOX.Editor.Builders
             var go = BuildFromSpec(spec);
             string path = $"Assets/Prefabs/{spec.Name}.prefab";
             PrefabUtility.SaveAsPrefabAsset(go, path); Object.DestroyImmediate(go);
+            string defPath = $"Assets/Settings/{spec.Name}_VehicleDef.asset";
+            var def = AssetDatabase.LoadAssetAtPath<VehicleDefinition>(defPath);
+            if (def != null) { var so = new SerializedObject(def); so.FindProperty("isPlayable").boolValue = !spec.IsReference; so.ApplyModifiedProperties(); EditorUtility.SetDirty(def); }
             AssetDatabase.SaveAssets(); Debug.Log($"[RCBuggyBuilder] Saved {path}");
         }
 
@@ -134,7 +136,6 @@ namespace R8EOX.Editor.Builders
             };
 
         // ---- Private Helpers ----
-
         static void AddRigidbody(GameObject root, BuggySpec spec)
         {
             var rb = root.AddComponent<Rigidbody>();
