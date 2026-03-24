@@ -10,6 +10,7 @@ Internal implementation for the UI system. Only `UIManager` should reference the
 - TMPro text fields use `[SerializeField] private TextMeshProUGUI`
 
 ## Contents
+- `UIColors.cs` — Shared color palette constants for all UI Internal components. `internal static class` with named `Color` fields: Primary (cyan), Danger (red), Warning (gold), Valid (green), PanelBg, ButtonFill, SliderTrack, BorderStrong/Medium/Subtle/Half, MutedText, SubtleText. Consumers reference these directly instead of declaring duplicate per-class fields. `ToastManager` (in `R8EOX.UI`) also uses this via the shared assembly.
 - `RaceHUD.cs` — TMPro-based race HUD: speed (km/h), position (ordinal), lap counter, race time, current lap time, best lap time, countdown overlay; includes FormatTime and GetOrdinal helpers
 - `Leaderboard.cs` — Shows/hides race standings list (skeleton)
 - `PauseMenu.cs` — Pause screen. Full button set: RESUME (primary), OPTIONS (secondary), RESTART, CHANGE VEHICLE, RETURN TO MENU, QUIT TO DESKTOP. Destructive actions (Restart, Return to Menu, Quit to Desktop) require ConfirmDialog confirmation. UI built programmatically on first Show() via lazy BuildUI(). Initialize(optionsCallback, restartCallback) wires caller-supplied handlers. Controls Time.timeScale (0 on Show, 1 on Hide). Routes vehicle swap and quit-to-menu through UIManager.
