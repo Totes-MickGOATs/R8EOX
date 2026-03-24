@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using UCamera = UnityEngine.Camera;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -93,7 +94,7 @@ namespace R8EOX.Editor.Builders
             var titleGo = CreateLabel("TitleText", "R8EO-X", p);
             var titleTmp = titleGo.GetComponent<TextMeshProUGUI>();
             titleTmp.fontSize = 72f;
-            CenterAnchor(titleGo.GetComponent<RectTransform>());
+            BRH.CenterAnchor(titleGo.GetComponent<RectTransform>());
 
             var promptGo = CreateLabel("PromptText", "PRESS ANY KEY", p);
             var promptCg = promptGo.AddComponent<CanvasGroup>();
@@ -159,7 +160,7 @@ namespace R8EOX.Editor.Builders
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            StretchFill(go.AddComponent<RectTransform>());
+            BRH.StretchFill(go.AddComponent<RectTransform>());
             var cg = go.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
             cg.interactable = false;
@@ -172,14 +173,14 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             var rt = go.AddComponent<RectTransform>();
-            CenterAnchor(rt);
+            BRH.CenterAnchor(rt);
             rt.sizeDelta = new Vector2(400f, 60f);
             go.AddComponent<Image>().color = PanelColor;
             go.AddComponent<Button>();
 
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(go.transform, false);
-            StretchFill(textGo.AddComponent<RectTransform>());
+            BRH.StretchFill(textGo.AddComponent<RectTransform>());
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             tmp.text = label;
             tmp.alignment = TextAlignmentOptions.Center;
@@ -191,27 +192,12 @@ namespace R8EOX.Editor.Builders
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            StretchFill(go.AddComponent<RectTransform>());
+            BRH.StretchFill(go.AddComponent<RectTransform>());
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = text;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 24f;
             return go;
-        }
-
-        private static void StretchFill(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
-
-        private static void CenterAnchor(RectTransform rt)
-        {
-            rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot     = new Vector2(0.5f, 0.5f);
         }
 
         private static void Wire(Object target, string field, Object value)
