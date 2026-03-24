@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using R8EOX.App.Internal;
+using R8EOX.Diagnostics;
 using R8EOX.Session;
 
 namespace R8EOX.App
@@ -45,6 +46,9 @@ namespace R8EOX.App
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            gameObject.AddComponent<DiagnosticsManager>();
+#endif
             sceneLoader = new SceneLoader();
             currentState = AppState.Boot;
         }
@@ -76,6 +80,8 @@ namespace R8EOX.App
                 return;
             }
 
+            Diag.BeginFlow("TrackLoad");
+            Diag.FlowStep("TrackLoad", "MenuRequestedTrackLoad");
             currentState = AppState.Loading;
 
             SessionConfig config = SessionConfig.CreateRuntime(
@@ -107,11 +113,14 @@ namespace R8EOX.App
         /// </summary>
         public void ReturnToMenu()
         {
+            Diag.BeginFlow("ReturnToMenu");
+            Diag.FlowStep("ReturnToMenu", "ReturnRequested");
             Time.timeScale = 1f;
 
             if (sessionManager != null)
             {
                 sessionManager.EndSession();
+                Diag.FlowStep("ReturnToMenu", "SessionEnded");
             }
 
             if (sessionManagerObject != null)
@@ -119,10 +128,12 @@ namespace R8EOX.App
                 Destroy(sessionManagerObject);
                 sessionManagerObject = null;
                 sessionManager = null;
+                Diag.FlowStep("ReturnToMenu", "VehiclesDestroyed");
             }
 
             currentState = AppState.Menu;
             sceneLoader.LoadScene("MainMenu");
+            Diag.FlowStep("ReturnToMenu", "MenuLoaded");
         }
 
         // ----- Private Handlers -----
@@ -134,6 +145,7 @@ namespace R8EOX.App
 
         private void HandleLoadComplete()
         {
+            Diag.FlowStep("TrackLoad", "SceneLoaded");
             currentState = AppState.InGame;
             OnLoadComplete?.Invoke();
         }
