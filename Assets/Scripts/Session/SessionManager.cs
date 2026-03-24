@@ -109,6 +109,16 @@ namespace R8EOX.Session
             }
             else
             {
+                if (registry != null && registry.Count > 0 && activeConfig != null
+                    && activeConfig.VehiclePrefab == null)
+                {
+                    var defaultVehicle = registry.GetDefault();
+                    if (defaultVehicle != null && defaultVehicle.VehiclePrefab != null)
+                    {
+                        activeConfig.SetVehiclePrefab(defaultVehicle.VehiclePrefab);
+                        Debug.Log($"[SessionManager] No vehicle overlay — using default: {defaultVehicle.DisplayName}");
+                    }
+                }
                 state.BeginSpawning();
                 SetupSession();
             }
@@ -222,11 +232,7 @@ namespace R8EOX.Session
             effectiveMode = TrackValidator.DegradeMode(
                 activeConfig.SessionMode, readiness, trackType);
             if (effectiveMode != activeConfig.SessionMode)
-            {
-                Debug.LogWarning(
-                    $"[SessionManager] Mode degraded from "
-                    + $"{activeConfig.SessionMode} to {effectiveMode}.");
-            }
+                Debug.LogWarning($"[SessionManager] Mode degraded from {activeConfig.SessionMode} to {effectiveMode}.");
         }
 
         private void SpawnPlayer()
@@ -235,11 +241,7 @@ namespace R8EOX.Session
             if (trackManager.GetSpawnPointCount() <= 0)
             {
                 Debug.LogWarning("[SessionManager] No spawn points! Spawning at origin.");
-                playerSpawn = new SpawnPointData
-                {
-                    Index = 0, Position = Vector3.up * 5f,
-                    Rotation = Quaternion.identity, IsPlayerSpawn = true
-                };
+                playerSpawn = new SpawnPointData { Index = 0, Position = Vector3.up * 5f, Rotation = Quaternion.identity, IsPlayerSpawn = true };
             }
             vehicleSpawner.SpawnPlayerVehicle(activeConfig.VehiclePrefab, playerSpawn);
             if (raceManager != null && vehicleSpawner.PlayerVehicle != null)
@@ -268,10 +270,7 @@ namespace R8EOX.Session
                 activeConfig.VehiclePrefab, aiSpawns.ToArray(),
                 activeConfig.AiOpponentCount);
             foreach (var vehicle in aiVehicles)
-            {
-                if (raceManager != null) raceManager.RegisterVehicle(vehicle);
-                if (aiManager != null) aiManager.RegisterDriver(vehicle);
-            }
+            { if (raceManager != null) raceManager.RegisterVehicle(vehicle); if (aiManager != null) aiManager.RegisterDriver(vehicle); }
         }
 
         private void WirePlayerVehicle()
