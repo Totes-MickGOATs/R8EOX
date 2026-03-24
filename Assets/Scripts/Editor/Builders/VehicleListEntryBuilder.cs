@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEditor;
 using LD = R8EOX.Editor.Builders.VehicleSelectLayoutData;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -32,7 +33,7 @@ namespace R8EOX.Editor.Builders
         {
             var t = entryRoot.transform.Find("Highlight");
             if (t == null) { Debug.LogWarning("[VehicleListEntryBuilder] Highlight not found."); return; }
-            LD.SetRectStretch(t.GetComponent<RectTransform>());
+            BRH.StretchFill(t.GetComponent<RectTransform>());
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.EntryNormal;
         }
