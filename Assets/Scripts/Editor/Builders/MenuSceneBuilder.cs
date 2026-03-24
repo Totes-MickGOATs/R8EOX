@@ -4,6 +4,8 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using UCamera = UnityEngine.Camera;
 
@@ -21,6 +23,10 @@ namespace R8EOX.Editor.Builders
 
             CreateCamera();
             var canvas = CreateCanvas();
+
+            var esGo = new GameObject("[EventSystem]");
+            esGo.AddComponent<EventSystem>();
+            esGo.AddComponent<InputSystemUIInputModule>();
 
             var menuManagerGo = new GameObject("[MenuManager]");
             menuManagerGo.transform.SetParent(canvas.transform, false);
@@ -142,6 +148,11 @@ namespace R8EOX.Editor.Builders
             var soList = new SerializedObject(tlp);
             soList.FindProperty("listContent").objectReferenceValue = listContentGo.GetComponent<Transform>();
             soList.ApplyModifiedProperties();
+
+            var entryTemplate = TrackListEntryBuilder.Build(listAreaGo.transform);
+            var soList2 = new SerializedObject(tlp);
+            soList2.FindProperty("trackEntryPrefab").objectReferenceValue = entryTemplate;
+            soList2.ApplyModifiedProperties();
 
             var so = new SerializedObject(s);
             so.FindProperty("trackListPanel").objectReferenceValue    = tlp;
