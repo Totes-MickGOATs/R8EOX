@@ -10,8 +10,10 @@ namespace R8EOX.Editor.Builders
     {
         private const int SamplingPointSize = 48;
         private const int AtlasPadding = 5;
-        private const int AtlasWidth = 512;
-        private const int AtlasHeight = 512;
+        private const int AtlasWidth = 1024;
+        private const int AtlasHeight = 1024;
+        private const string AsciiCharacters =
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
         [MenuItem("R8EOX/Build Font Assets")]
         private static void Build()
@@ -35,6 +37,7 @@ namespace R8EOX.Editor.Builders
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
+            EnsureMenuThemeConfigAsset();
             WireMenuThemeConfig();
 
             Debug.Log("[FontAssetBuilder] Done — font assets created and wired into MenuThemeConfig.");
@@ -52,8 +55,7 @@ namespace R8EOX.Editor.Builders
             var existing = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(outputPath);
             if (existing != null)
             {
-                Debug.Log($"[FontAssetBuilder] Already exists, skipping: {outputPath}");
-                return;
+                AssetDatabase.DeleteAsset(outputPath);
             }
 
             var fontAsset = TMP_FontAsset.CreateFontAsset(
@@ -64,7 +66,7 @@ namespace R8EOX.Editor.Builders
                 AtlasWidth,
                 AtlasHeight,
                 AtlasPopulationMode.Dynamic,
-                enableMultiAtlasSupport: true);
+                enableMultiAtlasSupport: false);
 
             if (fontAsset == null)
             {
@@ -72,8 +74,42 @@ namespace R8EOX.Editor.Builders
                 return;
             }
 
+            fontAsset.TryAddCharacters(AsciiCharacters);
+
+            fontAsset.atlasPopulationMode = AtlasPopulationMode.Static;
+            fontAsset.isMultiAtlasTexturesEnabled = false;
+
             AssetDatabase.CreateAsset(fontAsset, outputPath);
-            Debug.Log($"[FontAssetBuilder] Created {outputPath}");
+
+            if (fontAsset.atlasTextures != null
+                && fontAsset.atlasTextures.Length > 0
+                && fontAsset.atlasTextures[0] != null)
+            {
+                AssetDatabase.AddObjectToAsset(fontAsset.atlasTextures[0], outputPath);
+            }
+
+            if (fontAsset.material != null)
+            {
+                AssetDatabase.AddObjectToAsset(fontAsset.material, outputPath);
+            }
+
+            EditorUtility.SetDirty(fontAsset);
+
+            Debug.Log($"[FontAssetBuilder] Created {outputPath} — {fontAsset.characterTable.Count} glyphs baked.");
+        }
+
+        private static void EnsureMenuThemeConfigAsset()
+        {
+            var guids = AssetDatabase.FindAssets("t:MenuThemeConfig");
+            if (guids.Length > 0) return;
+
+            var config = ScriptableObject.CreateInstance<MenuThemeConfig>();
+            const string dir = "Assets/Settings";
+            if (!AssetDatabase.IsValidFolder(dir))
+                AssetDatabase.CreateFolder("Assets", "Settings");
+            AssetDatabase.CreateAsset(config, dir + "/MenuThemeConfig.asset");
+            AssetDatabase.SaveAssets();
+            Debug.Log("[FontAssetBuilder] Created MenuThemeConfig at " + dir + "/MenuThemeConfig.asset");
         }
 
         private static void WireMenuThemeConfig()
@@ -95,9 +131,9 @@ namespace R8EOX.Editor.Builders
 
             var so = new SerializedObject(config);
 
-            var bold    = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/Rajdhani-Bold SDF.asset");
+            var bold     = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/Rajdhani-Bold SDF.asset");
             var semibold = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/Rajdhani-SemiBold SDF.asset");
-            var mono    = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/SourceCodePro-Regular SDF.asset");
+            var mono     = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/SourceCodePro-Regular SDF.asset");
 
             SetFontProperty(so, "titleFont", bold,     "Rajdhani-Bold SDF");
             SetFontProperty(so, "bodyFont",  semibold, "Rajdhani-SemiBold SDF");
