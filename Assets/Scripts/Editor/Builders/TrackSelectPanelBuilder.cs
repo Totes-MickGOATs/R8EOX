@@ -19,7 +19,7 @@ namespace R8EOX.Editor.Builders
             BuildButtons(p, s);
 
             var soScreen = new SerializedObject(s);
-            soScreen.FindProperty("trackListPanel").objectReferenceValue = tlp;
+            SerializedPropertyHelper.SetRef(soScreen, "trackListPanel", tlp);
             soScreen.ApplyModifiedProperties();
         }
 
@@ -81,12 +81,12 @@ namespace R8EOX.Editor.Builders
             scrollRect.content = contentRt;
 
             var soList = new SerializedObject(tlp);
-            soList.FindProperty("listContent").objectReferenceValue = listContentGo.GetComponent<Transform>();
+            SerializedPropertyHelper.SetRef(soList, "listContent", listContentGo.GetComponent<Transform>());
             soList.ApplyModifiedProperties();
 
             var entryTemplate = TrackListEntryBuilder.Build(listAreaGo.transform);
             var soList2 = new SerializedObject(tlp);
-            soList2.FindProperty("trackEntryPrefab").objectReferenceValue = entryTemplate;
+            SerializedPropertyHelper.SetRef(soList2, "trackEntryPrefab", entryTemplate);
             soList2.ApplyModifiedProperties();
         }
 
@@ -106,7 +106,7 @@ namespace R8EOX.Editor.Builders
             BuildTrackPreviewContent(previewAreaGo.transform, tpp);
 
             var soScreen = new SerializedObject(s);
-            soScreen.FindProperty("trackPreviewPanel").objectReferenceValue = tpp;
+            SerializedPropertyHelper.SetRef(soScreen, "trackPreviewPanel", tpp);
             soScreen.ApplyModifiedProperties();
         }
 
@@ -130,8 +130,8 @@ namespace R8EOX.Editor.Builders
             backRt.anchoredPosition = Vector2.zero;
 
             var soScreen = new SerializedObject(s);
-            soScreen.FindProperty("startButton").objectReferenceValue = startGo.GetComponent<Button>();
-            soScreen.FindProperty("backButton").objectReferenceValue  = backGo.GetComponent<Button>();
+            SerializedPropertyHelper.SetRef(soScreen, "startButton", startGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(soScreen, "backButton",  backGo.GetComponent<Button>());
             soScreen.ApplyModifiedProperties();
         }
 
@@ -191,13 +191,13 @@ namespace R8EOX.Editor.Builders
             emptyTmp.alignment = TextAlignmentOptions.Center;
 
             var so = new SerializedObject(pp);
-            so.FindProperty("previewImage").objectReferenceValue     = previewImg;
-            so.FindProperty("trackNameLabel").objectReferenceValue   = nameTmp;
-            so.FindProperty("trackTypeLabel").objectReferenceValue   = typeTmp;
-            so.FindProperty("descriptionLabel").objectReferenceValue = descTmp;
-            so.FindProperty("statusLabel").objectReferenceValue      = statusTmp;
-            so.FindProperty("statusIndicator").objectReferenceValue  = indImg;
-            so.FindProperty("emptyState").objectReferenceValue       = emptyGo;
+            SerializedPropertyHelper.SetRef(so, "previewImage",     previewImg);
+            SerializedPropertyHelper.SetRef(so, "trackNameLabel",   nameTmp);
+            SerializedPropertyHelper.SetRef(so, "trackTypeLabel",   typeTmp);
+            SerializedPropertyHelper.SetRef(so, "descriptionLabel", descTmp);
+            SerializedPropertyHelper.SetRef(so, "statusLabel",      statusTmp);
+            SerializedPropertyHelper.SetRef(so, "statusIndicator",  indImg);
+            SerializedPropertyHelper.SetRef(so, "emptyState",       emptyGo);
             so.ApplyModifiedProperties();
         }
 
