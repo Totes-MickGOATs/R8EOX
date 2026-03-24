@@ -129,6 +129,36 @@ Assets/
 - **OnValidate fires during AddComponent**: Builder code can't set serialized fields before OnValidate runs. Don't put warnings in OnValidate for fields that builders wire post-creation
 - **Test console = quality bar**: Treat ALL console warnings/errors during test runs as real bugs requiring root-cause fixes, not symptoms to suppress with LogAssert.ignoreFailingMessages
 - **TMP resources in git**: `Assets/TextMesh Pro/` must be committed — worktrees and fresh clones need it. The folder is exempt from project lint rules in `is_unity_generated()`
+- **Save after every MCP modification**: See "MCP Save Rule" section below
+
+## MCP Save Rule — MANDATORY
+
+> **Every MCP call that modifies a scene, GameObject, component, prefab, or asset MUST be immediately followed by a save.** Unsaved changes are silently lost when another agent loads a scene, enters play mode, or runs a builder.
+
+### How to Save
+
+- **Menu item**: `execute_menu_item("R8EOX/Save All")` — saves all open scenes + all dirty assets in one call
+- **Scene only**: `manage_scene(action="save")` — saves the active scene
+- **Atomic pattern (preferred)**: Use `batch_execute` to combine your modification + save into a single MCP call, so no other agent can interleave:
+
+```json
+{
+  "commands": [
+    { "tool": "manage_gameobject", "params": { "action": "create", "name": "MyObject" } },
+    { "tool": "execute_menu_item", "params": { "item_path": "R8EOX/Save All" } }
+  ]
+}
+```
+
+### When to Save
+
+- After **every** `manage_gameobject`, `manage_components`, `manage_material`, `manage_ui`, `manage_prefabs`, `manage_scene` (create/modify), `manage_animation`, `manage_vfx`, or any other MCP call that changes editor state
+- Before `manage_editor(action="play")`, `manage_scene(action="load")`, or any builder menu item
+- After a sequence of related modifications (e.g., creating a GO + adding components + setting properties), save at the end of the sequence — but always within the same `batch_execute`
+
+### Why This Matters
+
+Multiple agents may be connected to the same Unity editor via MCP. Without immediate saves, Agent A's unsaved scene edits are silently wiped when Agent B loads a different scene or triggers play mode. The `batch_execute` pattern prevents interleaving by making the modification + save atomic from MCP's perspective.
 
 ## Orchestration
 
