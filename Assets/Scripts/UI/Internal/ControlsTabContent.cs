@@ -25,11 +25,7 @@ namespace R8EOX.UI.Internal
 
         private void BuildUI()
         {
-            var vg = gameObject.AddComponent<VerticalLayoutGroup>();
-            vg.childForceExpandWidth  = true;
-            vg.childForceExpandHeight = false;
-            vg.spacing = 8f;
-            vg.padding = new RectOffset(0, 0, 0, 0);
+            OptionsUIFactory.SetupTabLayout(gameObject);
 
             BuildProfileSection();
             BuildInputSection();
