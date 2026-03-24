@@ -17,5 +17,12 @@ namespace R8EOX.UI.Internal
         internal static readonly Color BorderHalf   = new Color(0f, 0.784f, 1f, 0.5f);
         internal static readonly Color MutedText    = new Color(0.533f, 0.533f, 0.533f, 1f);
         internal static readonly Color SubtleText   = new Color(0.7f, 0.7f, 0.7f, 1f);
+        internal static readonly Color Cyan10       = new Color(0f, 0.784f, 1f, 0.10f);
+        internal static readonly Color Gold         = new Color(0.91f, 0.722f, 0.286f, 1f);
+        internal static readonly Color Gold25       = new Color(0.91f, 0.722f, 0.286f, 0.25f);
+        internal static readonly Color Gold50       = new Color(0.91f, 0.722f, 0.286f, 0.50f);
+        internal static readonly Color Red25        = new Color(1f, 0.318f, 0.329f, 0.25f);
+        internal static readonly Color SurfaceHover = new Color(0.098f, 0.102f, 0.130f, 1f);
+        internal static readonly Color PanelElevated = new Color(0.098f, 0.102f, 0.130f, 0.97f);
     }
 }
