@@ -19,8 +19,14 @@ namespace R8EOX.Menu.Internal
         private Color hoverColor;
         private Color textColor;
         private bool isLocked;
+        private Button cachedButton;
 
         internal MenuButtonStyle Style => style;
+
+        private void Awake()
+        {
+            cachedButton = GetComponent<Button>();
+        }
 
         internal void Configure(
             MenuButtonStyle buttonStyle,
@@ -42,9 +48,8 @@ namespace R8EOX.Menu.Internal
                 label.text = text;
             }
 
-            var button = GetComponent<Button>();
-            if (button != null)
-                button.interactable = !isLocked;
+            if (cachedButton != null)
+                cachedButton.interactable = !isLocked;
         }
 
         internal void SetText(string text)
@@ -57,9 +62,8 @@ namespace R8EOX.Menu.Internal
         {
             isLocked = locked;
 
-            var button = GetComponent<Button>();
-            if (button != null)
-                button.interactable = !isLocked;
+            if (cachedButton != null)
+                cachedButton.interactable = !isLocked;
 
             if (backgroundImage != null)
             {
