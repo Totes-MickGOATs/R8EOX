@@ -155,7 +155,7 @@ namespace R8EOX.UI.Internal
             var lbl = placeholderGO.AddComponent<TextMeshProUGUI>();
             lbl.text      = "Rebinding coming soon";
             lbl.fontSize  = 16f;
-            lbl.color     = new Color(0.533f, 0.533f, 0.533f, 1f);
+            lbl.color     = UIColors.MutedText;
             lbl.alignment = TextAlignmentOptions.Center;
             var lblLE = placeholderGO.AddComponent<LayoutElement>();
             lblLE.preferredHeight = 44f;
