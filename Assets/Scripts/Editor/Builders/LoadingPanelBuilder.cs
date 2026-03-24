@@ -33,7 +33,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("Background");
             go.transform.SetParent(parent, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 0f), new Vector2(1f, 1f),
                 new Vector2(0f, 0f), new Vector2(0f, 0f),
                 new Vector2(0.5f, 0.5f));
@@ -45,7 +45,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("ContentArea");
             go.transform.SetParent(parent, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0.5f, 0.35f), new Vector2(0.5f, 0.55f),
                 new Vector2(0f, 0f), new Vector2(0f, 0f),
                 new Vector2(0.5f, 0.5f));
@@ -58,7 +58,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TitleGlow");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -LD.TitleHeight), new Vector2(0f, 0f),
                 new Vector2(0.5f, 1f));
@@ -81,7 +81,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TitleLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -LD.TitleHeight), new Vector2(0f, 0f),
                 new Vector2(0.5f, 1f));
@@ -102,7 +102,7 @@ namespace R8EOX.Editor.Builders
             trackGo.transform.SetParent(content, false);
             var trackRt = trackGo.AddComponent<RectTransform>();
             float barBottom = -(LD.BarTopOffset + LD.BarHeight);
-            BuilderRectHelper.SetRect(trackRt,
+            BRH.SetRect(trackRt,
                 new Vector2(0.05f, 1f), new Vector2(0.95f, 1f),
                 new Vector2(0f, barBottom), new Vector2(0f, -LD.BarTopOffset),
                 new Vector2(0.5f, 1f));
@@ -111,7 +111,7 @@ namespace R8EOX.Editor.Builders
             var fillGo = new GameObject("ProgressFill");
             fillGo.transform.SetParent(trackGo.transform, false);
             var fillRt = fillGo.AddComponent<RectTransform>();
-            BuilderRectHelper.SetRect(fillRt,
+            BRH.SetRect(fillRt,
                 new Vector2(0f, 0f), new Vector2(1f, 1f),
                 new Vector2(0f, 0f), new Vector2(0f, 0f),
                 new Vector2(0.5f, 0.5f));
@@ -128,7 +128,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("ProgressLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -130f), new Vector2(0f, -106f),
                 new Vector2(0.5f, 1f));
@@ -147,7 +147,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TipLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            BRH.BuilderRectHelper.SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -190f), new Vector2(0f, -138f),
                 new Vector2(0.5f, 1f));
