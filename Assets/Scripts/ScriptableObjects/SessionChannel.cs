@@ -1,4 +1,5 @@
 using UnityEngine;
+using R8EOX.Session;
 
 namespace R8EOX
 {
