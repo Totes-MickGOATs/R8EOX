@@ -75,6 +75,11 @@ namespace R8EOX.Menu
             skipSplash = true;
         }
 
+        private void Update()
+        {
+            navigator?.Tick();
+        }
+
         private void OnDestroy()
         {
             if (appManager != null)
