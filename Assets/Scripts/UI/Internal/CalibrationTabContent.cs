@@ -33,14 +33,7 @@ namespace R8EOX.UI.Internal
         {
             _settingsManager = settings;
 
-            var vg = gameObject.AddComponent<VerticalLayoutGroup>();
-            vg.childForceExpandWidth  = true;
-            vg.childForceExpandHeight = false;
-            vg.spacing  = 8f;
-            vg.padding  = new RectOffset(0, 0, 0, 16);
-
-            gameObject.AddComponent<ContentSizeFitter>().verticalFit =
-                ContentSizeFitter.FitMode.PreferredSize;
+            OptionsUIFactory.SetupTabLayout(gameObject, padding: new RectOffset(0, 0, 0, 16), addFitter: true);
 
             BuildControllerSection();
             BuildAxisTestSection();
