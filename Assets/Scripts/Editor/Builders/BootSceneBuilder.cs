@@ -37,13 +37,7 @@ namespace R8EOX.Editor.Builders
             var channel = AssetDatabase.LoadAssetAtPath<R8EOX.SessionChannel>(
                 AssetDatabase.GUIDToAssetPath(guids[0]));
             var so = new SerializedObject(appManager);
-            var prop = so.FindProperty("sessionChannel");
-            if (prop == null)
-            {
-                Debug.LogError("[BootSceneBuilder] Property 'sessionChannel' not found on AppManager.");
-                return;
-            }
-            prop.objectReferenceValue = channel;
+            SerializedPropertyHelper.SetRef(so, "sessionChannel", channel);
             so.ApplyModifiedProperties();
         }
 
