@@ -43,6 +43,24 @@ ReadMcpResourceTool(server="UnityMCP", uri="mcpforunity://instances")
   - Otherwise, pin to the instance that is NOT in `.claude-worktrees/` (that's the E2E test editor — avoid it)
   - **If you skip pinning with multiple instances, MCP will error on every call**
 
+## ⛔ MANDATORY: SAVE AFTER EVERY MCP MODIFICATION
+
+**Every MCP call that modifies a scene, GameObject, component, or asset MUST be immediately followed by a save.** Unsaved changes are silently lost when another agent loads a scene or enters play mode.
+
+**Preferred pattern** — use `batch_execute` to make modification + save atomic:
+```json
+{
+  "commands": [
+    { "tool": "manage_gameobject", "params": { "action": "create", "name": "MyObject" } },
+    { "tool": "execute_menu_item", "params": { "item_path": "R8EOX/Save All" } }
+  ]
+}
+```
+
+- After a sequence of related modifications, always include `execute_menu_item("R8EOX/Save All")` as the **last command** in the `batch_execute`
+- Before `manage_scene(action="load")` or `manage_editor(action="play")`, save first
+- This prevents other agents from interleaving and wiping your unsaved changes
+
 ## Your Tools
 
 You work primarily through UnityMCP tools:
