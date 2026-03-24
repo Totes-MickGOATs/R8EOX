@@ -16,8 +16,8 @@ namespace R8EOX.Settings.Internal
         {
             var file = new GlobalSettingsFile
             {
-                video = data.video,
-                profiles = data.profiles
+                Video = data.video,
+                Profiles = data.profiles
             };
             string json = JsonUtility.ToJson(file, prettyPrint: true);
             EnsureDirectory(GlobalSettingsPath);
@@ -50,8 +50,8 @@ namespace R8EOX.Settings.Internal
                 {
                     string json = File.ReadAllText(globalPath);
                     var file = JsonUtility.FromJson<GlobalSettingsFile>(json);
-                    result.video = file.video;
-                    result.profiles = file.profiles;
+                    result.video = file.Video;
+                    result.profiles = file.Profiles;
                 }
                 catch (Exception ex)
                 {
