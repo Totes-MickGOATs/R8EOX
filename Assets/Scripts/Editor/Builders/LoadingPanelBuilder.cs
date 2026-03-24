@@ -71,7 +71,7 @@ namespace R8EOX.Editor.Builders
             tmp.fontSize = LD.TitleFontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.characterSpacing = LD.TitleCharSpacing;
-            if (font != null) tmp.font = font;
+            AssignFont(tmp, font);
             var glowColor = LD.TitleColor;
             glowColor.a = 0.2f;
             tmp.color = glowColor;
@@ -95,7 +95,7 @@ namespace R8EOX.Editor.Builders
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.characterSpacing = LD.TitleCharSpacing;
-            if (font != null) tmp.font = font;
+            AssignFont(tmp, font);
             tmp.color = LD.TitleColor;
         }
 
@@ -140,7 +140,7 @@ namespace R8EOX.Editor.Builders
             tmp.text = "Loading... 0%";
             tmp.fontSize = LD.LabelFontSize;
             tmp.alignment = TextAlignmentOptions.Center;
-            if (font != null) tmp.font = font;
+            AssignFont(tmp, font);
             tmp.color = LD.MutedTextColor;
             return tmp;
         }
@@ -161,7 +161,7 @@ namespace R8EOX.Editor.Builders
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.fontStyle = FontStyles.Italic;
-            if (font != null) tmp.font = font;
+            AssignFont(tmp, font);
             tmp.color = LD.MutedTextColor;
             return tmp;
         }
@@ -172,6 +172,14 @@ namespace R8EOX.Editor.Builders
             if (font == null)
                 Debug.LogWarning($"[LoadingPanelBuilder] Font not found at: {path}");
             return font;
+        }
+
+        private static void AssignFont(TextMeshProUGUI tmp, TMP_FontAsset font)
+        {
+            if (font == null) return;
+            var so = new SerializedObject(tmp);
+            so.FindProperty("m_fontAsset").objectReferenceValue = font;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         internal static void SetRect(
