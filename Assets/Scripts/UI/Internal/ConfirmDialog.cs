@@ -9,6 +9,10 @@ namespace R8EOX.UI.Internal
 {
     internal class ConfirmDialog : MonoBehaviour
     {
+        // Set while any ConfirmDialog instance is visible so other overlay
+        // Escape-key handlers can skip their own dismissal logic.
+        internal static bool IsDialogOpen { get; private set; }
+
         [Header("State")]
         [SerializeField] private bool isDanger;
 
@@ -52,6 +56,7 @@ namespace R8EOX.UI.Internal
             dialog._onConfirm = onConfirm;
             dialog._onCancel = onCancel;
             dialog.Build(title, message, confirmText);
+            IsDialogOpen = true;
             return dialog;
         }
 
@@ -230,12 +235,14 @@ namespace R8EOX.UI.Internal
 
         private void Confirm()
         {
+            IsDialogOpen = false;
             _onConfirm?.Invoke();
             Destroy(gameObject);
         }
 
         private void Cancel()
         {
+            IsDialogOpen = false;
             _onCancel?.Invoke();
             Destroy(gameObject);
         }
