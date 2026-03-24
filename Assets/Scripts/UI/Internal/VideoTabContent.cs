@@ -28,24 +28,10 @@ namespace R8EOX.UI.Internal
         {
             if (isInitialized) return;
             settingsManager = settings;
-            SetupLayoutGroup();
+            OptionsUIFactory.SetupTabLayout(gameObject, 4f, new RectOffset(8, 8, 8, 8), true);
             BuildUI();
             PopulateFromSettings();
             isInitialized = true;
-        }
-
-        private void SetupLayoutGroup()
-        {
-            var vlg = gameObject.GetComponent<VerticalLayoutGroup>();
-            if (vlg == null) vlg = gameObject.AddComponent<VerticalLayoutGroup>();
-            vlg.childForceExpandWidth = true;
-            vlg.childForceExpandHeight = false;
-            vlg.spacing = 4f;
-            vlg.padding = new RectOffset(8, 8, 8, 8);
-
-            var csf = gameObject.GetComponent<ContentSizeFitter>();
-            if (csf == null) csf = gameObject.AddComponent<ContentSizeFitter>();
-            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
 
         // ── Build UI ──────────────────────────────────────────────────────
