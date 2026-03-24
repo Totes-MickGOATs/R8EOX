@@ -26,6 +26,7 @@ namespace R8EOX.Menu.Internal
 
         internal void Show(float duration)
         {
+            Debug.Log($"[MenuScreen] Show({duration}) on {gameObject.name}, alpha before={CanvasGroup.alpha}");
             gameObject.SetActive(true);
             StopAllCoroutines();
             StartCoroutine(FadeIn(duration));
@@ -33,12 +34,14 @@ namespace R8EOX.Menu.Internal
 
         internal void Hide(float duration)
         {
+            Debug.Log($"[MenuScreen] Hide({duration}) on {gameObject.name}");
             StopAllCoroutines();
             StartCoroutine(FadeOut(duration));
         }
 
         internal void ShowImmediate()
         {
+            Debug.Log($"[MenuScreen] ShowImmediate on {gameObject.name}");
             gameObject.SetActive(true);
             CanvasGroup.alpha = 1f;
             CanvasGroup.interactable = true;
@@ -47,6 +50,7 @@ namespace R8EOX.Menu.Internal
 
         internal void HideImmediate()
         {
+            Debug.Log($"[MenuScreen] HideImmediate on {gameObject.name}");
             CanvasGroup.alpha = 0f;
             CanvasGroup.interactable = false;
             CanvasGroup.blocksRaycasts = false;
@@ -67,6 +71,7 @@ namespace R8EOX.Menu.Internal
             CanvasGroup.alpha = 1f;
             CanvasGroup.interactable = true;
             CanvasGroup.blocksRaycasts = true;
+            Debug.Log($"[MenuScreen] FadeIn complete on {gameObject.name}, alpha={CanvasGroup.alpha}");
             OnEnter();
         }
 
@@ -83,6 +88,7 @@ namespace R8EOX.Menu.Internal
                 yield return null;
             }
             CanvasGroup.alpha = 0f;
+            Debug.Log($"[MenuScreen] FadeOut complete on {gameObject.name}");
             OnExit();
             gameObject.SetActive(false);
         }
