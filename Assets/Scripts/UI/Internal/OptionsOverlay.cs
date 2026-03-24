@@ -68,7 +68,7 @@ namespace R8EOX.UI.Internal
             panelRT.anchorMin = new Vector2(0.5f, 0.5f);
             panelRT.anchorMax = new Vector2(0.5f, 0.5f);
             panelRT.sizeDelta = new Vector2(840f, 620f);
-            panel.AddComponent<Image>().color = new Color(0.078f, 0.082f, 0.102f);
+            panel.AddComponent<Image>().color = UIColors.ButtonFill;
 
             var vg = panel.AddComponent<VerticalLayoutGroup>();
             vg.padding = new RectOffset(24, 24, 20, 12);
@@ -150,7 +150,7 @@ namespace R8EOX.UI.Internal
         {
             var backGO = CreateChild("BackButton", parent);
             backGO.AddComponent<LayoutElement>().preferredHeight = 52f;
-            backGO.AddComponent<Image>().color = new Color(0.078f, 0.082f, 0.102f);
+            backGO.AddComponent<Image>().color = UIColors.ButtonFill;
 
             var btn = backGO.AddComponent<Button>();
             btn.onClick.AddListener(OnBackPressed);
