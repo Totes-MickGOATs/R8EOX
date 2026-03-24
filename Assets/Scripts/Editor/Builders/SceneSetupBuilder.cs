@@ -89,7 +89,7 @@ namespace R8EOX.Editor.Builders
             var prop = so.FindProperty("mainCamera");
             if (prop != null && prop.objectReferenceValue == null)
             {
-                prop.objectReferenceValue = mainCam;
+                SerializedPropertyHelper.SetRef(so, "mainCamera", mainCam);
                 so.ApplyModifiedProperties();
             }
         }
@@ -116,12 +116,8 @@ namespace R8EOX.Editor.Builders
             if (configAsset != null)
             {
                 var so = new SerializedObject(tm);
-                var prop = so.FindProperty("config");
-                if (prop != null)
-                {
-                    prop.objectReferenceValue = configAsset;
-                    so.ApplyModifiedProperties();
-                }
+                SerializedPropertyHelper.SetRef(so, "config", configAsset);
+                so.ApplyModifiedProperties();
             }
 
             return tm;
@@ -139,7 +135,7 @@ namespace R8EOX.Editor.Builders
             if (configAsset == null)
                 return;
 
-            prop.objectReferenceValue = configAsset;
+            SerializedPropertyHelper.SetRef(so, "config", configAsset);
             so.ApplyModifiedProperties();
         }
 
