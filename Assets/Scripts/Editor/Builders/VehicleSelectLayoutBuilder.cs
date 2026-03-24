@@ -70,12 +70,10 @@ namespace R8EOX.Editor.Builders
             var t = root.transform.Find("DimBackdrop");
             if (t == null)
             {
-                var go = new GameObject("DimBackdrop");
+                var go = new GameObject("DimBackdrop", typeof(RectTransform), typeof(Image));
                 go.transform.SetParent(root.transform, false);
                 go.transform.SetAsFirstSibling();
                 t = go.transform;
-                go.AddComponent<RectTransform>();
-                go.AddComponent<Image>();
             }
             LD.SetRectStretch(t.GetComponent<RectTransform>());
             t.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
