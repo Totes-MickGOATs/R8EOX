@@ -20,7 +20,6 @@ namespace R8EOX.Diagnostics
 
         private GUIStyle headerStyle;
         private GUIStyle labelStyle;
-        private bool stylesInitialized;
 
         public void Initialize(DiagnosticsManager mgr)
         {
@@ -33,20 +32,18 @@ namespace R8EOX.Diagnostics
 
         private void InitStyles()
         {
-            if (stylesInitialized) return;
             headerStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 14,
                 fontStyle = FontStyle.Bold
             };
             labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 12 };
-            stylesInitialized = true;
         }
 
         private void OnGUI()
         {
             if (!visible || manager == null) return;
-            InitStyles();
+            if (headerStyle == null) InitStyles();
 
             GUI.Box(new Rect(10, 10, 520, 420), "");
             GUILayout.BeginArea(new Rect(15, 15, 510, 410));
