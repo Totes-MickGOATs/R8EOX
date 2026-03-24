@@ -8,56 +8,79 @@ namespace R8EOX
     {
         [SerializeField] private VehicleDefinition[] vehicles;
 
-        public int Count => vehicles?.Length ?? 0;
+        private VehicleDefinition[] _cachedAll;
+        private VehicleDefinition[] _cachedPlayable;
+        private bool _cacheValid;
+
+        public int Count { get { EnsureCache(); return _cachedAll.Length; } }
+
+        private void OnEnable() => _cacheValid = false;
+
+        private void OnValidate() => _cacheValid = false;
+
+        private void EnsureCache()
+        {
+            if (_cacheValid) return;
+            RebuildCache();
+        }
+
+        private void RebuildCache()
+        {
+            if (vehicles == null)
+            {
+                _cachedAll = System.Array.Empty<VehicleDefinition>();
+                _cachedPlayable = System.Array.Empty<VehicleDefinition>();
+                _cacheValid = true;
+                return;
+            }
+
+            var all = new List<VehicleDefinition>(vehicles.Length);
+            var playable = new List<VehicleDefinition>(vehicles.Length);
+            for (int i = 0; i < vehicles.Length; i++)
+            {
+                if (vehicles[i] == null)
+                {
+                    Debug.LogWarning($"[VehicleRegistry] Null entry at index {i} — skipped.");
+                    continue;
+                }
+                all.Add(vehicles[i]);
+                if (vehicles[i].IsPlayable) playable.Add(vehicles[i]);
+            }
+
+            _cachedAll = all.ToArray();
+            _cachedPlayable = playable.ToArray();
+            _cacheValid = true;
+        }
 
         public VehicleDefinition[] GetAll()
         {
-            if (vehicles == null || vehicles.Length == 0)
-                return System.Array.Empty<VehicleDefinition>();
-
-            var valid = new List<VehicleDefinition>();
-            for (int i = 0; i < vehicles.Length; i++)
-            {
-                if (vehicles[i] != null)
-                    valid.Add(vehicles[i]);
-                else
-                    Debug.LogWarning($"[VehicleRegistry] Null entry at index {i} — skipped.");
-            }
-            return valid.ToArray();
+            EnsureCache();
+            return _cachedAll;
         }
 
         public VehicleDefinition GetDefault()
         {
-            if (vehicles == null || vehicles.Length == 0) return null;
-            for (int i = 0; i < vehicles.Length; i++)
-            {
-                if (vehicles[i] != null) return vehicles[i];
-            }
-            return null;
+            EnsureCache();
+            return _cachedAll.Length > 0 ? _cachedAll[0] : null;
         }
 
         public VehicleDefinition[] GetPlayable()
         {
-            if (vehicles == null || vehicles.Length == 0)
-                return System.Array.Empty<VehicleDefinition>();
-            var results = new List<VehicleDefinition>();
-            foreach (var v in vehicles)
-            {
-                if (v != null && v.IsPlayable) results.Add(v);
-            }
-            return results.ToArray();
+            EnsureCache();
+            return _cachedPlayable;
         }
 
         public VehicleDefinition[] GetByCategory(VehicleCategory category)
         {
-            if (vehicles == null || vehicles.Length == 0)
+            EnsureCache();
+            if (_cachedAll.Length == 0)
                 return System.Array.Empty<VehicleDefinition>();
 
             var results = new List<VehicleDefinition>();
-            for (int i = 0; i < vehicles.Length; i++)
+            for (int i = 0; i < _cachedAll.Length; i++)
             {
-                if (vehicles[i] != null && vehicles[i].Category == category)
-                    results.Add(vehicles[i]);
+                if (_cachedAll[i].Category == category)
+                    results.Add(_cachedAll[i]);
             }
 
             return results.ToArray();
