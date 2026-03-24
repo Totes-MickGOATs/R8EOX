@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using LD = R8EOX.Editor.Builders.VehicleSelectLayoutData;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -12,7 +13,7 @@ namespace R8EOX.Editor.Builders
             var svT = listPanelT.Find("ScrollView");
             if (svT == null) { Debug.LogWarning("[OverlayScrollViewBuilder] ScrollView not found."); return; }
             var scrollViewRT = svT.GetComponent<RectTransform>();
-            LD.SetRectStretch(scrollViewRT);
+            BRH.StretchFill(scrollViewRT);
             scrollViewRT.offsetMin = new Vector2(5, 5);
             scrollViewRT.offsetMax = new Vector2(-5, -5);
 
