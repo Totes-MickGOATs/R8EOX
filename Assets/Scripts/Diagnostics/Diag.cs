@@ -74,7 +74,7 @@ namespace R8EOX.Diagnostics
 
         [Conditional("UNITY_EDITOR")]
         [Conditional("DEVELOPMENT_BUILD")]
-        public static void SetVehicleSnapshot(Internal.VehicleDiagSnapshot snapshot)
+        internal static void SetVehicleSnapshot(Internal.VehicleDiagSnapshot snapshot)
         {
             if (manager == null) return;
             manager.VehicleSnapshot = snapshot;
