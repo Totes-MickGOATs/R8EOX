@@ -10,6 +10,7 @@ Editor-only builder scripts for constructing vehicles, terrain, and track scenes
 | `AssemblyInfo.cs` | InternalsVisibleTo declarations for the Editor assembly |
 | `AssetHelper.cs` | Utility methods for loading and creating assets in editor scripts |
 | `BuilderMaterialHelper.cs` | Shared `GetOrCreateMaterial` and `GetOrCreatePhysicsMaterial` helpers used by RCBuggyBuilder and any future builder that creates materials |
+| `BuilderRectHelper.cs` | Shared RectTransform helpers (`StretchFill`, `CenterAnchor`, `SetAnchors`, `SetRect`) in `namespace R8EOX.Editor`; consumed by all UI builder files via `using BRH = R8EOX.Editor.BuilderRectHelper` alias |
 | `BootstrapWirer.cs` | Null-guarded helpers for wiring all manager references onto `SessionBootstrapper` via SerializedObject; extracted from SceneSetupBuilder |
 | `EnvironmentBuilder.cs` | Constructs environment elements (lighting, skybox, post-processing) |
 | `LayerData.cs` | Data struct for terrain layer configuration |
