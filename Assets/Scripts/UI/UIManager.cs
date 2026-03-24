@@ -83,7 +83,14 @@ namespace R8EOX.UI
         /// <summary>Destroy the vehicle selection overlay if active.</summary>
         public void CleanupVehicleSelectOverlay()
         {
-            if (activeOverlay != null) activeOverlay.Hide();
+            try
+            {
+                if (activeOverlay != null) activeOverlay.Hide();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[UIManager] Overlay Hide() failed: {e.Message}");
+            }
             if (overlayInstance != null) Destroy(overlayInstance);
             activeOverlay = null;
             overlayInstance = null;
