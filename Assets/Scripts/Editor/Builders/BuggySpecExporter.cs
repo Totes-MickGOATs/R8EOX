@@ -86,14 +86,13 @@ namespace R8EOX.Editor.Builders
         {
             // Create temp components to read their serialized defaults
             var tempGO = new GameObject("_ExporterTemp");
-            var vm = tempGO.AddComponent<Rigidbody>();
+            tempGO.AddComponent<Rigidbody>();
             var vmComp = tempGO.AddComponent<R8EOX.Vehicle.VehicleManager>();
             var dtGO = new GameObject("Drivetrain");
             dtGO.transform.SetParent(tempGO.transform);
             var dt = dtGO.AddComponent<R8EOX.Vehicle.Internal.Drivetrain>();
 
             var vmSO = new SerializedObject(vmComp);
-            var dtSO = new SerializedObject(dt);
 
             // Read actual serialized defaults
             float steeringSpeed = vmSO.FindProperty("_steeringSpeed")?.floatValue ?? 7f;
@@ -124,12 +123,6 @@ namespace R8EOX.Editor.Builders
                 F("    \"tumbleBounce\": {0}", tumbleBounce) + ",\n" +
                 F("    \"tumbleFriction\": {0}", tumbleFriction) + "\n" +
                 "  }";
-        }
-
-        static float ReadConst(SerializedObject so, string name)
-        {
-            var prop = so.FindProperty(name);
-            return prop != null ? prop.floatValue : 0f;
         }
 
         // ---- Motor Presets (read from registry) ----
