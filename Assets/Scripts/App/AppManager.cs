@@ -101,6 +101,11 @@ namespace R8EOX.App
             sessionManager.BeginSession(config);
             sessionManager.SetAbortCallback(ReturnToMenu);
 
+            if (sessionChannel != null)
+            {
+                sessionChannel.SetManager(sessionManager);
+            }
+
             StartCoroutine(sceneLoader.LoadSceneAsync(
                 trackDef.SceneName,
                 onProgress: HandleLoadProgress,
