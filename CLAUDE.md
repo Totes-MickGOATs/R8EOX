@@ -186,21 +186,28 @@ When the E2E test editor is running, **two Unity editors are connected to MCP**.
 
 ```bash
 # After writing/modifying a file:
+git status  # ← ALWAYS check for companion .meta files!
 git add path/to/ExactFile.cs
+git add path/to/ExactFile.cs.meta   # ← REQUIRED for new files (Unity auto-generates these)
 git commit -m "feat: add ExactFile with purpose description"
 
 # Then continue to the next file. Repeat for EVERY file.
 ```
+
+#### ⚠️ UNITY .meta FILES — THE #1 MISSED ITEM
+
+Unity generates a `.meta` file for **every** new file and folder. If you create `Foo.cs`, Unity creates `Foo.cs.meta`. If you create folder `Bar/`, Unity creates `Bar.meta`. **These must be committed alongside their parent file.** Without `.meta` files, Unity loses GUID references — causing magenta materials, missing scripts, and broken prefab links. A `.cs` commit without its `.meta` is an incomplete commit.
 
 #### What This Means — COMMIT BEFORE PROCEEDING
 
 **You are BLOCKED from starting work on the next file until the current file is committed.** The workflow is strictly sequential per file:
 
 1. Write or edit `Foo.cs`
-2. `git add Foo.cs && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
-3. Only NOW may you proceed to `Bar.cs`
-4. `git add Bar.cs && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
-5. Only NOW may you proceed to the next file
+2. `git status` — check for `Foo.cs.meta` (will exist if `Foo.cs` is new)
+3. `git add Foo.cs Foo.cs.meta && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
+4. Only NOW may you proceed to `Bar.cs`
+5. `git add Bar.cs Bar.cs.meta && git commit -m "feat: ..."` — **STOP HERE until commit succeeds**
+6. Only NOW may you proceed to the next file
 
 This applies to ALL file types: `.cs`, `.unity`, `.asset`, `.meta`, `CLAUDE.md`, everything.
 
@@ -221,7 +228,8 @@ Do not mentally categorize your own edits as "just config" or "just docs." If yo
 When dispatching agents, the orchestrator MUST ALSO:
 1. Include this commit rule **verbatim** in every agent prompt
 2. After each agent completes, verify commits happened via `git log`
-3. If an agent returned without committing, flag it as a failure
+3. After each agent completes, run `git status` to check for orphaned `.meta` files the agent missed — commit them immediately
+4. If an agent returned without committing, flag it as a failure
 
 ### File Conflict Prevention
 
