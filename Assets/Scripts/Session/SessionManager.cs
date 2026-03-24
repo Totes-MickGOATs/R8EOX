@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using R8EOX.Diagnostics;
 using R8EOX.Session.Internal;
 using R8EOX.Track;
 
@@ -48,6 +49,7 @@ namespace R8EOX.Session
                 uiManager.SetSessionManager(this);
                 if (race != null) uiManager.SetRaceManager(race);
             }
+            Diag.FlowStep("TrackLoad", "TrackSystemsReady");
             if (activeConfig != null) EnterVehicleSelectOrSpawn();
         }
 
@@ -69,6 +71,7 @@ namespace R8EOX.Session
         public void EndSession()
         {
             if (state.CurrentPhase == SessionPhase.Idle) return;
+            Diag.Log(DiagChannel.Session, "EndSession start");
             state.BeginTeardown();
             if (errorOverlay != null) { Destroy(errorOverlay); errorOverlay = null; }
             CleanupOverlay();
@@ -104,9 +107,11 @@ namespace R8EOX.Session
             var registry = sessionChannel != null
                 ? sessionChannel.VehicleRegistry : null;
             var overlayPrefab = sessionChannel?.OverlayRegistry?.VehicleSelectOverlayPrefab;
-            Debug.Log($"[SessionManager] EnterVehicleSelectOrSpawn: channel={sessionChannel != null} registry={registry != null} count={registry?.Count ?? 0} overlayPrefab={overlayPrefab != null} uiManager={uiManager != null}");
+            Diag.Log(DiagChannel.Session, $"EnterVehicleSelectOrSpawn: registry={registry != null} count={registry?.Count ?? 0} overlayPrefab={overlayPrefab != null}");
             if (registry != null && registry.Count > 0 && overlayPrefab != null)
             {
+                Diag.FlowStep("TrackLoad", "VehicleSelectStarted");
+                Diag.BeginFlow("VehicleSelect");
                 state.BeginVehicleSelect();
                 ShowVehicleSelectOverlay(registry);
             }
@@ -129,11 +134,14 @@ namespace R8EOX.Session
             var prefab = sessionChannel.OverlayRegistry.VehicleSelectOverlayPrefab;
             uiManager.ShowVehicleSelectOverlay(
                 prefab, registry, OnVehicleSelected, OnVehicleSelectCancelled);
+            Diag.FlowStep("VehicleSelect", "OverlayInstantiated");
+            Diag.FlowStep("VehicleSelect", "OverlayVisible");
         }
 
         private void OnVehicleSelected(VehicleDefinition definition)
         {
             activeConfig.SetVehiclePrefab(definition.VehiclePrefab);
+            Diag.FlowStep("VehicleSelect", "ConfirmPressed");
             CleanupOverlay();
             state.EndVehicleSelect();
             if (isSwapping)
@@ -170,8 +178,9 @@ namespace R8EOX.Session
 
         private void CleanupOverlay()
         {
-            Debug.Log($"[SessionManager] CleanupOverlay called, uiManager={uiManager != null}");
             if (uiManager != null) uiManager.CleanupVehicleSelectOverlay();
+            Diag.FlowStep("VehicleSelect", "OverlayDismissed");
+            Diag.Log(DiagChannel.Session, "CleanupOverlay completed");
         }
 
         private void Update()
@@ -185,10 +194,10 @@ namespace R8EOX.Session
         private void SetupSession()
         {
             if (activeConfig == null || trackManager == null) return;
-            Debug.Log("[SessionManager] SetupSession — start");
+            Diag.Log(DiagChannel.Session, "SetupSession start");
             CreateErrorOverlay();
             InitializeTrack();
-            Debug.Log("[SessionManager] SetupSession — track initialized");
+            Diag.Log(DiagChannel.Session, "Track initialized");
             if (raceManager != null) raceManager.Initialize(trackManager);
             if (aiManager != null) aiManager.Initialize(trackManager);
             ValidateAndDegradeMode();
@@ -202,18 +211,15 @@ namespace R8EOX.Session
                     "Assign a vehicle prefab to SessionConfig or VehicleDefinition");
                 return;
             }
-            Debug.Log("[SessionManager] SetupSession — spawning player");
             SpawnPlayer();
-            Debug.Log("[SessionManager] SetupSession — validating vehicle");
-            ValidateVehicle();
-            Debug.Log("[SessionManager] SetupSession — spawning AI");
+            Diag.FlowStep("TrackLoad", "VehicleSpawned");
             SpawnAIOpponents();
-            Debug.Log("[SessionManager] SetupSession — wiring player vehicle");
             WirePlayerVehicle();
-            Debug.Log("[SessionManager] SetupSession — starting race if applicable");
+            Diag.FlowStep("TrackLoad", "CameraTracking");
             StartRaceIfApplicable();
             state.MarkReady();
-            Debug.Log($"[SessionManager] Session ready: mode={effectiveMode}");
+            Diag.FlowStep("TrackLoad", "SessionReady");
+            Diag.Log(DiagChannel.Session, $"Session ready: mode={effectiveMode}");
         }
 
         private void CreateErrorOverlay()
@@ -246,14 +252,6 @@ namespace R8EOX.Session
             vehicleSpawner.SpawnPlayerVehicle(activeConfig.VehiclePrefab, playerSpawn);
             if (raceManager != null && vehicleSpawner.PlayerVehicle != null)
                 raceManager.RegisterVehicle(vehicleSpawner.PlayerVehicle);
-        }
-
-        private void ValidateVehicle()
-        {
-            var vehicle = vehicleSpawner.PlayerVehicle;
-            if (vehicle == null) return;
-            var readiness = VehicleValidator.Validate(vehicle);
-            VehicleValidator.LogReadiness(readiness, vehicle.name);
         }
 
         private void SpawnAIOpponents()
