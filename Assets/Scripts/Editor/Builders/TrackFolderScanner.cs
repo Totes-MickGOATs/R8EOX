@@ -65,7 +65,7 @@ namespace R8EOX.Editor.Builders
         {
             string relative = terrainFolder + "/heightmap.raw";
             string absolute =
-                Application.dataPath.Replace("Assets", "") + relative;
+                Path.GetDirectoryName(Application.dataPath) + "/" + relative;
             return File.Exists(absolute) ? relative : null;
         }
 
@@ -99,7 +99,7 @@ namespace R8EOX.Editor.Builders
         {
             string layersFolder = trackFolderPath + "/Terrain/Layers";
             string layersAbsolute =
-                Application.dataPath.Replace("Assets", "") + layersFolder;
+                Path.GetDirectoryName(Application.dataPath) + "/" + layersFolder;
             if (!Directory.Exists(layersAbsolute))
                 return new List<LayerData>();
 
