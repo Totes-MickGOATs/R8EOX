@@ -85,12 +85,8 @@ namespace R8EOX.Tests.PlayMode
             var vehicle = sessionManager.PlayerVehicle;
             Assert.IsNotNull(vehicle, "Vehicle should exist before EndSession");
 
-            // Vehicle destruction may cause MissingReferenceException on Rigidbody
-            // for one frame — this is expected behavior
-            LogAssert.ignoreFailingMessages = true;
             sessionManager.EndSession();
             yield return E2ETestUtils.WaitForFrames(3);
-            LogAssert.ignoreFailingMessages = false;
 
             // After EndSession, vehicle should be destroyed
             Assert.IsTrue(vehicle == null, "Vehicle should be destroyed after EndSession");
