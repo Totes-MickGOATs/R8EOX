@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R8EOX — Boot to Driving Call Chain</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--dim:#8b949e;
+--blue:#388bfd;--teal:#2ea68f;--orange:#d29922;--purple:#a371f7;--green:#3fb950;--red:#f85149;
+--blue-bg:#1a2744;--teal-bg:#1a3330;--orange-bg:#2e2617;--purple-bg:#271f3d;--green-bg:#1a2e1e;--red-bg:#2e1a1a;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+h1{font-size:16px;font-weight:600;color:var(--text)}
+h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin-bottom:8px}
+h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;gap:16px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar h1{white-space:nowrap}
+.search-box{flex:1;max-width:300px;padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.search-box:focus{border-color:var(--blue)}
+.search-box::placeholder{color:var(--dim)}
+.btn{padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn:hover{background:var(--border)}
+.btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-group{display:flex;gap:4px}
+.speed-ctrl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+.speed-ctrl input{width:60px;accent-color:var(--blue)}
+
+/* Main layout */
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:280px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:12px}
+.canvas-area{flex:1;position:relative;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+
+/* Sidebar sections */
+.section{margin-bottom:16px}
+.phase-toggle{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:12px}
+.phase-toggle input{accent-color:var(--blue)}
+.phase-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.data-struct{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:8px;font-family:'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5}
+.data-struct .key{color:var(--blue)}
+.data-struct .val{color:var(--green)}
+.data-struct .type{color:var(--purple)}
+.data-struct .arrow{color:var(--orange)}
+
+/* Tooltip / detail panel */
+.detail-panel{position:absolute;top:0;right:0;width:360px;height:100%;background:var(--surface);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .2s;overflow-y:auto;padding:16px;z-index:10}
+.detail-panel.open{transform:translateX(0)}
+.detail-close{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer}
+.detail-file{font-family:'SF Mono',Menlo,monospace;font-size:11px;color:var(--teal);margin:8px 0 4px}
+.detail-method{font-family:'SF Mono',Menlo,monospace;font-size:12px;color:var(--orange);margin-bottom:8px}
+.detail-desc{font-size:12px;line-height:1.6;color:var(--text);margin-bottom:12px}
+.detail-data{font-size:11px;color:var(--dim);line-height:1.5}
+.detail-data span{color:var(--green)}
+
+/* Vehicle sim */
+.vehicle-sim{position:absolute;bottom:0;left:0;right:0;height:0;background:var(--surface);border-top:1px solid var(--border);transition:height .3s;overflow:hidden;z-index:5}
+.vehicle-sim.open{height:320px}
+.sim-content{display:flex;height:100%;padding:12px;gap:12px}
+.sim-canvas-wrap{flex:1;position:relative}
+.sim-canvas-wrap canvas{width:100%;height:100%;border-radius:6px;background:#0a0e14}
+.sim-info{width:260px;overflow-y:auto;font-size:11px}
+.sim-info .gauge{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)}
+.sim-info .gauge .label{color:var(--dim)}
+.sim-info .gauge .value{color:var(--green);font-family:'SF Mono',Menlo,monospace}
+.sim-controls{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.sim-key{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:12px;font-weight:600;color:var(--dim);transition:all .1s}
+.sim-key.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.force-indicator{display:flex;align-items:center;gap:6px;padding:2px 0}
+.force-bar{height:6px;border-radius:3px;transition:width .1s}
+.wheel-label{font-size:10px;color:var(--dim);width:24px}
+
+/* Phase legend on canvas */
+.zoom-info{position:absolute;bottom:8px;left:8px;font-size:11px;color:var(--dim);pointer-events:none;z-index:2}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>R8EOX Call Chain</h1>
+  <input class="search-box" id="search" type="text" placeholder="Search classes, methods...">
+  <div class="btn-group">
+    <button class="btn" id="btnPlay" onclick="toggleAnim()">&#9654; Play</button>
+    <button class="btn" id="btnReset" onclick="resetAnim()">Reset</button>
+  </div>
+  <div class="speed-ctrl">
+    <span>Speed</span>
+    <input type="range" id="speedRange" min="1" max="10" value="4">
+    <span id="speedLabel">4x</span>
+  </div>
+  <button class="btn" id="btnSim" onclick="toggleSim()">Vehicle Sim</button>
+  <button class="btn" onclick="resetView()">Fit View</button>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="section">
+      <h2>Phases</h2>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="0"><span class="phase-dot" style="background:var(--blue)"></span>Boot → MainMenu</label>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="1"><span class="phase-dot" style="background:var(--teal)"></span>Menu Navigation</label>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="2"><span class="phase-dot" style="background:var(--orange)"></span>Track Load</label>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="3"><span class="phase-dot" style="background:var(--purple)"></span>Scene Activation</label>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="4"><span class="phase-dot" style="background:var(--green)"></span>Session Setup</label>
+      <label class="phase-toggle"><input type="checkbox" checked data-phase="5"><span class="phase-dot" style="background:var(--red)"></span>Per-Frame Loop</label>
+    </div>
+    <div class="section">
+      <h2>State Enums</h2>
+      <div class="data-struct">
+        <div><span class="type">AppState</span></div>
+        <div><span class="key">Boot</span> <span class="arrow">→</span> <span class="key">Menu</span> <span class="arrow">→</span> <span class="key">Loading</span> <span class="arrow">→</span> <span class="val">InGame</span></div>
+      </div>
+      <div class="data-struct">
+        <div><span class="type">SessionPhase</span></div>
+        <div><span class="key">Idle</span> <span class="arrow">→</span> <span class="key">Loading</span> <span class="arrow">→</span> <span class="key">VehicleSelect</span> <span class="arrow">→</span> <span class="key">Spawning</span> <span class="arrow">→</span> <span class="val">Ready</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Key Data</h2>
+      <div class="data-struct">
+        <div><span class="type">SessionConfig</span></div>
+        <div>&nbsp;<span class="key">mode</span>: <span class="val">Practice</span></div>
+        <div>&nbsp;<span class="key">vehiclePrefab</span>: <span class="val">GameObject</span></div>
+        <div>&nbsp;<span class="key">trackScenePath</span>: <span class="val">"OutpostTrack"</span></div>
+      </div>
+      <div class="data-struct">
+        <div><span class="type">SessionChannel</span> <span style="color:var(--dim)">(SO)</span></div>
+        <div>&nbsp;<span class="key">activeConfig</span>: <span class="val">SessionConfig</span></div>
+        <div>&nbsp;<span class="key">VehicleRegistry</span>: <span class="val">VehicleDefinition[]</span></div>
+        <div>&nbsp;<span class="key">TrackRegistry</span>: <span class="val">TrackDefinition[]</span></div>
+      </div>
+      <div class="data-struct">
+        <div><span class="type">VehicleFrame</span> <span style="color:var(--dim)">(struct)</span></div>
+        <div>&nbsp;<span class="key">Dt</span>: <span class="val">float</span></div>
+        <div>&nbsp;<span class="key">ThrottleRaw</span>: <span class="val">0..1</span></div>
+        <div>&nbsp;<span class="key">BrakeInput</span>: <span class="val">0..1</span></div>
+        <div>&nbsp;<span class="key">SteerInput</span>: <span class="val">-1..1</span></div>
+        <div>&nbsp;<span class="key">SmoothThrottle</span>: <span class="val">0..1</span></div>
+        <div>&nbsp;<span class="key">ForwardSpeed</span>: <span class="val">m/s</span></div>
+        <div>&nbsp;<span class="key">IsAirborne</span>: <span class="val">bool</span></div>
+        <div>&nbsp;<span class="key">EngineForce</span>: <span class="val">N</span></div>
+        <div>&nbsp;<span class="key">BrakeForce</span>: <span class="val">N</span></div>
+        <div>&nbsp;<span class="key">CurrentSteering</span>: <span class="val">rad</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-area">
+    <canvas id="graphCanvas"></canvas>
+    <div class="zoom-info" id="zoomInfo">Scroll to zoom · Drag to pan · Click node for details</div>
+    <div class="detail-panel" id="detailPanel">
+      <button class="detail-close" onclick="closeDetail()">&times;</button>
+      <h3 id="detailTitle"></h3>
+      <div class="detail-file" id="detailFile"></div>
+      <div class="detail-method" id="detailMethod"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+      <h3 style="margin-top:12px">Data Flow</h3>
+      <div class="detail-data" id="detailData"></div>
+    </div>
+
+    <div class="vehicle-sim" id="vehicleSim">
+      <div class="sim-content">
+        <div class="sim-canvas-wrap"><canvas id="simCanvas"></canvas></div>
+        <div class="sim-info">
+          <h2>Vehicle Physics</h2>
+          <div id="simGauges"></div>
+          <h2 style="margin-top:12px">Wheel Forces</h2>
+          <div id="wheelForces"></div>
+          <h2 style="margin-top:12px">Controls (WASD / Arrows)</h2>
+          <div class="sim-controls">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div class="sim-key" id="kUp">W</div>
+              <div style="display:flex;gap:4px">
+                <div class="sim-key" id="kLeft">A</div>
+                <div class="sim-key" id="kDown">S</div>
+                <div class="sim-key" id="kRight">D</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--dim)">W/Up=Throttle · S/Down=Brake · A/D=Steer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== NODE DATA ====================
+const PHASES = [
+  {name:'Boot → MainMenu',color:'#388bfd',bg:'#1a2744'},
+  {name:'Menu Navigation',color:'#2ea68f',bg:'#1a3330'},
+  {name:'Track Load',color:'#d29922',bg:'#2e2617'},
+  {name:'Scene Activation',color:'#a371f7',bg:'#271f3d'},
+  {name:'Session Setup',color:'#3fb950',bg:'#1a2e1e'},
+  {name:'Per-Frame Loop',color:'#f85149',bg:'#2e1a1a'},
+];
+
+const NODES = [
+  // Phase 0: Boot
+  {id:0,p:0,label:'Boot.unity',sub:'Scene Load',file:'Scenes/Boot.unity',method:'—',line:'-',
+   desc:'Unity loads the Boot scene. Contains [AppRoot] GameObject with AppManager component.',
+   data:'Creates: [AppRoot] GameObject'},
+  {id:1,p:0,label:'AppManager',sub:'Awake()',file:'Scripts/App/AppManager.cs',method:'Awake()',line:'45',
+   desc:'Marks [AppRoot] as DontDestroyOnLoad. Creates SceneLoader instance. Sets AppState = Boot.',
+   data:'DontDestroyOnLoad(gameObject)\nsceneLoader = new SceneLoader()\ncurrentState = AppState.Boot'},
+  {id:2,p:0,label:'AppManager',sub:'Start()',file:'Scripts/App/AppManager.cs',method:'Start()',line:'52',
+   desc:'Transitions to Menu state and synchronously loads MainMenu scene.',
+   data:'currentState → AppState.Menu\nsceneLoader.LoadScene("MainMenu")'},
+  {id:3,p:0,label:'SceneLoader',sub:'LoadScene()',file:'Scripts/App/Internal/SceneLoader.cs',method:'LoadScene()',line:'86',
+   desc:'Synchronous scene load via SceneManager.LoadScene("MainMenu").',
+   data:'SceneManager.LoadScene("MainMenu") [blocking]'},
+
+  // Phase 1: Menu
+  {id:4,p:1,label:'MenuManager',sub:'Start()',file:'Scripts/Menu/MenuManager.cs',method:'Start()',line:'37',
+   desc:'Finds [AppRoot], gets AppManager & SettingsManager. Creates MenuNavigator. Initializes all screens. Subscribes to load events.',
+   data:'navigator = new MenuNavigator()\nInitializeScreens()\nSubscribeToAppEvents()'},
+  {id:5,p:1,label:'SplashScreen',sub:'Show',file:'Scripts/Menu/Internal/SplashScreen.cs',method:'Initialize()',line:'-',
+   desc:'Shows splash/logo screen on first run. Skipped on subsequent MainMenu loads (static skipSplash flag).',
+   data:'onComplete → OnSplashComplete'},
+  {id:6,p:1,label:'MainMenuScreen',sub:'[Play]',file:'Scripts/Menu/Internal/MainMenuScreen.cs',method:'OnPlayPressed()',line:'-',
+   desc:'User presses Play button. Pushes ModeSelectScreen onto navigator stack.',
+   data:'navigator.PushScreen(modeSelectScreen)'},
+  {id:7,p:1,label:'ModeSelectScreen',sub:'[Testing]',file:'Scripts/Menu/Internal/ModeSelectScreen.cs',method:'HandleTesting()',line:'55',
+   desc:'User selects Testing/Practice mode. Invokes mode selected callback.',
+   data:'onModeSelected(SessionMode.Practice)'},
+  {id:8,p:1,label:'TrackSelectScreen',sub:'[START]',file:'Scripts/Menu/Internal/TrackSelectScreen.cs',method:'HandleStart()',line:'56',
+   desc:'User selects Outpost track and clicks START. Validates track is playable and supports mode.',
+   data:'onTrackConfirmed(selectedTrack)\nTrackDefinition: SceneName="OutpostTrack"'},
+
+  // Phase 2: Track Load
+  {id:9,p:2,label:'MenuManager',sub:'OnTrackConfirmed()',file:'Scripts/Menu/MenuManager.cs',method:'OnTrackConfirmed()',line:'171',
+   desc:'Shows loading screen. Resets progress bar. Calls AppManager.LoadTrack().',
+   data:'navigator.ReplaceScreen(loadingScreen)\nappManager.LoadTrack(track, selectedMode)'},
+  {id:10,p:2,label:'AppManager',sub:'LoadTrack()',file:'Scripts/App/AppManager.cs',method:'LoadTrack()',line:'65',
+   desc:'Master track load orchestrator. Creates SessionConfig, wires SessionChannel, spawns SessionManager, starts async load.',
+   data:'AppState → Loading\nSessionConfig.CreateRuntime(mode, null, sceneName)'},
+  {id:11,p:2,label:'SessionChannel',sub:'SetSession()',file:'Scripts/Session/SessionChannel.cs',method:'SetSession()',line:'-',
+   desc:'Stores active session config on the shared ScriptableObject channel.',
+   data:'activeConfig = config\nHasActiveSession → true'},
+  {id:12,p:2,label:'[SessionManager]',sub:'Created',file:'Scripts/App/AppManager.cs',method:'LoadTrack()',line:'91',
+   desc:'Creates [SessionManager] child GameObject under [AppRoot]. Adds SessionManager component.',
+   data:'new GameObject("[SessionManager]")\nAddComponent<SessionManager>()'},
+  {id:13,p:2,label:'SessionManager',sub:'BeginSession()',file:'Scripts/Session/SessionManager.cs',method:'BeginSession()',line:'54',
+   desc:'Stores config. Sets SessionPhase to Loading. TrackManager is null here (scene not loaded yet).',
+   data:'activeConfig = config\nSessionPhase → Loading'},
+  {id:14,p:2,label:'SceneLoader',sub:'LoadSceneAsync()',file:'Scripts/App/Internal/SceneLoader.cs',method:'LoadSceneAsync()',line:'26',
+   desc:'Async scene load with progress callbacks. Delays activation until 90% loaded.',
+   data:'allowSceneActivation = false until 0.9\nonProgress → MenuManager.HandleLoadProgress'},
+
+  // Phase 3: Scene Activation
+  {id:15,p:3,label:'SessionBootstrapper',sub:'Awake()',file:'Scripts/Session/Internal/SessionBootstrapper.cs',method:'Awake()',line:'47',
+   desc:'Fires when OutpostTrack scene activates. Checks if SessionChannel has active session → routes to menu flow or editor-play flow.',
+   data:'sessionChannel.HasActiveSession → true\n→ HandleFullFlow()'},
+  {id:16,p:3,label:'SessionBootstrapper',sub:'HandleFullFlow()',file:'Scripts/Session/Internal/SessionBootstrapper.cs',method:'HandleFullFlow()',line:'63',
+   desc:'Finds existing [SessionManager] GO. Passes all scene manager references to SessionManager.',
+   data:'FindExistingSessionManager()\nsessionManager.OnSceneReady(track, race, camera, ui, audio, vfx, ai)'},
+  {id:17,p:3,label:'SessionManager',sub:'OnSceneReady()',file:'Scripts/Session/SessionManager.cs',method:'OnSceneReady()',line:'37',
+   desc:'Stores all scene manager references. Wires UIManager bidirectionally. Triggers vehicle select or spawn.',
+   data:'trackManager, raceManager, cameraManager, uiManager, audioManager, vfxManager, aiManager'},
+  {id:18,p:3,label:'SessionManager',sub:'EnterVehicleSelectOrSpawn()',file:'Scripts/Session/SessionManager.cs',method:'EnterVehicleSelectOrSpawn()',line:'100',
+   desc:'If VehicleRegistry has vehicles and overlay prefab exists → show vehicle select overlay. Otherwise → spawn immediately.',
+   data:'SessionPhase → VehicleSelect or Spawning'},
+
+  // Phase 4: Session Setup
+  {id:19,p:4,label:'SessionManager',sub:'SetupSession()',file:'Scripts/Session/SessionManager.cs',method:'SetupSession()',line:'182',
+   desc:'Master session initialization. Initializes track, race, AI. Validates. Spawns player. Wires systems.',
+   data:'InitializeTrack()\nSpawnPlayer()\nWirePlayerVehicle()'},
+  {id:20,p:4,label:'TrackManager',sub:'Initialize()',file:'Scripts/Track/TrackManager.cs',method:'Initialize()',line:'17',
+   desc:'Discovers spawn points (SpawnGrid or individual SpawnPoints), centerline, and checkpoints in the loaded scene.',
+   data:'DiscoverSpawnPoints()\nDiscoverCenterline()\nDiscoverCheckpoints()'},
+  {id:21,p:4,label:'VehicleSpawner',sub:'SpawnPlayerVehicle()',file:'Scripts/Session/Internal/VehicleSpawner.cs',method:'SpawnPlayerVehicle()',line:'14',
+   desc:'Gets terrain-aware spawn position. Instantiates vehicle prefab. Renames to "PlayerVehicle".',
+   data:'SpawnSafety.GetSafeSpawnPosition()\nInstantiate(prefab, pos, rot)'},
+  {id:22,p:4,label:'VehicleManager',sub:'Awake()',file:'Scripts/Vehicle/VehicleManager.cs',method:'Awake()',line:'111',
+   desc:'Gets Rigidbody, resolves IVehicleInput (→ RCInput), gets RCAirPhysics, Drivetrain, CollisionTracker.',
+   data:'_rb = GetComponent<Rigidbody>()\n_input = GetComponent<IVehicleInput>()'},
+  {id:23,p:4,label:'VehicleManager',sub:'Start()',file:'Scripts/Vehicle/VehicleManager.cs',method:'Start()',line:'117',
+   desc:'Applies motor preset. Sets center of mass. Creates TumbleController. Discovers and configures wheels.',
+   data:'ApplyMotorPreset()\n_wheels.Discover(transform)\nConfigure suspension + grip'},
+  {id:24,p:4,label:'WirePlayerVehicle',sub:'Camera+Audio+VFX',file:'Scripts/Session/SessionManager.cs',method:'WirePlayerVehicle()',line:'277',
+   desc:'Connects player vehicle to camera tracking, audio listener, and VFX system.',
+   data:'cameraManager.SetTarget(player.transform)\naudioManager.SetTarget(player)\nvfxManager.SetTarget(player)'},
+  {id:25,p:4,label:'state.MarkReady()',sub:'SessionPhase → Ready',file:'Scripts/Session/SessionManager.cs',method:'SetupSession()',line:'205',
+   desc:'Session fully initialized. Player can now drive. SessionPhase transitions to Ready.',
+   data:'SessionPhase → Ready\nAppState = InGame\n✓ PLAYER CAN DRIVE'},
+
+  // Phase 5: Per-frame loop
+  {id:26,p:5,label:'RCInput',sub:'Update()',file:'Scripts/Input/RCInput.cs',method:'Update()',line:'66',
+   desc:'Reads gamepad every frame. Left stick X → Steer (with power curve). Right trigger → Throttle. Left trigger → Brake.',
+   data:'Steer: leftStick/x (deadzone 0.2)\nThrottle: rightTrigger (deadzone 0.15)\nBrake: leftTrigger (deadzone 0.15)'},
+  {id:27,p:5,label:'VehicleManager',sub:'FixedUpdate()',file:'Scripts/Vehicle/VehicleManager.cs',method:'FixedUpdate()',line:'138',
+   desc:'Creates VehicleFrame struct. Runs all 7 pipeline stages sequentially. Syncs state back.',
+   data:'frame = new VehicleFrame { Dt = fixedDeltaTime }'},
+  {id:28,p:5,label:'1. InputStage',sub:'Read + Smooth',file:'Scripts/Vehicle/Internal/Pipeline/InputStage.cs',method:'Execute()',line:'7',
+   desc:'Reads IVehicleInput properties. Applies throttle ramping (up: 4/s, down: 10/s). Computes forward speed via dot product.',
+   data:'frame.ThrottleRaw, BrakeInput, SteerInput\nframe.SmoothThrottle (ramped)\nframe.ForwardSpeed = Dot(vel, fwd)'},
+  {id:29,p:5,label:'2. AirborneStage',sub:'Ground Detection',file:'Scripts/Vehicle/Internal/Pipeline/AirborneStage.cs',method:'Execute()',line:'7',
+   desc:'Checks if any wheels are on ground. Updates airborne detector with hysteresis. Computes tumble factor.',
+   data:'frame.IsAirborne = !wheels.AnyOnGround()\nframe.TumbleFactor, TiltAngle'},
+  {id:30,p:5,label:'3. GroundDriveStage',sub:'ESCMath → Forces',file:'Scripts/Vehicle/Internal/Pipeline/GroundDriveStage.cs',method:'Execute()',line:'11',
+   desc:'Converts throttle/brake to engine/brake forces via ESCMath state machine. Handles reverse engagement. Applies coast drag.',
+   data:'Throttle → EngineForce (max 18N)\nBrake → BrakeForce (max 15.3N)\nReverse → -9.9N\nCoast drag: 2.5N'},
+  {id:31,p:5,label:'4. DrivetrainStage',sub:'Diff Distribution',file:'Scripts/Vehicle/Internal/Pipeline/DrivetrainStage.cs',method:'Execute()',line:'5',
+   desc:'Distributes engine force to wheels via differential logic. RWD: all rear. AWD: 35% front / 65% rear with coupling.',
+   data:'Drivetrain.Distribute(engineForce, front[], rear[])\nPer-wheel MotorForceShare set'},
+  {id:32,p:5,label:'5. SteeringStage',sub:'Speed-Sensitive',file:'Scripts/Vehicle/Internal/Pipeline/SteeringStage.cs',method:'Execute()',line:'5',
+   desc:'Computes steering angle with speed reduction. Max 28.6° at low speed, 40% of that at high speed. Reverse inverts.',
+   data:'steeringMax=0.50 rad\nhighSpeedFactor=0.4\nsteeringSpeed=7.0 rad/s'},
+  {id:33,p:5,label:'6. AirPhysicsStage',sub:'Gyro Torques',file:'Scripts/Vehicle/Internal/Pipeline/AirPhysicsStage.cs',method:'Execute()',line:'5',
+   desc:'If airborne, applies gyroscopic torques from wheel spin. Tuned for 1/10th RC scale.',
+   data:'RCAirPhysics.Apply(dt, throttle, brake, steer)\nMoI=0.006, GyroScale=1.5'},
+  {id:34,p:5,label:'7. WheelSolveStage',sub:'Per-Wheel Physics',file:'Scripts/Vehicle/Internal/Pipeline/WheelSolveStage.cs',method:'Execute()',line:'7',
+   desc:'Per wheel: SphereCast ground → WheelForceSolver.Solve() → AddForceAtPosition(total, contact). Rotates steer wheels.',
+   data:'Suspension + Lateral + Longitudinal + Motor\nFrictionCircle clamps combined slip\nAddForceAtPosition → Rigidbody'},
+];
+
+// Edges: [from, to]
+const EDGES = [
+  [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],
+  [8,9],[9,10],[10,11],[10,12],[11,13],[12,13],[13,14],
+  [14,15],[15,16],[16,17],[17,18],
+  [18,19],[19,20],[19,21],[21,22],[22,23],[19,24],[24,25],
+  [25,26],[26,27],[27,28],[28,29],[29,30],[30,31],[31,32],[32,33],[33,34],
+  // Loop back
+  [34,27],
+];
+
+// ==================== GRAPH LAYOUT ====================
+const NODE_W = 160, NODE_H = 56, PAD_X = 40, PAD_Y = 28;
+const phaseVisible = [true,true,true,true,true,true];
+
+// Lay out nodes in columns by phase
+function layoutNodes(){
+  const cols = [[],[],[],[],[],[],[]];
+  NODES.forEach(n => cols[n.p].push(n));
+  let x = 60;
+  cols.forEach((col, pi) => {
+    const rows = col.length;
+    // Special layout for phase 2 (two parallel tracks at nodes 11,12)
+    let y = 60;
+    col.forEach((n, ri) => {
+      // Offset parallel nodes
+      if(n.id === 12) { n.x = x + NODE_W + PAD_X; n.y = col[col.indexOf(NODES[11])].y; return; }
+      n.x = x; n.y = y;
+      y += NODE_H + PAD_Y;
+    });
+    // Fix node 12 if it wasn't set
+    if(cols[pi].find(n=>n.id===12)){
+      const n12 = NODES[12];
+      if(!n12.x) { n12.x = x; n12.y = 60; }
+    }
+    x += NODE_W + PAD_X + (pi === 2 ? NODE_W + PAD_X : 0);
+  });
+  // Manual adjustments for parallel branches in phase 4
+  // Nodes 20 and 21 should be parallel
+}
+layoutNodes();
+
+// Flatten layout to a more readable flow
+(function(){
+  let x = 80, y = 60;
+  const perRow = 5;
+  let row = 0, col = 0;
+  NODES.forEach((n, i) => {
+    // Create a serpentine layout
+    if(col >= perRow) { col = 0; row++; }
+    const direction = row % 2 === 0 ? 1 : -1;
+    const cx = direction === 1 ? col : (perRow - 1 - col);
+    n.x = 80 + cx * (NODE_W + PAD_X);
+    n.y = 60 + row * (NODE_H + PAD_Y + 20);
+    n.w = NODE_W;
+    n.h = NODE_H;
+    col++;
+  });
+})();
+
+// ==================== CANVAS RENDERING ====================
+const canvas = document.getElementById('graphCanvas');
+const ctx = canvas.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+let camX = 0, camY = 0, camZoom = 1;
+let animIdx = -1, animPlaying = false, animTimer = null;
+let hoveredNode = null, selectedNode = null, searchTerm = '';
+
+function resize(){
+  const r = canvas.parentElement.getBoundingClientRect();
+  canvas.width = r.width * dpr;
+  canvas.height = r.height * dpr;
+  canvas.style.width = r.width + 'px';
+  canvas.style.height = r.height + 'px';
+  draw();
+}
+window.addEventListener('resize', resize);
+
+function toScreen(wx, wy){
+  return [(wx - camX) * camZoom + canvas.width/dpr/2, (wy - camY) * camZoom + canvas.height/dpr/2];
+}
+function toWorld(sx, sy){
+  return [(sx - canvas.width/dpr/2) / camZoom + camX, (sy - canvas.height/dpr/2) / camZoom + camY];
+}
+
+function resetView(){
+  if(NODES.length === 0) return;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  NODES.forEach(n=>{
+    if(!phaseVisible[n.p]) return;
+    minX=Math.min(minX,n.x);minY=Math.min(minY,n.y);
+    maxX=Math.max(maxX,n.x+NODE_W);maxY=Math.max(maxY,n.y+NODE_H);
+  });
+  if(minX===Infinity){minX=0;minY=0;maxX=800;maxY=600;}
+  const cw = canvas.width/dpr, ch = canvas.height/dpr;
+  const w = maxX - minX + 120, h = maxY - minY + 80;
+  camZoom = Math.min(cw / w, ch / h, 2);
+  camX = (minX + maxX) / 2;
+  camY = (minY + maxY) / 2;
+  draw();
+}
+
+function draw(){
+  const w = canvas.width, h = canvas.height;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(w/dpr/2, h/dpr/2);
+  ctx.scale(camZoom, camZoom);
+  ctx.translate(-camX, -camY);
+
+  // Draw edges
+  EDGES.forEach(([fi, ti]) => {
+    const fn = NODES[fi], tn = NODES[ti];
+    if(!phaseVisible[fn.p] || !phaseVisible[tn.p]) return;
+    const x1 = fn.x + fn.w/2, y1 = fn.y + fn.h;
+    const x2 = tn.x + tn.w/2, y2 = tn.y;
+
+    // Animate highlight
+    const isAnimEdge = animPlaying && animIdx >= 0 && (fi === animIdx || ti === animIdx);
+
+    ctx.beginPath();
+    ctx.strokeStyle = isAnimEdge ? '#fff' : '#30363d';
+    ctx.lineWidth = isAnimEdge ? 2 : 1;
+    // Bezier curve
+    const midY = (y1 + y2) / 2;
+    ctx.moveTo(x1, y1);
+    ctx.bezierCurveTo(x1, midY, x2, midY, x2, y2);
+    ctx.stroke();
+
+    // Arrowhead
+    const angle = Math.atan2(y2 - midY, x2 - x2);
+    const ax = x2, ay = y2 - 2;
+    ctx.beginPath();
+    ctx.moveTo(ax - 4, ay - 6);
+    ctx.lineTo(ax, ay);
+    ctx.lineTo(ax + 4, ay - 6);
+    ctx.strokeStyle = isAnimEdge ? '#fff' : '#484f58';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // Draw loop-back arrow for physics loop (34 → 27)
+  if(phaseVisible[5]){
+    const fn = NODES[34], tn = NODES[27];
+    const x1 = fn.x + fn.w, y1 = fn.y + fn.h/2;
+    const x2 = tn.x + tn.w, y2 = tn.y + tn.h/2;
+    ctx.beginPath();
+    ctx.strokeStyle = '#f8514966';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,4]);
+    const ox = Math.max(x1, x2) + 30;
+    ctx.moveTo(x1, y1);
+    ctx.bezierCurveTo(ox, y1, ox, y2, x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Label
+    ctx.fillStyle = '#f8514999';
+    ctx.font = '10px -apple-system, sans-serif';
+    ctx.fillText('FixedUpdate loop', ox - 30, (y1+y2)/2);
+  }
+
+  // Draw nodes
+  NODES.forEach((n, i) => {
+    if(!phaseVisible[n.p]) return;
+    const phase = PHASES[n.p];
+    const isAnim = animPlaying && i === animIdx;
+    const isHover = n === hoveredNode;
+    const isSelected = n === selectedNode;
+    const isSearch = searchTerm && (n.label.toLowerCase().includes(searchTerm) ||
+                      n.sub.toLowerCase().includes(searchTerm) ||
+                      (n.file && n.file.toLowerCase().includes(searchTerm)) ||
+                      (n.method && n.method.toLowerCase().includes(searchTerm)));
+    const dimmed = searchTerm && !isSearch;
+
+    ctx.globalAlpha = dimmed ? 0.2 : 1;
+
+    // Shadow for animated
+    if(isAnim){
+      ctx.shadowColor = phase.color;
+      ctx.shadowBlur = 16;
+    }
+
+    // Background
+    ctx.fillStyle = isSelected ? phase.color + '33' : (isHover ? phase.bg : '#161b22');
+    ctx.strokeStyle = isAnim ? '#fff' : (isSelected ? phase.color : (isHover ? phase.color : '#30363d'));
+    ctx.lineWidth = isAnim ? 2.5 : (isSelected ? 2 : 1);
+    roundRect(ctx, n.x, n.y, n.w, n.h, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Phase color bar
+    ctx.fillStyle = phase.color;
+    ctx.fillRect(n.x, n.y, 4, n.h);
+    // Clip to rounded left
+    ctx.beginPath();
+    ctx.moveTo(n.x + 4, n.y);
+    ctx.arc(n.x + 8, n.y + 8, 8, -Math.PI, -Math.PI/2);
+    ctx.lineTo(n.x, n.y);
+    ctx.closePath();
+    ctx.fillStyle = phase.color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(n.x + 4, n.y + n.h);
+    ctx.arc(n.x + 8, n.y + n.h - 8, 8, Math.PI/2, Math.PI);
+    ctx.lineTo(n.x, n.y + n.h);
+    ctx.closePath();
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = '#e6edf3';
+    ctx.font = 'bold 11px -apple-system, sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText(truncate(n.label, 18), n.x + 12, n.y + 10);
+
+    // Sub label
+    ctx.fillStyle = phase.color;
+    ctx.font = '10px "SF Mono", Menlo, monospace';
+    ctx.fillText(truncate(n.sub, 22), n.x + 12, n.y + 28);
+
+    // Step number
+    if(n.p === 5 && n.label.match(/^\d/)){
+      // Already has number in label
+    }
+
+    ctx.globalAlpha = 1;
+  });
+
+  ctx.restore();
+
+  // Zoom info
+  document.getElementById('zoomInfo').textContent =
+    `Zoom: ${(camZoom*100).toFixed(0)}% · ${NODES.filter(n=>phaseVisible[n.p]).length} nodes visible`;
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function truncate(s, max){ return s.length > max ? s.slice(0, max-1)+'…' : s; }
+
+// ==================== INTERACTION ====================
+let isDragging = false, dragStartX, dragStartY, dragCamX, dragCamY;
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  camZoom = Math.max(0.2, Math.min(4, camZoom * factor));
+  draw();
+}, {passive: false});
+
+canvas.addEventListener('mousedown', e => {
+  isDragging = true;
+  dragStartX = e.offsetX; dragStartY = e.offsetY;
+  dragCamX = camX; dragCamY = camY;
+  canvas.style.cursor = 'grabbing';
+});
+
+canvas.addEventListener('mousemove', e => {
+  if(isDragging){
+    camX = dragCamX - (e.offsetX - dragStartX) / camZoom;
+    camY = dragCamY - (e.offsetY - dragStartY) / camZoom;
+    draw();
+    return;
+  }
+  const [wx, wy] = toWorld(e.offsetX, e.offsetY);
+  let found = null;
+  for(let i = NODES.length - 1; i >= 0; i--){
+    const n = NODES[i];
+    if(!phaseVisible[n.p]) continue;
+    if(wx >= n.x && wx <= n.x + n.w && wy >= n.y && wy <= n.y + n.h){
+      found = n; break;
+    }
+  }
+  if(found !== hoveredNode){
+    hoveredNode = found;
+    canvas.style.cursor = found ? 'pointer' : 'grab';
+    draw();
+  }
+});
+
+canvas.addEventListener('mouseup', e => {
+  if(isDragging && Math.abs(e.offsetX - dragStartX) < 3 && Math.abs(e.offsetY - dragStartY) < 3){
+    // Click
+    if(hoveredNode){
+      selectedNode = hoveredNode;
+      showDetail(selectedNode);
+    } else {
+      closeDetail();
+    }
+  }
+  isDragging = false;
+  canvas.style.cursor = hoveredNode ? 'pointer' : 'grab';
+});
+
+canvas.addEventListener('mouseleave', () => {
+  isDragging = false;
+  hoveredNode = null;
+  draw();
+});
+
+// Detail panel
+function showDetail(n){
+  const panel = document.getElementById('detailPanel');
+  document.getElementById('detailTitle').textContent = n.label + ' — ' + n.sub;
+  document.getElementById('detailFile').textContent = n.file || '';
+  document.getElementById('detailMethod').textContent = n.method + (n.line !== '-' ? ' (line ' + n.line + ')' : '');
+  document.getElementById('detailDesc').textContent = n.desc;
+  document.getElementById('detailData').innerHTML = (n.data||'').split('\n').map(l =>
+    l.replace(/(→)/g, '<span style="color:#d29922">$1</span>')
+     .replace(/([A-Z][a-zA-Z]+\.[A-Z][a-zA-Z]+\([^)]*\))/g, '<span style="color:#3fb950">$1</span>')
+  ).join('<br>');
+  panel.classList.add('open');
+  draw();
+}
+
+function closeDetail(){
+  selectedNode = null;
+  document.getElementById('detailPanel').classList.remove('open');
+  draw();
+}
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase();
+  draw();
+});
+
+// Phase toggles
+document.querySelectorAll('.phase-toggle input').forEach(cb => {
+  cb.addEventListener('change', e => {
+    phaseVisible[parseInt(e.target.dataset.phase)] = e.target.checked;
+    draw();
+  });
+});
+
+// Speed
+document.getElementById('speedRange').addEventListener('input', e => {
+  document.getElementById('speedLabel').textContent = e.target.value + 'x';
+});
+
+// ==================== ANIMATION ====================
+function toggleAnim(){
+  if(animPlaying){ stopAnim(); return; }
+  animPlaying = true;
+  if(animIdx < 0) animIdx = 0;
+  document.getElementById('btnPlay').classList.add('active');
+  document.getElementById('btnPlay').innerHTML = '&#9646;&#9646; Pause';
+  stepAnim();
+}
+
+function stopAnim(){
+  animPlaying = false;
+  clearTimeout(animTimer);
+  document.getElementById('btnPlay').classList.remove('active');
+  document.getElementById('btnPlay').innerHTML = '&#9654; Play';
+  draw();
+}
+
+function resetAnim(){
+  stopAnim();
+  animIdx = -1;
+  draw();
+}
+
+function stepAnim(){
+  if(!animPlaying) return;
+  // Skip hidden phases
+  let tries = 0;
+  do {
+    animIdx = (animIdx + 1) % NODES.length;
+    tries++;
+  } while(!phaseVisible[NODES[animIdx].p] && tries < NODES.length);
+
+  // Center on animated node
+  const n = NODES[animIdx];
+  camX += (n.x + n.w/2 - camX) * 0.3;
+  camY += (n.y + n.h/2 - camY) * 0.3;
+
+  selectedNode = n;
+  showDetail(n);
+  draw();
+
+  const speed = parseInt(document.getElementById('speedRange').value);
+  const delay = Math.max(200, 2000 / speed);
+  animTimer = setTimeout(stepAnim, delay);
+}
+
+// ==================== VEHICLE SIM ====================
+let simOpen = false;
+const simCanvas = document.getElementById('simCanvas');
+const simCtx = simCanvas.getContext('2d');
+
+const sim = {
+  x: 0, y: 0, angle: 0, speed: 0,
+  steer: 0, throttle: 0, brake: 0,
+  engineForce: 0, brakeForce: 0, coastDrag: 0,
+  steeringAngle: 0, smoothThrottle: 0,
+  reverseEngaged: false,
+  wheels: [
+    {name:'FL', motor:0, lateral:0, longitudinal:0, suspension:1, isSteer:true, isDrive:false},
+    {name:'FR', motor:0, lateral:0, longitudinal:0, suspension:1, isSteer:true, isDrive:false},
+    {name:'RL', motor:0, lateral:0, longitudinal:0, suspension:1, isSteer:false, isDrive:true},
+    {name:'RR', motor:0, lateral:0, longitudinal:0, suspension:1, isSteer:false, isDrive:true},
+  ],
+  // Constants matching BuggySpec
+  engineForceMax: 18, brakeForceMax: 15.3, reverseForce: 9.9,
+  coastDragVal: 2.5, maxSpeed: 20,
+  steeringMax: 0.5, steeringSpeed: 7, highSpeedFactor: 0.4, steeringSpeedLimit: 8,
+  throttleRampUp: 4, throttleRampDown: 10, gripCoeff: 3.5,
+};
+
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+function toggleSim(){
+  simOpen = !simOpen;
+  document.getElementById('vehicleSim').classList.toggle('open', simOpen);
+  document.getElementById('btnSim').classList.toggle('active', simOpen);
+  if(simOpen) {
+    resizeSim();
+    requestAnimationFrame(simLoop);
+  }
+}
+
+function resizeSim(){
+  const r = simCanvas.parentElement.getBoundingClientRect();
+  simCanvas.width = r.width * dpr;
+  simCanvas.height = r.height * dpr;
+  simCanvas.style.width = r.width + 'px';
+  simCanvas.style.height = r.height + 'px';
+}
+window.addEventListener('resize', () => { if(simOpen) resizeSim(); });
+
+let lastSimTime = 0;
+function simLoop(t){
+  if(!simOpen) return;
+  const dt = Math.min((t - (lastSimTime||t)) / 1000, 0.05);
+  lastSimTime = t;
+
+  // Read input
+  const rawThrottle = (keys['w'] || keys['arrowup']) ? 1 : 0;
+  const rawBrake = (keys['s'] || keys['arrowdown']) ? 1 : 0;
+  const rawSteerL = (keys['a'] || keys['arrowleft']) ? -1 : 0;
+  const rawSteerR = (keys['d'] || keys['arrowright']) ? 1 : 0;
+  const rawSteer = rawSteerL + rawSteerR;
+
+  // InputStage: apply steering curve
+  sim.steer = Math.sign(rawSteer) * Math.pow(Math.abs(rawSteer), 1.5);
+  sim.throttle = rawThrottle;
+  sim.brake = rawBrake;
+
+  // Smooth throttle (ramp)
+  const rampRate = (sim.throttle > sim.smoothThrottle) ? sim.throttleRampUp : sim.throttleRampDown;
+  sim.smoothThrottle = moveTowards(sim.smoothThrottle, sim.throttle, rampRate * dt);
+
+  // GroundDriveStage: ESCMath
+  if(sim.smoothThrottle > 0){
+    sim.reverseEngaged = false;
+    sim.engineForce = (Math.abs(sim.speed) >= sim.maxSpeed) ? 0 : sim.smoothThrottle * sim.engineForceMax;
+    sim.brakeForce = 0;
+    sim.coastDrag = 0;
+  } else if(sim.brake > 0){
+    if(sim.reverseEngaged){
+      sim.engineForce = (Math.abs(sim.speed) >= sim.maxSpeed) ? 0 : -sim.brake * sim.reverseForce;
+      sim.brakeForce = 0;
+    } else {
+      sim.engineForce = 0;
+      sim.brakeForce = sim.brake * sim.brakeForceMax;
+    }
+    sim.coastDrag = 0;
+    // Reverse engagement
+    if(sim.speed < 0.25 && sim.brake > 0.1) sim.reverseEngaged = true;
+    if(sim.speed > 0.5) sim.reverseEngaged = false;
+  } else {
+    sim.reverseEngaged = false;
+    sim.engineForce = 0;
+    sim.brakeForce = 0;
+    sim.coastDrag = sim.coastDragVal;
+  }
+
+  // SteeringStage
+  const spd = Math.abs(sim.speed);
+  const t2 = Math.min(1, spd / sim.steeringSpeedLimit);
+  const effectiveMax = sim.steeringMax * (1 - t2 * (1 - sim.highSpeedFactor));
+  const steerSign = sim.speed < -0.25 ? -1 : 1;
+  const steerTarget = sim.steer * effectiveMax * steerSign;
+  sim.steeringAngle = moveTowards(sim.steeringAngle, steerTarget, sim.steeringSpeed * dt);
+
+  // DrivetrainStage: RWD 50/50 rear
+  sim.wheels.forEach(w => { w.motor = 0; });
+  if(sim.engineForce !== 0){
+    sim.wheels[2].motor = sim.engineForce * 0.5;
+    sim.wheels[3].motor = sim.engineForce * 0.5;
+  }
+
+  // Simplified physics integration
+  const netForce = sim.engineForce - sim.brakeForce * Math.sign(sim.speed) - sim.coastDrag * Math.sign(sim.speed);
+  sim.speed += netForce * dt * 0.8; // mass factor
+  if(sim.brakeForce > 0 && Math.abs(sim.speed) < 0.3) sim.speed *= 0.9;
+  sim.speed = Math.max(-sim.maxSpeed * 0.5, Math.min(sim.maxSpeed, sim.speed));
+
+  // Turning
+  if(Math.abs(sim.speed) > 0.1){
+    const turnRate = sim.steeringAngle * sim.speed * 0.8;
+    sim.angle += turnRate * dt;
+  }
+
+  // Position
+  sim.x += Math.sin(sim.angle) * sim.speed * dt * 15;
+  sim.y -= Math.cos(sim.angle) * sim.speed * dt * 15;
+
+  // Per-wheel forces (simplified visualization)
+  const lateralForce = sim.speed * sim.steeringAngle * sim.gripCoeff;
+  sim.wheels.forEach((w, i) => {
+    w.suspension = 1;
+    w.longitudinal = w.isDrive ? (sim.engineForce * 0.5 - sim.brakeForce * 0.25) : (-sim.brakeForce * 0.25);
+    w.lateral = w.isSteer ? lateralForce * 0.5 : lateralForce * 0.3;
+    // Friction circle clamp
+    const maxGrip = sim.gripCoeff * w.suspension;
+    const combined = Math.sqrt(w.lateral*w.lateral + w.longitudinal*w.longitudinal);
+    if(combined > maxGrip && combined > 0){
+      const scale = maxGrip / combined;
+      w.lateral *= scale;
+      w.longitudinal *= scale;
+    }
+  });
+
+  // Key indicators
+  document.getElementById('kUp').classList.toggle('active', !!keys['w'] || !!keys['arrowup']);
+  document.getElementById('kDown').classList.toggle('active', !!keys['s'] || !!keys['arrowdown']);
+  document.getElementById('kLeft').classList.toggle('active', !!keys['a'] || !!keys['arrowleft']);
+  document.getElementById('kRight').classList.toggle('active', !!keys['d'] || !!keys['arrowright']);
+
+  drawSim();
+  updateSimGauges();
+  requestAnimationFrame(simLoop);
+}
+
+function moveTowards(current, target, maxDelta){
+  if(Math.abs(target - current) <= maxDelta) return target;
+  return current + Math.sign(target - current) * maxDelta;
+}
+
+function drawSim(){
+  const w = simCanvas.width / dpr, h = simCanvas.height / dpr;
+  simCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  simCtx.clearRect(0, 0, w, h);
+
+  // Grid
+  simCtx.save();
+  simCtx.translate(w/2, h/2);
+  const gridSize = 40;
+  const ox = (-sim.x % gridSize + gridSize) % gridSize - gridSize;
+  const oy = (-sim.y % gridSize + gridSize) % gridSize - gridSize;
+  simCtx.strokeStyle = '#1a1f28';
+  simCtx.lineWidth = 0.5;
+  for(let gx = ox - w; gx < w; gx += gridSize){
+    simCtx.beginPath(); simCtx.moveTo(gx, -h); simCtx.lineTo(gx, h); simCtx.stroke();
+  }
+  for(let gy = oy - h; gy < h; gy += gridSize){
+    simCtx.beginPath(); simCtx.moveTo(-w, gy); simCtx.lineTo(w, gy); simCtx.stroke();
+  }
+
+  // Car (top-down) at center, rotated
+  simCtx.rotate(sim.angle);
+
+  const carL = 60, carW = 32;
+  const wheelL = 12, wheelW = 5;
+  const axleF = -22, axleR = 22;
+  const trackW = 15;
+
+  // Car body
+  simCtx.fillStyle = '#2d333b';
+  simCtx.strokeStyle = '#484f58';
+  simCtx.lineWidth = 1;
+  roundRect(simCtx, -carW/2, -carL/2, carW, carL, 6);
+  simCtx.fill(); simCtx.stroke();
+
+  // Direction indicator
+  simCtx.fillStyle = '#388bfd44';
+  simCtx.beginPath();
+  simCtx.moveTo(0, -carL/2 - 8);
+  simCtx.lineTo(-6, -carL/2 + 2);
+  simCtx.lineTo(6, -carL/2 + 2);
+  simCtx.fill();
+
+  // Wheels
+  const wheelPositions = [
+    {x: -trackW, y: axleF, steer: true, idx: 0},
+    {x: trackW, y: axleF, steer: true, idx: 1},
+    {x: -trackW, y: axleR, steer: false, idx: 2},
+    {x: trackW, y: axleR, steer: false, idx: 3},
+  ];
+
+  wheelPositions.forEach(wp => {
+    simCtx.save();
+    simCtx.translate(wp.x, wp.y);
+    if(wp.steer) simCtx.rotate(sim.steeringAngle);
+
+    // Wheel rectangle
+    const wData = sim.wheels[wp.idx];
+    const isActive = Math.abs(wData.motor) > 0.5 || Math.abs(wData.lateral) > 0.5;
+    simCtx.fillStyle = isActive ? '#e6edf3' : '#8b949e';
+    simCtx.fillRect(-wheelW/2, -wheelL/2, wheelW, wheelL);
+
+    // Force vectors
+    const forceScale = 1.5;
+    // Lateral force (red, sideways)
+    if(Math.abs(wData.lateral) > 0.1){
+      simCtx.strokeStyle = '#f85149';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(0, 0);
+      simCtx.lineTo(wData.lateral * forceScale, 0);
+      simCtx.stroke();
+      // arrowhead
+      const dir = Math.sign(wData.lateral);
+      simCtx.beginPath();
+      simCtx.moveTo(wData.lateral * forceScale, 0);
+      simCtx.lineTo(wData.lateral * forceScale - dir*4, -3);
+      simCtx.lineTo(wData.lateral * forceScale - dir*4, 3);
+      simCtx.fillStyle = '#f85149';
+      simCtx.fill();
+    }
+    // Longitudinal force (green, forward)
+    if(Math.abs(wData.longitudinal) > 0.1){
+      simCtx.strokeStyle = '#3fb950';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(0, 0);
+      simCtx.lineTo(0, -wData.longitudinal * forceScale);
+      simCtx.stroke();
+      const dir = Math.sign(wData.longitudinal);
+      simCtx.beginPath();
+      simCtx.moveTo(0, -wData.longitudinal * forceScale);
+      simCtx.lineTo(-3, -wData.longitudinal * forceScale + dir*4);
+      simCtx.lineTo(3, -wData.longitudinal * forceScale + dir*4);
+      simCtx.fillStyle = '#3fb950';
+      simCtx.fill();
+    }
+
+    // Friction circle
+    const maxGrip = sim.gripCoeff * wData.suspension * forceScale;
+    simCtx.beginPath();
+    simCtx.arc(0, 0, Math.min(maxGrip, 25), 0, Math.PI * 2);
+    simCtx.strokeStyle = '#ffffff15';
+    simCtx.lineWidth = 0.5;
+    simCtx.stroke();
+
+    // Combined force dot
+    const cx = wData.lateral * forceScale;
+    const cy = -wData.longitudinal * forceScale;
+    if(Math.abs(cx) > 0.5 || Math.abs(cy) > 0.5){
+      simCtx.beginPath();
+      simCtx.arc(cx, cy, 2.5, 0, Math.PI*2);
+      simCtx.fillStyle = '#d29922';
+      simCtx.fill();
+    }
+
+    simCtx.restore();
+  });
+
+  // Speed text on car
+  simCtx.fillStyle = '#e6edf3';
+  simCtx.font = 'bold 9px -apple-system, sans-serif';
+  simCtx.textAlign = 'center';
+  simCtx.textBaseline = 'middle';
+  simCtx.fillText(Math.abs(sim.speed).toFixed(1) + ' m/s', 0, 0);
+
+  simCtx.restore();
+
+  // Legend
+  simCtx.fillStyle = '#8b949e';
+  simCtx.font = '10px -apple-system, sans-serif';
+  simCtx.textAlign = 'left';
+  simCtx.textBaseline = 'top';
+  simCtx.fillText('Green=Longitudinal  Red=Lateral  Yellow=Combined  Circle=Grip limit', 8, h - 16);
+}
+
+function updateSimGauges(){
+  const g = document.getElementById('simGauges');
+  g.innerHTML = [
+    gauge('Speed', (sim.speed).toFixed(2) + ' m/s'),
+    gauge('Throttle', (sim.smoothThrottle * 100).toFixed(0) + '%'),
+    gauge('Brake', (sim.brake * 100).toFixed(0) + '%'),
+    gauge('Steer Input', sim.steer.toFixed(2)),
+    gauge('Steering Angle', (sim.steeringAngle * 57.3).toFixed(1) + '°'),
+    gauge('Engine Force', sim.engineForce.toFixed(1) + ' N'),
+    gauge('Brake Force', sim.brakeForce.toFixed(1) + ' N'),
+    gauge('Coast Drag', sim.coastDrag.toFixed(1) + ' N'),
+    gauge('Reverse', sim.reverseEngaged ? 'YES' : 'no'),
+  ].join('');
+
+  const wf = document.getElementById('wheelForces');
+  wf.innerHTML = sim.wheels.map(w =>
+    `<div style="margin-bottom:6px"><div style="font-size:10px;color:${w.isDrive?'#3fb950':'#8b949e'};font-weight:600">${w.name} ${w.isDrive?'(drive)':''} ${w.isSteer?'(steer)':''}</div>` +
+    `<div class="force-indicator"><span class="wheel-label">Mot</span><div class="force-bar" style="width:${Math.abs(w.motor)*3}px;background:#3fb950"></div> <span style="font-size:10px;color:#8b949e">${w.motor.toFixed(1)}N</span></div>` +
+    `<div class="force-indicator"><span class="wheel-label">Lat</span><div class="force-bar" style="width:${Math.abs(w.lateral)*3}px;background:#f85149"></div> <span style="font-size:10px;color:#8b949e">${w.lateral.toFixed(1)}N</span></div>` +
+    `<div class="force-indicator"><span class="wheel-label">Lon</span><div class="force-bar" style="width:${Math.abs(w.longitudinal)*3}px;background:#388bfd"></div> <span style="font-size:10px;color:#8b949e">${w.longitudinal.toFixed(1)}N</span></div></div>`
+  ).join('');
+}
+
+function gauge(label, val){
+  return `<div class="gauge"><span class="label">${label}</span><span class="value">${val}</span></div>`;
+}
+
+// ==================== INIT ====================
+setTimeout(() => { resize(); resetView(); }, 50);
+</script>
+</body>
+</html>
