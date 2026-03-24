@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace R8EOX.UI.Internal
@@ -57,6 +58,7 @@ namespace R8EOX.UI.Internal
             dialog._onCancel = onCancel;
             dialog.Build(title, message, confirmText);
             IsDialogOpen = true;
+            SceneManager.sceneLoaded += dialog.OnSceneLoaded;
             return dialog;
         }
 
@@ -233,8 +235,11 @@ namespace R8EOX.UI.Internal
                 Cancel();
         }
 
+        private void OnSceneLoaded(Scene s, LoadSceneMode m) => Cancel();
+
         private void Confirm()
         {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
             IsDialogOpen = false;
             _onConfirm?.Invoke();
             Destroy(gameObject);
@@ -242,6 +247,7 @@ namespace R8EOX.UI.Internal
 
         private void Cancel()
         {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
             IsDialogOpen = false;
             _onCancel?.Invoke();
             Destroy(gameObject);
