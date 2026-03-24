@@ -209,8 +209,9 @@ namespace R8EOX.Tests.EditMode
             tracer.RegisterFlow(def);
             tracer.BeginFlow("Timed");
 
-            // Simulate time well past the timeout (start=0, now=10)
-            tracer.Tick(10f);
+            // StartTime is captured from Time.realtimeSinceStartup in BeginFlow
+            // so we must tick relative to that, not from zero
+            tracer.Tick(UnityEngine.Time.realtimeSinceStartup + 10f);
 
             Assert.That(tracer.ActiveFlows.ContainsKey("Timed"), Is.False);
             Assert.That(tracer.FailedFlows.Count, Is.EqualTo(1));
@@ -225,8 +226,8 @@ namespace R8EOX.Tests.EditMode
             tracer.RegisterFlow(def);
             tracer.BeginFlow("Timed");
 
-            // Well within timeout
-            tracer.Tick(2f);
+            // Well within timeout — tick relative to StartTime
+            tracer.Tick(UnityEngine.Time.realtimeSinceStartup + 2f);
 
             Assert.That(tracer.ActiveFlows.ContainsKey("Timed"), Is.True);
         }
