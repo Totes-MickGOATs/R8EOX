@@ -56,4 +56,5 @@ Scripts/
 - `AI/` — AI opponents: centerline-following drivers with difficulty scaling, wired via SessionManager
 - `VFX/` — Tire marks, exhaust, sparks, screen effects (skeleton)
 - `ScriptableObjects/` — Data containers: SessionConfig, TrackConfig, RaceConfig, TrackDefinition, TrackRegistry, MenuThemeConfig, motor/suspension/traction configs
+- `Diagnostics/` — Runtime diagnostics: flow tracing, event logging, deferred destroy verification, IMGUI overlay (fully stripped in release builds)
 - `Editor/` — Builder tools: TrackBuilder, RCBuggyBuilder, MenuSceneBuilder, BootSceneBuilder, TrackRegistryBuilder
