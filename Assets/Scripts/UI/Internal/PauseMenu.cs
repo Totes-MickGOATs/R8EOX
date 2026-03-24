@@ -13,9 +13,7 @@ namespace R8EOX.UI.Internal
         private bool _isBuilt;
 
         // Colors
-        private static readonly Color PanelBgColor  = new Color(20 / 255f, 20 / 255f, 26 / 255f, 0.97f);
-        private static readonly Color TitleColor     = new Color(0f, 0.784f, 1f, 1f);
-        private static readonly Color DividerColor   = new Color(0f, 0.784f, 1f, 0.20f);
+        private static readonly Color DividerColor = new Color(0f, 0.784f, 1f, 0.20f);
 
         internal void Initialize(
             System.Action optionsCallback,
@@ -53,9 +51,9 @@ namespace R8EOX.UI.Internal
             var panelGo = new GameObject("Panel", typeof(RectTransform));
             panelGo.transform.SetParent(transform, false);
             var panelImg = panelGo.AddComponent<Image>();
-            panelImg.color = PanelBgColor;
+            panelImg.color = UIColors.PanelBg;
             var panelOutline = panelGo.AddComponent<Outline>();
-            panelOutline.effectColor = new Color(0f, 0.784f, 1f, 0.25f);
+            panelOutline.effectColor = UIColors.BorderMedium;
             panelOutline.effectDistance = new Vector2(1f, -1f);
 
             var panelRt = panelGo.GetComponent<RectTransform>();
@@ -88,7 +86,7 @@ namespace R8EOX.UI.Internal
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text      = "PAUSED";
             tmp.fontSize  = 28f;
-            tmp.color     = TitleColor;
+            tmp.color     = UIColors.Primary;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontStyle = FontStyles.Bold;
 
