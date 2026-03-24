@@ -6,16 +6,14 @@ namespace R8EOX.UI.Internal
 {
     internal class CalibrationTabContent : MonoBehaviour
     {
-        // ── Dependencies ──────────────────────────────────────────────────
         private Settings.SettingsManager _settingsManager;
 
-        // ── Visualizers ───────────────────────────────────────────────────
         private StickVisualizer _leftStick;
         private StickVisualizer _rightStick;
         private TriggerVisualizer _leftTrigger;
         private TriggerVisualizer _rightTrigger;
 
-        // ── Slider references (held for RESET) ────────────────────────────
+        // Slider references held for RESET
         private Slider _steerSensSlider;
         private Slider _throttleSensSlider;
         private Slider _brakeSensSlider;
@@ -26,8 +24,6 @@ namespace R8EOX.UI.Internal
         private Slider _leftYOffsetSlider;
         private Slider _rightXOffsetSlider;
         private Slider _rightYOffsetSlider;
-
-        // ── Public API ────────────────────────────────────────────────────
 
         internal void Initialize(Settings.SettingsManager settings)
         {
@@ -40,8 +36,6 @@ namespace R8EOX.UI.Internal
             BuildPerAxisSection();
             BuildActionButtons();
         }
-
-        // ── Section Builders ──────────────────────────────────────────────
 
         private void BuildControllerSection()
         {
@@ -156,8 +150,6 @@ namespace R8EOX.UI.Internal
                     OnResetConfirmed));
         }
 
-        // ── MonoBehaviour ─────────────────────────────────────────────────
-
         private void Update()
         {
             if (!gameObject.activeSelf)
@@ -177,8 +169,6 @@ namespace R8EOX.UI.Internal
             _leftTrigger?.UpdateValue(lt, lt);
             _rightTrigger?.UpdateValue(rt, rt);
         }
-
-        // ── Callbacks ─────────────────────────────────────────────────────
 
         private void OnWizardComplete(float[] neutralOffsets, float[,] axisRanges)
         {
@@ -221,8 +211,6 @@ namespace R8EOX.UI.Internal
             if (_rightXOffsetSlider)  _rightXOffsetSlider.SetValueWithoutNotify(cal.RightXOffset);
             if (_rightYOffsetSlider)  _rightYOffsetSlider.SetValueWithoutNotify(cal.RightYOffset);
         }
-
-        // ── Factory Helpers ───────────────────────────────────────────────
 
         private StickVisualizer CreateStickVisualizer(Transform parent, string label)
         {
