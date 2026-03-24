@@ -74,11 +74,27 @@ If the code looks clean, say so briefly.
 - **Banned patterns**: Singleton `.Instance`, `SendMessage`, `BroadcastMessage`, `FindObjectOfType`, peer-to-peer Observer events
 - **Approved alternatives**: Command pattern, container-mediated Component, explicit Tick(), Subclass Sandbox
 
+## ⛔ MANDATORY: COMMIT AFTER EVERY FILE — NO EXCEPTIONS
+
+**You are BLOCKED from starting the next file until the current file is committed.**
+
+After writing or modifying ANY file (e.g., `CLAUDE.md`):
+```bash
+git status  # ← Check for companion .meta files!
+git add path/to/ExactFile.md
+git add path/to/ExactFile.md.meta   # ← REQUIRED for new files (Unity auto-generates these)
+git commit -m "docs: description of change"
+# STOP — do NOT proceed until this commit succeeds
+```
+
+- One file + its `.meta` = one commit = IMMEDIATELY
+- Unity generates a `.meta` for every new file/folder — **always check `git status` and include it**
+- `git add -A` / `git add .` / `--no-verify` = **BANNED**
+- If commit fails, fix and retry — never skip
+
 ## Subagent Workflow
 Follow the checklist in `.ai/knowledge/tooling/subagent-workflow.md`. Key points:
 - After reviewing, verify folder CLAUDE.md files are up to date
-- If you update ANY file (e.g., CLAUDE.md), **commit it IMMEDIATELY** before proceeding
-- You are BLOCKED from starting the next file until the current commit succeeds
 - Flag missing or stale documentation in your review output
 - Report all files reviewed, any commits made, and issues found
 
