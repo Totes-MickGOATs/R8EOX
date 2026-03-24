@@ -28,13 +28,13 @@ namespace R8EOX.Editor.Builders
         {
             var so = new SerializedObject(bootstrapper);
 
-            SetRef(so, bootstrapper, "trackManager",  trackManager);
-            SetRef(so, bootstrapper, "cameraManager", cameraManager);
-            SetRef(so, bootstrapper, "raceManager",   raceManager);
-            SetRef(so, bootstrapper, "uiManager",     uiManager);
-            SetRef(so, bootstrapper, "audioManager",  audioManager);
-            SetRef(so, bootstrapper, "vfxManager",    vfxManager);
-            SetRef(so, bootstrapper, "aiManager",     aiManager);
+            SerializedPropertyHelper.SetRef(so, "trackManager",  trackManager);
+            SerializedPropertyHelper.SetRef(so, "cameraManager", cameraManager);
+            SerializedPropertyHelper.SetRef(so, "raceManager",   raceManager);
+            SerializedPropertyHelper.SetRef(so, "uiManager",     uiManager);
+            SerializedPropertyHelper.SetRef(so, "audioManager",  audioManager);
+            SerializedPropertyHelper.SetRef(so, "vfxManager",    vfxManager);
+            SerializedPropertyHelper.SetRef(so, "aiManager",     aiManager);
 
             WireSessionChannel(so, bootstrapper);
             WireDefaultVehicle(so, bootstrapper);
@@ -99,18 +99,6 @@ namespace R8EOX.Editor.Builders
             }
         }
 
-        private static void SetRef(SerializedObject so, Object ctx,
-            string propName, Object value)
-        {
-            var prop = so.FindProperty(propName);
-            if (prop == null)
-            {
-                Debug.LogError($"[BootstrapWirer] Property '{propName}' not found on " +
-                    ctx.GetType().Name);
-                return;
-            }
-            prop.objectReferenceValue = value;
-        }
     }
 }
 #endif
