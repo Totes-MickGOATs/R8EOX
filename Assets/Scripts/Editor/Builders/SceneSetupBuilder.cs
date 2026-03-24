@@ -200,63 +200,16 @@ namespace R8EOX.Editor.Builders
             R8EOX.UI.UIManager         uiManager,
             R8EOX.Audio.AudioManager   audioManager,
             R8EOX.VFX.VFXManager       vfxManager,
-            R8EOX.AI.AIManager         aiManager)
-        {
-            var so = new SerializedObject(bootstrapper);
-
-            so.FindProperty("trackManager").objectReferenceValue  = trackManager;
-            so.FindProperty("cameraManager").objectReferenceValue = cameraManager;
-            so.FindProperty("raceManager").objectReferenceValue   = raceManager;
-            so.FindProperty("uiManager").objectReferenceValue     = uiManager;
-            so.FindProperty("audioManager").objectReferenceValue  = audioManager;
-            so.FindProperty("vfxManager").objectReferenceValue    = vfxManager;
-            so.FindProperty("aiManager").objectReferenceValue     = aiManager;
-
-            WireSessionChannel(so);
-            WireDefaultVehicle(so);
-
-            so.ApplyModifiedProperties();
-        }
-
-        private static void WireSessionChannel(SerializedObject so)
-        {
-            var prop = so.FindProperty("sessionChannel");
-            if (prop == null || prop.objectReferenceValue != null)
-                return;
-
-            var guids = AssetDatabase.FindAssets("t:SessionChannel");
-            if (guids.Length == 0)
-                return;
-
-            prop.objectReferenceValue = AssetDatabase.LoadAssetAtPath<ScriptableObject>(
-                AssetDatabase.GUIDToAssetPath(guids[0]));
-        }
-
-        private static void WireDefaultVehicle(SerializedObject so)
-        {
-            var prop = so.FindProperty("defaultVehiclePrefab");
-            if (prop == null || prop.objectReferenceValue != null)
-                return;
-
-            var defGuids = AssetDatabase.FindAssets("t:VehicleDefinition");
-            if (defGuids.Length > 0)
-            {
-                var def = AssetDatabase.LoadAssetAtPath<VehicleDefinition>(
-                    AssetDatabase.GUIDToAssetPath(defGuids[0]));
-                if (def != null && def.VehiclePrefab != null)
-                {
-                    prop.objectReferenceValue = def.VehiclePrefab;
-                    return;
-                }
-            }
-
-            var prefabGuids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs" });
-            if (prefabGuids.Length > 0)
-            {
-                prop.objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(
-                    AssetDatabase.GUIDToAssetPath(prefabGuids[0]));
-            }
-        }
+            R8EOX.AI.AIManager         aiManager) =>
+            BootstrapWirer.WireBootstrapper(
+                bootstrapper,
+                trackManager,
+                cameraManager,
+                raceManager,
+                uiManager,
+                audioManager,
+                vfxManager,
+                aiManager);
 
         // ---- Helpers ---------------------------------------------------------
 
