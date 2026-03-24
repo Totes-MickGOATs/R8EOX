@@ -18,11 +18,6 @@ namespace R8EOX.UI.Internal
         private const float SECTION_SPACING     = 16f;
         private const float SECTION_RULE_HEIGHT = 1f;
 
-        private static readonly Color SLIDER_FILL       = new Color(0f,    0.784f, 1f);
-        private static readonly Color SLIDER_TRACK      = new Color(0.15f, 0.15f,  0.15f);
-        private static readonly Color VALUE_COLOR       = new Color(0.91f, 0.722f, 0.286f);
-        private static readonly Color SECTION_COLOR     = new Color(0f,    0.784f, 1f);
-        private static readonly Color SECTION_RULE_COLOR = new Color(0f,   0.784f, 1f, 0.25f);
 
         // ── Section Header ────────────────────────────────────────────────────
 
@@ -35,11 +30,11 @@ namespace R8EOX.UI.Internal
             root.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             var lbl = NewGO("Label", root.transform).AddComponent<TextMeshProUGUI>();
-            lbl.text = text.ToUpperInvariant(); lbl.fontSize = 16f; lbl.color = SECTION_COLOR;
+            lbl.text = text.ToUpperInvariant(); lbl.fontSize = 16f; lbl.color = UIColors.Primary;
             SetH(lbl.gameObject, 20f);
 
             var rule = NewGO("Rule", root.transform).AddComponent<Image>();
-            rule.color = SECTION_RULE_COLOR;
+            rule.color = UIColors.BorderMedium;
             SetH(rule.gameObject, SECTION_RULE_HEIGHT);
             return root;
         }
@@ -62,7 +57,7 @@ namespace R8EOX.UI.Internal
             valElem.minWidth = VALUE_WIDTH; valElem.preferredWidth = VALUE_WIDTH;
             var valTmp = valGO.AddComponent<TextMeshProUGUI>();
             valTmp.text = value.ToString("F2"); valTmp.fontSize = 16f;
-            valTmp.color = VALUE_COLOR; valTmp.alignment = TextAlignmentOptions.Right;
+            valTmp.color = UIColors.Warning; valTmp.alignment = TextAlignmentOptions.Right;
 
             slider.onValueChanged.AddListener(v =>
             {
@@ -84,7 +79,7 @@ namespace R8EOX.UI.Internal
 
             var ddGO = NewGO("Dropdown", row.transform);
             ddGO.AddComponent<LayoutElement>().flexibleWidth = 1f;
-            ddGO.AddComponent<Image>().color = SLIDER_TRACK;
+            ddGO.AddComponent<Image>().color = UIColors.SliderTrack;
 
             var dd = ddGO.AddComponent<TMP_Dropdown>();
             dd.ClearOptions();
@@ -112,11 +107,11 @@ namespace R8EOX.UI.Internal
             var te = tGO.AddComponent<LayoutElement>();
             te.minWidth = 28f; te.preferredWidth = 28f; te.minHeight = 28f;
 
-            var bg = tGO.AddComponent<Image>(); bg.color = SLIDER_TRACK;
+            var bg = tGO.AddComponent<Image>(); bg.color = UIColors.SliderTrack;
             var toggle = tGO.AddComponent<Toggle>(); toggle.targetGraphic = bg;
 
             var checkGO = NewGO("Checkmark", tGO.transform);
-            var checkImg = checkGO.AddComponent<Image>(); checkImg.color = SLIDER_FILL;
+            var checkImg = checkGO.AddComponent<Image>(); checkImg.color = UIColors.Primary;
             Fill(checkGO.GetComponent<RectTransform>(), 4f);
             toggle.graphic = checkImg;
 
@@ -132,7 +127,7 @@ namespace R8EOX.UI.Internal
         {
             var row = MakeHRow("TierButtons", parent);
             var buttons = new Button[labels.Length];
-            var activeBg  = new Color(0f, 0.784f, 1f, 0.5f);
+            var activeBg   = UIColors.BorderHalf;
             var inactiveBg = new Color(0f, 0f, 0f, 0f);
 
             for (int i = 0; i < labels.Length; i++)
@@ -169,8 +164,8 @@ namespace R8EOX.UI.Internal
             bGO.AddComponent<LayoutElement>().minHeight = ROW_HEIGHT;
 
             Color bgCol, txtCol;
-            if      (style == STYLE_DANGER)    { bgCol = new Color(1f, 0.318f, 0.329f, 0.15f); txtCol = new Color(1f, 0.318f, 0.329f); }
-            else if (style == STYLE_SECONDARY) { bgCol = new Color(0.15f, 0.15f, 0.15f);       txtCol = new Color(0.533f, 0.533f, 0.533f); }
+            if      (style == STYLE_DANGER)    { bgCol = new Color(1f, 0.318f, 0.329f, 0.15f); txtCol = UIColors.Danger; }
+            else if (style == STYLE_SECONDARY) { bgCol = UIColors.SliderTrack;                  txtCol = UIColors.MutedText; }
             else                               { bgCol = new Color(0f, 0f, 0f, 0f);             txtCol = Color.white; }
 
             var bg = bGO.AddComponent<Image>(); bg.color = bgCol;
@@ -218,13 +213,13 @@ namespace R8EOX.UI.Internal
             s.direction = Slider.Direction.LeftToRight;
 
             var bg = NewGO("Background", c.transform).AddComponent<Image>();
-            bg.color = SLIDER_TRACK; SetH(bg.gameObject, SLIDER_HEIGHT);
+            bg.color = UIColors.SliderTrack; SetH(bg.gameObject, SLIDER_HEIGHT);
             Fill(bg.GetComponent<RectTransform>(), 0f); s.targetGraphic = bg;
 
             var fillArea = NewGO("Fill Area", c.transform);
             Fill(fillArea.GetComponent<RectTransform>(), 0f);
             var fill = NewGO("Fill", fillArea.transform).AddComponent<Image>();
-            fill.color = SLIDER_FILL; Fill(fill.GetComponent<RectTransform>(), 0f);
+            fill.color = UIColors.Primary; Fill(fill.GetComponent<RectTransform>(), 0f);
             s.fillRect = fill.GetComponent<RectTransform>();
 
             var hArea = NewGO("Handle Slide Area", c.transform);
