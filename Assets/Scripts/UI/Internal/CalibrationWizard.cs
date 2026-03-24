@@ -14,7 +14,6 @@ namespace R8EOX.UI.Internal
     /// </summary>
     internal class CalibrationWizard : MonoBehaviour
     {
-        // ── State constants ───────────────────────────────────────────────
         private const int StateRelease      = 0;
         private const int StateSampleNeutral = 1;
         private const int StateMoveExtremes = 2;
@@ -23,7 +22,6 @@ namespace R8EOX.UI.Internal
         private Action<float[], float[,]> _onComplete;
         private Action _onCancel;
 
-        // ── Sampling data ─────────────────────────────────────────────────
         private float[] _neutralAccum;
         private int     _sampleCount;
         private float[] _mins;
@@ -35,17 +33,13 @@ namespace R8EOX.UI.Internal
         private const int   NeutralFrames   = 60;
         private const float ExtremesSeconds = 10f;
 
-        // ── UI refs ───────────────────────────────────────────────────────
         private TextMeshProUGUI _instructionText;
         private TextMeshProUGUI _progressText;
         private Button          _okButton;
         private Button          _saveButton;
         private CanvasGroup     _canvasGroup;
 
-        // ── Colors ────────────────────────────────────────────────────────
         private static readonly Color BackdropColor = new Color(0f, 0f, 0f, 0.75f);
-
-        // ── Public API ────────────────────────────────────────────────────
 
         internal static CalibrationWizard Show(
             Action<float[], float[,]> onComplete, Action onCancel)
@@ -68,8 +62,6 @@ namespace R8EOX.UI.Internal
             SceneManager.sceneLoaded += wizard.OnSceneLoaded;
             return wizard;
         }
-
-        // ── Build ─────────────────────────────────────────────────────────
 
         private void Build()
         {
@@ -133,8 +125,6 @@ namespace R8EOX.UI.Internal
 
             StartCoroutine(FadeIn());
         }
-
-        // ── State Machine ─────────────────────────────────────────────────
 
         private void EnterState(int next)
         {
@@ -208,8 +198,6 @@ namespace R8EOX.UI.Internal
             if (_extremesTimer <= 0f) EnterState(StateResults);
         }
 
-        // ── Callbacks ─────────────────────────────────────────────────────
-
         private void OnOkPressed() => EnterState(_state + 1);
 
         private void OnSave()
@@ -224,8 +212,6 @@ namespace R8EOX.UI.Internal
         private void OnSceneLoaded(Scene s, LoadSceneMode m) => Cancel();
 
         private void Cancel() { SceneManager.sceneLoaded -= OnSceneLoaded; _onCancel?.Invoke(); Destroy(gameObject); }
-
-        // ── Helpers ───────────────────────────────────────────────────────
 
         private static void ReadAxes(Gamepad pad, float[] buffer)
         {
