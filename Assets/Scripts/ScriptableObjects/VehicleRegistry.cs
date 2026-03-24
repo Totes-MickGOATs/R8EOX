@@ -36,6 +36,18 @@ namespace R8EOX
             return null;
         }
 
+        public VehicleDefinition[] GetPlayable()
+        {
+            if (vehicles == null || vehicles.Length == 0)
+                return System.Array.Empty<VehicleDefinition>();
+            var results = new List<VehicleDefinition>();
+            foreach (var v in vehicles)
+            {
+                if (v != null && v.IsPlayable) results.Add(v);
+            }
+            return results.ToArray();
+        }
+
         public VehicleDefinition[] GetByCategory(VehicleCategory category)
         {
             if (vehicles == null || vehicles.Length == 0)
