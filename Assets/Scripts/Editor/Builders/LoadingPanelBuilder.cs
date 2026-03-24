@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 using LD = R8EOX.Editor.Builders.LoadingLayoutData;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -32,7 +33,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("Background");
             go.transform.SetParent(parent, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 0f), new Vector2(1f, 1f),
                 new Vector2(0f, 0f), new Vector2(0f, 0f),
                 new Vector2(0.5f, 0.5f));
@@ -44,7 +45,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("ContentArea");
             go.transform.SetParent(parent, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0.5f, 0.35f), new Vector2(0.5f, 0.55f),
                 new Vector2(0f, 0f), new Vector2(0f, 0f),
                 new Vector2(0.5f, 0.5f));
@@ -57,7 +58,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TitleGlow");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -LD.TitleHeight), new Vector2(0f, 0f),
                 new Vector2(0.5f, 1f));
@@ -80,7 +81,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TitleLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -LD.TitleHeight), new Vector2(0f, 0f),
                 new Vector2(0.5f, 1f));
@@ -127,7 +128,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("ProgressLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -130f), new Vector2(0f, -106f),
                 new Vector2(0.5f, 1f));
@@ -146,7 +147,7 @@ namespace R8EOX.Editor.Builders
             var go = new GameObject("TipLabel");
             go.transform.SetParent(content, false);
             var rt = go.AddComponent<RectTransform>();
-            SetRect(rt,
+            BRH.SetRect(rt,
                 new Vector2(0f, 1f), new Vector2(1f, 1f),
                 new Vector2(0f, -190f), new Vector2(0f, -138f),
                 new Vector2(0.5f, 1f));
@@ -171,18 +172,6 @@ namespace R8EOX.Editor.Builders
                 Debug.LogWarning($"[LoadingPanelBuilder] Font not found at {fontPath}");
         }
 
-        internal static void SetRect(
-            RectTransform rt,
-            Vector2 aMin, Vector2 aMax,
-            Vector2 oMin, Vector2 oMax,
-            Vector2 pivot)
-        {
-            rt.anchorMin  = aMin;
-            rt.anchorMax  = aMax;
-            rt.pivot      = pivot;
-            rt.offsetMin  = oMin;
-            rt.offsetMax  = oMax;
-        }
     }
 }
 #endif
