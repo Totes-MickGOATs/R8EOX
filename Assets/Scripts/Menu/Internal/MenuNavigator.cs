@@ -8,6 +8,7 @@ namespace R8EOX.Menu.Internal
         private readonly Stack<MenuScreen> screenStack = new Stack<MenuScreen>();
         private readonly float transitionDuration;
         private bool isTransitioning;
+        private float transitionEndTime;
 
         internal MenuScreen CurrentScreen =>
             screenStack.Count > 0 ? screenStack.Peek() : null;
@@ -19,9 +20,20 @@ namespace R8EOX.Menu.Internal
             this.transitionDuration = transitionDuration;
         }
 
+        // Must be called each frame by the owning MonoBehaviour so the
+        // transition lock is released once the fade duration has elapsed.
+        internal void Tick()
+        {
+            if (isTransitioning && Time.unscaledTime >= transitionEndTime)
+                isTransitioning = false;
+        }
+
         internal void PushScreen(MenuScreen screen)
         {
             if (screen == null || isTransitioning) return;
+
+            isTransitioning = true;
+            transitionEndTime = Time.unscaledTime + transitionDuration;
 
             if (screenStack.Count > 0)
             {
@@ -37,6 +49,9 @@ namespace R8EOX.Menu.Internal
         {
             if (screenStack.Count <= 1 || isTransitioning) return;
 
+            isTransitioning = true;
+            transitionEndTime = Time.unscaledTime + transitionDuration;
+
             var leaving = screenStack.Pop();
             leaving.Hide(transitionDuration);
 
@@ -50,6 +65,9 @@ namespace R8EOX.Menu.Internal
         internal void PopToRoot()
         {
             if (screenStack.Count <= 1 || isTransitioning) return;
+
+            isTransitioning = true;
+            transitionEndTime = Time.unscaledTime + transitionDuration;
 
             while (screenStack.Count > 1)
             {
@@ -67,6 +85,9 @@ namespace R8EOX.Menu.Internal
         internal void ReplaceScreen(MenuScreen screen)
         {
             if (screen == null || isTransitioning) return;
+
+            isTransitioning = true;
+            transitionEndTime = Time.unscaledTime + transitionDuration;
 
             if (screenStack.Count > 0)
             {
