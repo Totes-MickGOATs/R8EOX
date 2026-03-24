@@ -8,77 +8,61 @@ namespace R8EOX
     {
         [SerializeField] private TrackDefinition[] tracks;
 
-        public int Count => CountNonNull();
+        private TrackDefinition[] _cachedAll;
+        private bool _cacheValid;
 
-        private int CountNonNull()
+        public int Count { get { EnsureCache(); return _cachedAll.Length; } }
+
+        private void OnEnable() => _cacheValid = false;
+
+        private void OnValidate() => _cacheValid = false;
+
+        private void EnsureCache()
+        {
+            if (_cacheValid) return;
+            RebuildCache();
+        }
+
+        private void RebuildCache()
         {
             if (tracks == null)
             {
-                return 0;
+                _cachedAll = System.Array.Empty<TrackDefinition>();
+                _cacheValid = true;
+                return;
             }
 
-            int count = 0;
-            foreach (TrackDefinition track in tracks)
+            var all = new List<TrackDefinition>(tracks.Length);
+            for (int i = 0; i < tracks.Length; i++)
             {
-                if (track != null)
-                {
-                    count++;
-                }
+                if (tracks[i] != null) all.Add(tracks[i]);
             }
 
-            return count;
+            _cachedAll = all.ToArray();
+            _cacheValid = true;
         }
 
         public TrackDefinition[] GetAll()
         {
-            if (tracks == null)
-            {
-                return System.Array.Empty<TrackDefinition>();
-            }
-
-            var result = new List<TrackDefinition>(tracks.Length);
-            foreach (TrackDefinition track in tracks)
-            {
-                if (track != null)
-                {
-                    result.Add(track);
-                }
-            }
-
-            return result.ToArray();
+            EnsureCache();
+            return _cachedAll;
         }
 
         public TrackDefinition GetDefault()
         {
-            if (tracks == null)
-            {
-                return null;
-            }
-
-            foreach (TrackDefinition track in tracks)
-            {
-                if (track != null)
-                {
-                    return track;
-                }
-            }
-
-            return null;
+            EnsureCache();
+            return _cachedAll.Length > 0 ? _cachedAll[0] : null;
         }
 
         public TrackDefinition FindBySceneName(string sceneName)
         {
-            if (tracks == null || string.IsNullOrEmpty(sceneName))
-            {
-                return null;
-            }
+            if (string.IsNullOrEmpty(sceneName)) return null;
 
-            foreach (TrackDefinition track in tracks)
+            EnsureCache();
+            for (int i = 0; i < _cachedAll.Length; i++)
             {
-                if (track != null && track.SceneName == sceneName)
-                {
-                    return track;
-                }
+                if (_cachedAll[i].SceneName == sceneName)
+                    return _cachedAll[i];
             }
 
             return null;
