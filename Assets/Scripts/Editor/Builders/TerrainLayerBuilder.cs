@@ -171,8 +171,8 @@ namespace R8EOX.Editor.Builders
 
             string maskPath = $"{generatedFolder}/" +
                 $"MaskMap_{layerIndex}_{layerName}.png";
-            string absPath = Application.dataPath.Replace("Assets", "")
-                + maskPath;
+            string absPath = Path.GetDirectoryName(Application.dataPath)
+                + "/" + maskPath;
             File.WriteAllBytes(absPath, mohs.EncodeToPNG());
             Object.DestroyImmediate(mohs);
 
