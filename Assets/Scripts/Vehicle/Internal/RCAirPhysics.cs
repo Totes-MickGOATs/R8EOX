@@ -57,8 +57,15 @@ namespace R8EOX.Vehicle.Internal
         void Start()
         {
             _rb = GetComponentInParent<Rigidbody>();
+            if (_rb == null)
+            {
+                Debug.LogWarning("[RCAirPhysics] No Rigidbody found in parent hierarchy. Disabling component.", this);
+                enabled = false;
+                return;
+            }
+
             _wheels = GetComponentsInChildren<RaycastWheel>();
-            if (_wheels.Length == 0)
+            if (_wheels.Length == 0 && transform.parent != null)
                 _wheels = transform.parent.GetComponentsInChildren<RaycastWheel>();
 
             _prevWheelSpinRates = new float[_wheels.Length];
