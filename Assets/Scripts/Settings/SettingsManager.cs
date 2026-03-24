@@ -220,7 +220,7 @@ namespace R8EOX.Settings
 
         private void ApplyVideo()
         {
-            VideoApplier.Apply(currentData.video, null);
+            VideoApplier.Apply(currentData.video);
         }
 
         private void ApplyAudio()
