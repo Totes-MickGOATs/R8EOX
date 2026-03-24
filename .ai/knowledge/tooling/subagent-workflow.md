@@ -59,6 +59,25 @@ Unity generates a `.meta` file for **every** new file and folder. If you create 
 - [ ] Internal classes: `namespace R8EOX.{System}.Internal`, `internal class`
 - [ ] No banned patterns: `SendMessage`, `FindObjectOfType`, `.Instance`, legacy `Input.GetKey/GetAxis`
 - [ ] After creating/modifying C# files, check `read_console` for compilation errors
+- [ ] **SAVE after every MCP modification** — see below
+
+## ⛔ RULE #2: SAVE AFTER EVERY MCP MODIFICATION
+
+Every MCP call that modifies a scene, GameObject, component, or asset MUST be immediately followed by a save. Unsaved changes are silently lost when another agent loads a scene or enters play mode.
+
+**Preferred pattern** — use `batch_execute` to make modification + save atomic:
+```json
+{
+  "commands": [
+    { "tool": "manage_gameobject", "params": { "action": "create", "name": "MyObject" } },
+    { "tool": "execute_menu_item", "params": { "item_path": "R8EOX/Save All" } }
+  ]
+}
+```
+
+- Always include `execute_menu_item("R8EOX/Save All")` as the **last command** in any `batch_execute` that modifies editor state
+- Before `manage_scene(action="load")` or `manage_editor(action="play")`, save first
+- This prevents other agents from interleaving and wiping your unsaved changes
 
 ## After All Files Are Written and Committed
 
