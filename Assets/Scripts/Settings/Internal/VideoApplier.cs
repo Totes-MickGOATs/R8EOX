@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace R8EOX.Settings.Internal
@@ -71,7 +72,7 @@ namespace R8EOX.Settings.Internal
             // FRAGILE: rendererDataList is an internal URP API (URP 17.4.0 / Unity 6000.4.0f1).
             // It is not part of the public URP surface and may be removed or renamed in future
             // versions. If this throws, SSAO toggling silently degrades rather than crashing.
-            ScriptableRendererData[] dataList;
+            ReadOnlySpan<ScriptableRendererData> dataList;
             try
             {
                 dataList = urpAsset.rendererDataList;
