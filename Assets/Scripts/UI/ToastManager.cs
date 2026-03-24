@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using R8EOX.UI.Internal;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,11 +13,6 @@ namespace R8EOX.UI
     /// </summary>
     public class ToastManager : MonoBehaviour
     {
-        // ── Colors ────────────────────────────────────────────────────────────
-        private static readonly Color ColorSuccess = new Color(0f, 0.784f, 1f);
-        private static readonly Color ColorWarning  = new Color(0.91f, 0.722f, 0.286f);
-        private static readonly Color ColorError    = new Color(1f, 0.318f, 0.329f);
-        private static readonly Color ColorBg       = new Color(0.078f, 0.082f, 0.102f);
 
         // ── Timing ───────────────────────────────────────────────────────────
         private const float FadeInDuration  = 0.2f;
@@ -32,15 +28,15 @@ namespace R8EOX.UI
 
         /// <summary>Shows a success (cyan) toast.</summary>
         public void ShowSuccess(string message, float duration = 2f)
-            => Show(message, ColorSuccess, duration);
+            => Show(message, UIColors.Primary, duration);
 
         /// <summary>Shows a warning (gold) toast.</summary>
         public void ShowWarning(string message, float duration = 2f)
-            => Show(message, ColorWarning, duration);
+            => Show(message, UIColors.Warning, duration);
 
         /// <summary>Shows an error (red) toast.</summary>
         public void ShowError(string message, float duration = 2f)
-            => Show(message, ColorError, duration);
+            => Show(message, UIColors.Danger, duration);
 
         /// <summary>Shows a toast with a custom border color.</summary>
         public void Show(string message, Color borderColor, float duration = 2f)
@@ -134,7 +130,7 @@ namespace R8EOX.UI
             innerRt.offsetMax = new Vector2(-1f, -1f);
 
             var bg = innerGo.AddComponent<Image>();
-            bg.color = ColorBg;
+            bg.color = UIColors.ButtonFill;
 
             var innerLayout = innerGo.AddComponent<HorizontalLayoutGroup>();
             innerLayout.padding               = new RectOffset(16, 16, 8, 8);
