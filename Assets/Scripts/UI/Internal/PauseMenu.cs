@@ -12,7 +12,6 @@ namespace R8EOX.UI.Internal
         private System.Action _onRestartPressed;
         private bool _isBuilt;
 
-        // Colors
         private static readonly Color DividerColor = new Color(0f, 0.784f, 1f, 0.20f);
 
         internal void Initialize(
@@ -33,8 +32,6 @@ namespace R8EOX.UI.Internal
         {
             gameObject.SetActive(false);
         }
-
-        // ── UI construction ───────────────────────────────────────────────────
 
         private void BuildUI()
         {
@@ -152,8 +149,6 @@ namespace R8EOX.UI.Internal
             rt.offsetMin  = Vector2.zero;
             rt.offsetMax  = Vector2.zero;
         }
-
-        // ── Button handlers ───────────────────────────────────────────────────
 
         private void OnResumePressed() => uiManager?.HidePauseMenu();
 
