@@ -65,6 +65,7 @@ namespace R8EOX.Menu.Internal
             for (int i = 0; i < filteredTracks.Count; i++)
             {
                 GameObject go    = Instantiate(trackEntryPrefab, listContent);
+                go.SetActive(true);
                 TrackListEntry entry = go.GetComponent<TrackListEntry>();
                 entry.Configure(i, filteredTracks[i], OnEntryClicked);
                 entryInstances.Add(entry);
