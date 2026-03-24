@@ -80,8 +80,6 @@ namespace R8EOX.Editor.Builders
             Debug.Log($"[BuggySpecExporter] Updated {k_HtmlPath} with spec data");
         }
 
-        // ---- Shared Constants (read from actual component defaults) ----
-
         static string BuildSharedFromComponents()
         {
             // Create temp components to read their serialized defaults
@@ -125,8 +123,6 @@ namespace R8EOX.Editor.Builders
                 "  }";
         }
 
-        // ---- Motor Presets (read from registry) ----
-
         static string BuildMotorPresets()
         {
             string[] names = { "21.5T", "17.5T", "13.5T", "9.5T", "5.5T", "1.5T" };
@@ -149,8 +145,6 @@ namespace R8EOX.Editor.Builders
             return result;
         }
 
-        // ---- Colliders (inspected from built prefab) ----
-
         static string BuildCollidersFromPrefab(GameObject root)
         {
             string result = "  \"colliders\": [\n";
@@ -168,8 +162,6 @@ namespace R8EOX.Editor.Builders
             result += "  ]";
             return result;
         }
-
-        // ---- Skid Plates (child objects with BoxCollider + rotation) ----
 
         static string BuildSkidPlatesFromPrefab(GameObject root)
         {
@@ -193,8 +185,6 @@ namespace R8EOX.Editor.Builders
             result += "\n  ]";
             return result;
         }
-
-        // ---- Formatting helpers (delegate to serializer) ----
 
         static string F(float v) => BuggySpecSerializer.F(v);
         static string F(string fmt, float v) => BuggySpecSerializer.F(fmt, v);
