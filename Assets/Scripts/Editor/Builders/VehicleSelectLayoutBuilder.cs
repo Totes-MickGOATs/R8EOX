@@ -33,6 +33,7 @@ namespace R8EOX.Editor.Builders
 
             ApplyCanvas(root);
             ApplyCanvasScaler(root);
+            ApplyDimBackdrop(root);
             ApplyBackground(root);
             ApplyTitle(root);
             ApplySearchField(root);
@@ -64,11 +65,32 @@ namespace R8EOX.Editor.Builders
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         }
 
+        private static void ApplyDimBackdrop(GameObject root)
+        {
+            var t = root.transform.Find("DimBackdrop");
+            if (t == null)
+            {
+                var go = new GameObject("DimBackdrop");
+                go.transform.SetParent(root.transform, false);
+                go.transform.SetAsFirstSibling();
+                t = go.transform;
+                go.AddComponent<RectTransform>();
+                go.AddComponent<Image>();
+            }
+            LD.SetRectStretch(t.GetComponent<RectTransform>());
+            t.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
+        }
+
         private static void ApplyBackground(GameObject root)
         {
             var t = root.transform.Find("Background");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] Background not found."); return; }
-            LD.SetRectStretch(t.GetComponent<RectTransform>());
+            var rt = t.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = new Vector2(40f, 40f);
+            rt.offsetMax = new Vector2(-40f, -40f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.Background;
         }
@@ -78,7 +100,7 @@ namespace R8EOX.Editor.Builders
             var t = root.transform.Find("Title");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] Title not found."); return; }
             SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 1), new Vector2(1, 1),
-                new Vector2(20, -80), new Vector2(-20, 0), new Vector2(0.5f, 1));
+                new Vector2(60, -120), new Vector2(-60, -40), new Vector2(0.5f, 1));
             var tmp = t.GetComponent<TextMeshProUGUI>();
             if (tmp == null) return;
             tmp.fontSize = 42;
@@ -114,7 +136,7 @@ namespace R8EOX.Editor.Builders
             var go = t.gameObject;
             var rt = LD.EnsureRectTransform(go);
             SetRect(rt, new Vector2(0, 0), new Vector2(0.32f, 1),
-                new Vector2(15, 85), new Vector2(-10, -85), new Vector2(0, 0));
+                new Vector2(55, 125), new Vector2(-10, -125), new Vector2(0, 0));
             var img = go.GetComponent<Image>();
             if (img == null) img = go.AddComponent<Image>();
             img.color = LD.PanelDark;
@@ -128,7 +150,7 @@ namespace R8EOX.Editor.Builders
             var go = t.gameObject;
             var rt = LD.EnsureRectTransform(go);
             SetRect(rt, new Vector2(0.34f, 0), new Vector2(1, 1),
-                new Vector2(10, 85), new Vector2(-15, -85), new Vector2(0, 0));
+                new Vector2(10, 125), new Vector2(-55, -125), new Vector2(0, 0));
             var img = go.GetComponent<Image>();
             if (img == null) img = go.AddComponent<Image>();
             img.color = LD.PanelDark;
@@ -140,7 +162,7 @@ namespace R8EOX.Editor.Builders
             var t = root.transform.Find("ConfirmButton");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] ConfirmButton not found."); return; }
             SetRect(t.GetComponent<RectTransform>(), new Vector2(1, 0), new Vector2(1, 0),
-                new Vector2(-220, 15), new Vector2(-15, 65), new Vector2(1, 0));
+                new Vector2(-260, 55), new Vector2(-55, 105), new Vector2(1, 0));
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.ConfirmGreen;
             var btn = t.GetComponent<Button>();
@@ -159,7 +181,7 @@ namespace R8EOX.Editor.Builders
             var t = root.transform.Find("BackButton");
             if (t == null) { Debug.LogWarning("[VehicleSelectLayoutBuilder] BackButton not found."); return; }
             SetRect(t.GetComponent<RectTransform>(), new Vector2(0, 0), new Vector2(0, 0),
-                new Vector2(15, 15), new Vector2(220, 65), new Vector2(0, 0));
+                new Vector2(55, 55), new Vector2(260, 105), new Vector2(0, 0));
             var img = t.GetComponent<Image>();
             if (img != null) img.color = LD.BackRed;
             var btn = t.GetComponent<Button>();
