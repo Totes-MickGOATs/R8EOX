@@ -13,15 +13,11 @@ namespace R8EOX.UI.Internal
         private const float STEP_CURVE          = 0.05f;
         private const float BINDINGS_AREA_HEIGHT = 180f;
 
-        // ── Public Entry Point ────────────────────────────────────────────
-
         internal void Initialize(Settings.SettingsManager settings)
         {
             settingsManager = settings;
             BuildUI();
         }
-
-        // ── Build ─────────────────────────────────────────────────────────
 
         private void BuildUI()
         {
@@ -32,8 +28,6 @@ namespace R8EOX.UI.Internal
             BuildBindingsSection();
             BuildResetButton();
         }
-
-        // ── Controller Profile ────────────────────────────────────────────
 
         private void BuildProfileSection()
         {
@@ -71,8 +65,6 @@ namespace R8EOX.UI.Internal
                 onConfirm: () => settingsManager.DeleteProfile(name));
         }
 
-        // ── Input Settings ────────────────────────────────────────────────
-
         private void BuildInputSection()
         {
             OptionsUIFactory.CreateSectionHeader(transform, "Input Settings");
@@ -97,8 +89,6 @@ namespace R8EOX.UI.Internal
                 controls.CurveExponent,
                 v => settingsManager.SetControlsSettings(c => c.CurveExponent = v));
         }
-
-        // ── Key / Button Bindings ─────────────────────────────────────────
 
         private void BuildBindingsSection()
         {
@@ -157,8 +147,6 @@ namespace R8EOX.UI.Internal
             lblLE.preferredHeight = 44f;
         }
 
-        // ── Reset Defaults ────────────────────────────────────────────────
-
         private void BuildResetButton()
         {
             OptionsUIFactory.CreateActionButton(
@@ -182,8 +170,6 @@ namespace R8EOX.UI.Internal
                 c.CurveExponent    = defaults.CurveExponent;
             });
         }
-
-        // ── Helpers ───────────────────────────────────────────────────────
 
         private GameObject CreateHRow(string name)
         {
