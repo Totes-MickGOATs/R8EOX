@@ -3,6 +3,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -140,12 +141,12 @@ namespace R8EOX.Editor.Builders
 
             var imgGo = new GameObject("PreviewImage");
             imgGo.transform.SetParent(p, false);
-            SetAnchors(imgGo.AddComponent<RectTransform>(), 0.05f, 0.6f, 0.95f, 0.98f);
+            BRH.SetAnchors(imgGo.AddComponent<RectTransform>(), 0.05f, 0.6f, 0.95f, 0.98f);
             var previewImg = imgGo.AddComponent<Image>();
 
             var nameGo = new GameObject("TrackNameLabel");
             nameGo.transform.SetParent(p, false);
-            SetAnchors(nameGo.AddComponent<RectTransform>(), 0.05f, 0.48f, 0.95f, 0.58f);
+            BRH.SetAnchors(nameGo.AddComponent<RectTransform>(), 0.05f, 0.48f, 0.95f, 0.58f);
             var nameTmp = nameGo.AddComponent<TextMeshProUGUI>();
             nameTmp.fontSize  = 28f;
             nameTmp.alignment = TextAlignmentOptions.Left;
@@ -153,7 +154,7 @@ namespace R8EOX.Editor.Builders
 
             var typeGo = new GameObject("TrackTypeLabel");
             typeGo.transform.SetParent(p, false);
-            SetAnchors(typeGo.AddComponent<RectTransform>(), 0.05f, 0.40f, 0.95f, 0.48f);
+            BRH.SetAnchors(typeGo.AddComponent<RectTransform>(), 0.05f, 0.40f, 0.95f, 0.48f);
             var typeTmp = typeGo.AddComponent<TextMeshProUGUI>();
             typeTmp.fontSize  = 16f;
             typeTmp.alignment = TextAlignmentOptions.Left;
@@ -161,7 +162,7 @@ namespace R8EOX.Editor.Builders
 
             var descGo = new GameObject("DescriptionLabel");
             descGo.transform.SetParent(p, false);
-            SetAnchors(descGo.AddComponent<RectTransform>(), 0.05f, 0.15f, 0.95f, 0.40f);
+            BRH.SetAnchors(descGo.AddComponent<RectTransform>(), 0.05f, 0.15f, 0.95f, 0.40f);
             var descTmp = descGo.AddComponent<TextMeshProUGUI>();
             descTmp.fontSize         = 16f;
             descTmp.alignment        = TextAlignmentOptions.TopLeft;
@@ -170,7 +171,7 @@ namespace R8EOX.Editor.Builders
 
             var statusGo = new GameObject("StatusLabel");
             statusGo.transform.SetParent(p, false);
-            SetAnchors(statusGo.AddComponent<RectTransform>(), 0.10f, 0.05f, 0.95f, 0.13f);
+            BRH.SetAnchors(statusGo.AddComponent<RectTransform>(), 0.10f, 0.05f, 0.95f, 0.13f);
             var statusTmp = statusGo.AddComponent<TextMeshProUGUI>();
             statusTmp.fontSize  = 14f;
             statusTmp.alignment = TextAlignmentOptions.Left;
@@ -178,13 +179,13 @@ namespace R8EOX.Editor.Builders
 
             var indGo = new GameObject("StatusIndicator");
             indGo.transform.SetParent(p, false);
-            SetAnchors(indGo.AddComponent<RectTransform>(), 0.05f, 0.06f, 0.09f, 0.12f);
+            BRH.SetAnchors(indGo.AddComponent<RectTransform>(), 0.05f, 0.06f, 0.09f, 0.12f);
             var indImg = indGo.AddComponent<Image>();
             indImg.color = Color.green;
 
             var emptyGo = new GameObject("EmptyState");
             emptyGo.transform.SetParent(p, false);
-            StretchFill(emptyGo.AddComponent<RectTransform>());
+            BRH.StretchFill(emptyGo.AddComponent<RectTransform>());
             var emptyTmp = emptyGo.AddComponent<TextMeshProUGUI>();
             emptyTmp.text = "Select a track";
             emptyTmp.alignment = TextAlignmentOptions.Center;
@@ -217,20 +218,12 @@ namespace R8EOX.Editor.Builders
             go.AddComponent<Button>();
             var textGo = new GameObject("Text");
             textGo.transform.SetParent(go.transform, false);
-            StretchFill(textGo.AddComponent<RectTransform>());
+            BRH.StretchFill(textGo.AddComponent<RectTransform>());
             var tmp = textGo.AddComponent<TextMeshProUGUI>();
             tmp.text = label;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 24f;
             return go;
-        }
-
-        private static void StretchFill(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
         }
     }
 }
