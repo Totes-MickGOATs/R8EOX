@@ -88,7 +88,7 @@ namespace R8EOX.Editor.Builders
         {
             string absolutePath = heightmapRawPath.StartsWith("Assets")
                 ? Path.Combine(
-                    Application.dataPath.Replace("Assets", ""),
+                    Path.GetDirectoryName(Application.dataPath),
                     heightmapRawPath)
                 : heightmapRawPath;
 
