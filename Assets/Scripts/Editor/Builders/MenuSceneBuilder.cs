@@ -51,11 +51,11 @@ namespace R8EOX.Editor.Builders
             BuildTrackSelectPanel(trackGo.transform, trackSelect);
             BuildLoadingPanel(loadingGo.transform, loading);
 
-            Wire(manager, "splashScreen",      splash);
-            Wire(manager, "mainMenuScreen",    mainMenu);
-            Wire(manager, "modeSelectScreen",  modeSelect);
-            Wire(manager, "trackSelectScreen", trackSelect);
-            Wire(manager, "loadingScreen",     loading);
+            SerializedPropertyHelper.WireRef(manager, "splashScreen",      splash);
+            SerializedPropertyHelper.WireRef(manager, "mainMenuScreen",    mainMenu);
+            SerializedPropertyHelper.WireRef(manager, "modeSelectScreen",  modeSelect);
+            SerializedPropertyHelper.WireRef(manager, "trackSelectScreen", trackSelect);
+            SerializedPropertyHelper.WireRef(manager, "loadingScreen",     loading);
 
             foreach (var p in new[] { splashGo, mainGo, modeGo, trackGo, loadingGo })
                 p.SetActive(false);
@@ -100,8 +100,8 @@ namespace R8EOX.Editor.Builders
             var promptCg = promptGo.AddComponent<CanvasGroup>();
 
             var so = new SerializedObject(s);
-            so.FindProperty("titleTransform").objectReferenceValue = titleGo.GetComponent<RectTransform>();
-            so.FindProperty("promptGroup").objectReferenceValue    = promptCg;
+            SerializedPropertyHelper.SetRef(so, "titleTransform", titleGo.GetComponent<RectTransform>());
+            SerializedPropertyHelper.SetRef(so, "promptGroup",    promptCg);
             so.ApplyModifiedProperties();
         }
 
@@ -114,9 +114,9 @@ namespace R8EOX.Editor.Builders
             optionsGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -30f);
             quitGo.GetComponent<RectTransform>().anchoredPosition    = new Vector2(0f, -100f);
             var so = new SerializedObject(s);
-            so.FindProperty("playButton").objectReferenceValue    = playGo.GetComponent<Button>();
-            so.FindProperty("optionsButton").objectReferenceValue = optionsGo.GetComponent<Button>();
-            so.FindProperty("quitButton").objectReferenceValue    = quitGo.GetComponent<Button>();
+            SerializedPropertyHelper.SetRef(so, "playButton",    playGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(so, "optionsButton", optionsGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(so, "quitButton",    quitGo.GetComponent<Button>());
             so.ApplyModifiedProperties();
         }
 
@@ -131,10 +131,10 @@ namespace R8EOX.Editor.Builders
             multiGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -65f);
             backGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f, -135f);
             var so = new SerializedObject(s);
-            so.FindProperty("testingButton").objectReferenceValue     = testGo.GetComponent<Button>();
-            so.FindProperty("raceButton").objectReferenceValue        = raceGo.GetComponent<Button>();
-            so.FindProperty("multiplayerButton").objectReferenceValue = multiGo.GetComponent<Button>();
-            so.FindProperty("backButton").objectReferenceValue        = backGo.GetComponent<Button>();
+            SerializedPropertyHelper.SetRef(so, "testingButton",     testGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(so, "raceButton",        raceGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(so, "multiplayerButton", multiGo.GetComponent<Button>());
+            SerializedPropertyHelper.SetRef(so, "backButton",        backGo.GetComponent<Button>());
             so.ApplyModifiedProperties();
         }
 
@@ -148,9 +148,9 @@ namespace R8EOX.Editor.Builders
             LoadingPanelBuilder.Build(p, out var fillImg, out var progressTmp, out var tipTmp);
 
             var so = new SerializedObject(s);
-            so.FindProperty("progressFill").objectReferenceValue  = fillImg;
-            so.FindProperty("progressLabel").objectReferenceValue = progressTmp;
-            so.FindProperty("tipLabel").objectReferenceValue      = tipTmp;
+            SerializedPropertyHelper.SetRef(so, "progressFill",  fillImg);
+            SerializedPropertyHelper.SetRef(so, "progressLabel", progressTmp);
+            SerializedPropertyHelper.SetRef(so, "tipLabel",      tipTmp);
             so.ApplyModifiedProperties();
         }
 
@@ -198,19 +198,6 @@ namespace R8EOX.Editor.Builders
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 24f;
             return go;
-        }
-
-        private static void Wire(Object target, string field, Object value)
-        {
-            var so = new SerializedObject(target);
-            var prop = so.FindProperty(field);
-            if (prop == null)
-            {
-                Debug.LogError($"[MenuSceneBuilder] Property '{field}' not found on {target.GetType().Name}");
-                return;
-            }
-            prop.objectReferenceValue = value;
-            so.ApplyModifiedProperties();
         }
 
         private static void UpdateBuildSettings(string menuPath)
