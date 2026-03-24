@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEditor;
 using TMPro;
 using LD = R8EOX.Editor.Builders.VehicleSelectLayoutData;
+using BRH = R8EOX.Editor.BuilderRectHelper;
 
 namespace R8EOX.Editor.Builders
 {
@@ -19,9 +20,7 @@ namespace R8EOX.Editor.Builders
         }
 
         internal static void SetRect(RectTransform rt, Vector2 aMin, Vector2 aMax, Vector2 oMin, Vector2 oMax, Vector2 pivot)
-        {
-            LD.SetRectAnchored(rt, aMin, aMax, oMin, oMax, pivot);
-        }
+            => BRH.SetRect(rt, aMin, aMax, oMin, oMax, pivot);
 
         // -------------------------------------------------------------------------
         // Overlay prefab
@@ -75,7 +74,7 @@ namespace R8EOX.Editor.Builders
                 go.transform.SetAsFirstSibling();
                 t = go.transform;
             }
-            LD.SetRectStretch(t.GetComponent<RectTransform>());
+            BRH.StretchFill(t.GetComponent<RectTransform>());
             t.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
         }
 
