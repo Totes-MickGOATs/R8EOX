@@ -22,14 +22,8 @@ namespace R8EOX.UI.Internal
         private CanvasGroup _canvasGroup;
 
         // Colors
-        private static readonly Color BackdropColor     = new Color(0f, 0f, 0f, 0.7f);
-        private static readonly Color PanelBgColor      = new Color(20 / 255f, 20 / 255f, 26 / 255f, 0.95f);
-        private static readonly Color PanelBorderColor  = new Color(0f, 0.784f, 1f, 0.3f);
-        private static readonly Color TitleColor        = new Color(0f, 0.784f, 1f, 1f);
-        private static readonly Color CancelFillColor   = new Color(0.078f, 0.082f, 0.102f, 1f);
-        private static readonly Color CancelBorderColor = new Color(0f, 0.784f, 1f, 0.15f);
-        private static readonly Color DangerColor       = new Color(1f, 0.318f, 0.329f, 1f);
-        private static readonly Color PrimaryColor      = new Color(0f, 0.784f, 1f, 1f);
+        private static readonly Color BackdropColor = new Color(0f, 0f, 0f, 0.7f);
+        private static readonly Color PanelBgColor  = new Color(20 / 255f, 20 / 255f, 26 / 255f, 0.95f);
 
         internal static ConfirmDialog Show(
             string title,
@@ -109,7 +103,7 @@ namespace R8EOX.UI.Internal
             img.color = PanelBgColor;
 
             var outline = panelGo.AddComponent<Outline>();
-            outline.effectColor = PanelBorderColor;
+            outline.effectColor = UIColors.BorderStrong;
             outline.effectDistance = new Vector2(1f, -1f);
 
             var panelRt = panelGo.GetComponent<RectTransform>();
@@ -132,7 +126,7 @@ namespace R8EOX.UI.Internal
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = title;
             tmp.fontSize = 22f;
-            tmp.color = TitleColor;
+            tmp.color = UIColors.Primary;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontStyle = FontStyles.Bold;
 
@@ -171,11 +165,11 @@ namespace R8EOX.UI.Internal
         private void BuildButtons(Transform parent, string confirmText)
         {
             var cancelPos = new Vector2(-108f, -76f);
-            BuildButton(parent, "CancelBtn", "CANCEL", CancelFillColor, CancelBorderColor, Cancel, cancelPos);
+            BuildButton(parent, "CancelBtn", "CANCEL", UIColors.ButtonFill, UIColors.BorderSubtle, Cancel, cancelPos);
 
-            var confirmBorderColor = isDanger ? DangerColor : PrimaryColor;
+            var confirmBorderColor = isDanger ? UIColors.Danger : UIColors.Primary;
             var confirmPos = new Vector2(108f, -76f);
-            BuildButton(parent, "ConfirmBtn", confirmText, CancelFillColor, confirmBorderColor, Confirm, confirmPos);
+            BuildButton(parent, "ConfirmBtn", confirmText, UIColors.ButtonFill, confirmBorderColor, Confirm, confirmPos);
         }
 
         private static void BuildButton(
