@@ -80,14 +80,12 @@ namespace R8EOX.Editor.Builders
 
             scrollRect.content = contentRt;
 
+            var entryTemplate = TrackListEntryBuilder.Build(listAreaGo.transform);
+
             var soList = new SerializedObject(tlp);
             SerializedPropertyHelper.SetRef(soList, "listContent", listContentGo.GetComponent<Transform>());
+            SerializedPropertyHelper.SetRef(soList, "trackEntryPrefab", entryTemplate);
             soList.ApplyModifiedProperties();
-
-            var entryTemplate = TrackListEntryBuilder.Build(listAreaGo.transform);
-            var soList2 = new SerializedObject(tlp);
-            SerializedPropertyHelper.SetRef(soList2, "trackEntryPrefab", entryTemplate);
-            soList2.ApplyModifiedProperties();
         }
 
         private static void BuildPreviewArea(Transform p, R8EOX.Menu.Internal.TrackSelectScreen s)
