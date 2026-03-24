@@ -170,6 +170,7 @@ namespace R8EOX.Session
 
         private void CleanupOverlay()
         {
+            Debug.Log($"[SessionManager] CleanupOverlay called, uiManager={uiManager != null}");
             if (uiManager != null) uiManager.CleanupVehicleSelectOverlay();
         }
 
