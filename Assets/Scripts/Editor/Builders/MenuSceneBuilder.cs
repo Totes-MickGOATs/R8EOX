@@ -139,72 +139,7 @@ namespace R8EOX.Editor.Builders
 
         private static void BuildTrackSelectPanel(Transform p, R8EOX.Menu.Internal.TrackSelectScreen s)
         {
-            var listAreaGo = CreatePanel("TrackListArea", p);
-            var tlp = listAreaGo.AddComponent<R8EOX.Menu.Internal.TrackListPanel>();
-            var listContentGo = new GameObject("ListContent");
-            listContentGo.transform.SetParent(listAreaGo.transform, false);
-            StretchFill(listContentGo.AddComponent<RectTransform>());
-
-            var previewAreaGo = CreatePanel("TrackPreviewArea", p);
-            var tpp = previewAreaGo.AddComponent<R8EOX.Menu.Internal.TrackPreviewPanel>();
-            BuildTrackPreviewContent(previewAreaGo.transform, tpp);
-
-            var startGo = CreateButton("StartButton",      "START", p);
-            var backGo  = CreateButton("BackButton_Track", "BACK",  p);
-            startGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -200f);
-            backGo.GetComponent<RectTransform>().anchoredPosition  = new Vector2(0f, -270f);
-
-            var soList = new SerializedObject(tlp);
-            soList.FindProperty("listContent").objectReferenceValue = listContentGo.GetComponent<Transform>();
-            soList.ApplyModifiedProperties();
-
-            var entryTemplate = TrackListEntryBuilder.Build(listAreaGo.transform);
-            var soList2 = new SerializedObject(tlp);
-            soList2.FindProperty("trackEntryPrefab").objectReferenceValue = entryTemplate;
-            soList2.ApplyModifiedProperties();
-
-            var so = new SerializedObject(s);
-            so.FindProperty("trackListPanel").objectReferenceValue    = tlp;
-            so.FindProperty("trackPreviewPanel").objectReferenceValue = tpp;
-            so.FindProperty("startButton").objectReferenceValue       = startGo.GetComponent<Button>();
-            so.FindProperty("backButton").objectReferenceValue        = backGo.GetComponent<Button>();
-            so.ApplyModifiedProperties();
-        }
-
-        private static void BuildTrackPreviewContent(Transform p, R8EOX.Menu.Internal.TrackPreviewPanel pp)
-        {
-            var imgGo = new GameObject("PreviewImage");
-            imgGo.transform.SetParent(p, false);
-            StretchFill(imgGo.AddComponent<RectTransform>());
-            var previewImg = imgGo.AddComponent<Image>();
-
-            var nameGo   = CreateLabel("TrackNameLabel",   string.Empty, p);
-            var typeGo   = CreateLabel("TrackTypeLabel",   string.Empty, p);
-            var descGo   = CreateLabel("DescriptionLabel", string.Empty, p);
-            var statusGo = CreateLabel("StatusLabel",      string.Empty, p);
-
-            var indGo = new GameObject("StatusIndicator");
-            indGo.transform.SetParent(p, false);
-            indGo.AddComponent<RectTransform>().sizeDelta = new Vector2(16f, 16f);
-            var indImg = indGo.AddComponent<Image>();
-            indImg.color = Color.green;
-
-            var emptyGo = new GameObject("EmptyState");
-            emptyGo.transform.SetParent(p, false);
-            StretchFill(emptyGo.AddComponent<RectTransform>());
-            var emptyTmp = emptyGo.AddComponent<TextMeshProUGUI>();
-            emptyTmp.text = "Select a track";
-            emptyTmp.alignment = TextAlignmentOptions.Center;
-
-            var so = new SerializedObject(pp);
-            so.FindProperty("previewImage").objectReferenceValue      = previewImg;
-            so.FindProperty("trackNameLabel").objectReferenceValue    = nameGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("trackTypeLabel").objectReferenceValue    = typeGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("descriptionLabel").objectReferenceValue  = descGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("statusLabel").objectReferenceValue       = statusGo.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("statusIndicator").objectReferenceValue   = indImg;
-            so.FindProperty("emptyState").objectReferenceValue        = emptyGo;
-            so.ApplyModifiedProperties();
+            TrackSelectPanelBuilder.Build(p, s);
         }
 
         private static void BuildLoadingPanel(Transform p, R8EOX.Menu.Internal.TrackLoadingScreen s)
