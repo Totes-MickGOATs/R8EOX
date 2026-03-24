@@ -10,7 +10,8 @@ namespace R8EOX.Diagnostics
         private int activeTab;
         private Vector2 scrollPosition;
         private readonly string[] tabNames = { "Flows", "Events", "Vehicle", "Verify" };
-        private readonly bool[] channelFilters = new bool[System.Enum.GetValues(typeof(DiagChannel)).Length];
+        private static readonly System.Array s_channels = System.Enum.GetValues(typeof(DiagChannel));
+        private readonly bool[] channelFilters = new bool[s_channels.Length];
 
         private readonly Color passColor = new Color(0.4f, 1f, 0.4f);
         private readonly Color failColor = new Color(1f, 0.4f, 0.4f);
@@ -142,7 +143,7 @@ namespace R8EOX.Diagnostics
         private void DrawEventsTab()
         {
             GUILayout.BeginHorizontal();
-            var channels = System.Enum.GetValues(typeof(DiagChannel));
+            var channels = s_channels;
             for (int i = 0; i < channels.Length; i++)
             {
                 channelFilters[i] = GUILayout.Toggle(
